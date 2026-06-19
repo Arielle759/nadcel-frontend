@@ -1,23 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { api } from "@/lib/api";
-
-interface SalonDetail {
-  id: number;
-  nom: string;
-  description: string;
-  adresse: string;
-  services: string[];
-}
-
-async function getSalon(id: string): Promise<SalonDetail | null> {
-  try {
-    const { data } = await api.get<SalonDetail>(`/salons/${id}`);
-    return data;
-  } catch {
-    return null;
-  }
-}
+import { getSalon } from "@/lib/salons";
 
 export default async function SalonDetailPage({
   params,
@@ -65,12 +48,12 @@ export default async function SalonDetailPage({
         </ul>
       </div>
 
-      <button
-        type="button"
-        className="mt-2 w-fit rounded-full bg-foreground px-6 py-2 font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+      <Link
+        href={`/salons/${salon.id}/appointments`}
+        className="mt-2 inline-flex w-fit items-center justify-center rounded-full bg-foreground px-6 py-2 font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
       >
         Réserver
-      </button>
+      </Link>
     </main>
   );
 }
