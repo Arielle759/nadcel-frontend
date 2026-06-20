@@ -12,7 +12,6 @@ export interface UpdateSalonData {
   nom: string;
   description: string;
   adresse: string;
-  services: string[];
 }
 
 interface UseManagerResult {

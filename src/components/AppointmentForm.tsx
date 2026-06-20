@@ -2,15 +2,16 @@
 
 import { FormEvent, useState } from "react";
 import { useAppointments } from "@/hooks/useAppointments";
+import type { Service } from "@/hooks/useServices";
 
 interface AppointmentFormProps {
   salonId: number;
-  services: string[];
+  services: Service[];
 }
 
 export default function AppointmentForm({ salonId, services }: AppointmentFormProps) {
   const { createAppointment, loading, error } = useAppointments();
-  const [service, setService] = useState(services[0] ?? "");
+  const [service, setService] = useState(services[0]?.name ?? "");
   const [date, setDate] = useState("");
   const [heure, setHeure] = useState("");
   const [success, setSuccess] = useState(false);
@@ -29,7 +30,7 @@ export default function AppointmentForm({ salonId, services }: AppointmentFormPr
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-black/[.08] p-6 dark:border-white/[.145]"
+      className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6"
     >
       <div className="flex flex-col gap-1">
         <label htmlFor="service" className="text-sm font-medium">
@@ -40,11 +41,11 @@ export default function AppointmentForm({ salonId, services }: AppointmentFormPr
           required
           value={service}
           onChange={(e) => setService(e.target.value)}
-          className="rounded-md border border-black/[.08] px-3 py-2 dark:border-white/[.145] dark:bg-black"
+          className="rounded-md border border-sage/40 px-3 py-2"
         >
           {services.map((s) => (
-            <option key={s} value={s}>
-              {s}
+            <option key={s.id} value={s.name}>
+              {s.name}
             </option>
           ))}
         </select>
@@ -60,7 +61,7 @@ export default function AppointmentForm({ salonId, services }: AppointmentFormPr
           required
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="rounded-md border border-black/[.08] px-3 py-2 dark:border-white/[.145] dark:bg-black"
+          className="rounded-md border border-sage/40 px-3 py-2"
         />
       </div>
 
@@ -74,7 +75,7 @@ export default function AppointmentForm({ salonId, services }: AppointmentFormPr
           required
           value={heure}
           onChange={(e) => setHeure(e.target.value)}
-          className="rounded-md border border-black/[.08] px-3 py-2 dark:border-white/[.145] dark:bg-black"
+          className="rounded-md border border-sage/40 px-3 py-2"
         />
       </div>
 
@@ -84,7 +85,7 @@ export default function AppointmentForm({ salonId, services }: AppointmentFormPr
       <button
         type="submit"
         disabled={loading}
-        className="mt-2 rounded-full bg-foreground px-5 py-2 font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+        className="mt-2 rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
       >
         {loading ? "Envoi en cours..." : "Confirmer réservation"}
       </button>

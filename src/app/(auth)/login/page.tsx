@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="flex flex-1 items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm flex flex-col gap-4 rounded-lg border border-black/[.08] p-8 dark:border-white/[.145]"
+        className="w-full max-w-sm flex flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-8"
       >
         <h1 className="text-2xl font-semibold text-center">Connexion</h1>
 
@@ -43,7 +43,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md border border-black/[.08] px-3 py-2 dark:border-white/[.145] dark:bg-black"
+            className="rounded-md border border-sage/40 px-3 py-2"
           />
         </div>
 
@@ -57,7 +57,7 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-md border border-black/[.08] px-3 py-2 dark:border-white/[.145] dark:bg-black"
+            className="rounded-md border border-sage/40 px-3 py-2"
           />
         </div>
 
@@ -66,7 +66,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 rounded-full bg-foreground px-5 py-2 text-background font-medium transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+          className="mt-2 rounded-full bg-dark-sage px-5 py-2 text-beige font-medium transition-colors hover:bg-sage disabled:opacity-50"
         >
           {loading ? "Connexion..." : "Se connecter"}
         </button>

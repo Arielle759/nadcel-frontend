@@ -1,79 +1,82 @@
 "use client";
 
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { api } from "@/lib/api";
-import { useManager } from "@/hooks/useManager";
-import type { SalonDetail } from "@/lib/salons";
+import { useServices } from "@/hooks/useServices";
 
-export default function ManagerSalonDetailPage() {
-  const { id } = useParams<{ id: string }>();
+export default function EditServicePage() {
+  const { id, serviceId } = useParams<{ id: string; serviceId: string }>();
   const router = useRouter();
-  const { updateSalon, loading: saving, error: saveError } = useManager();
+  const { getServices, updateService, loading: saving, error: saveError } = useServices();
 
-  const [salon, setSalon] = useState<SalonDetail | null>(null);
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
-  const [adresse, setAdresse] = useState("");
+  const [prix, setPrix] = useState("");
+  const [duree, setDuree] = useState("");
+  const [categorie, setCategorie] = useState("");
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchSalon() {
-      try {
-        const { data } = await api.get<SalonDetail>(`/salons/${id}`);
+    getServices(id)
+      .then((services) => {
         if (!isMounted) return;
-        setSalon(data);
-        setNom(data.nom);
-        setDescription(data.description);
-        setAdresse(data.adresse);
-      } catch {
-        if (isMounted) setFetchError("Impossible de charger le salon.");
-      } finally {
+        const service = services.find((s) => String(s.id) === serviceId);
+        if (!service) {
+          setFetchError("Service introuvable.");
+          return;
+        }
+        setNom(service.name);
+        setDescription(service.description);
+        setPrix(String(service.price));
+        setDuree(String(service.duration));
+        setCategorie(service.category);
+      })
+      .catch(() => {
+        if (isMounted) setFetchError("Impossible de charger le service.");
+      })
+      .finally(() => {
         if (isMounted) setFetching(false);
-      }
-    }
-
-    fetchSalon();
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [getServices, id, serviceId]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSuccess(false);
     try {
-      const updated = await updateSalon(id, {
-        nom,
+      await updateService(serviceId, {
+        name: nom,
         description,
-        adresse,
+        price: Number(prix),
+        duration: Number(duree),
+        category: categorie,
       });
-      setSalon(updated);
       setSuccess(true);
     } catch {
-      // error state is exposed via useManager
+      // error state is exposed via useServices
     }
   }
 
   if (fetching) {
     return (
       <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-anthracite/70">Chargement du salon...</p>
+        <p className="text-anthracite/70">Chargement du service...</p>
       </main>
     );
   }
 
-  if (fetchError || !salon) {
+  if (fetchError) {
     return (
       <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-sm text-red-600">{fetchError ?? "Salon introuvable."}</p>
+        <p className="text-sm text-red-600">{fetchError}</p>
       </main>
     );
   }
@@ -82,21 +85,13 @@ export default function ManagerSalonDetailPage() {
     <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
       <button
         type="button"
-        onClick={() => router.push("/manager/salons")}
+        onClick={() => router.push(`/manager/salons/${id}/services`)}
         className="self-start text-sm text-dark-sage hover:underline"
       >
-        ← Retour à mes salons
+        ← Retour aux services
       </button>
 
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">{salon.nom}</h1>
-        <Link
-          href={`/manager/salons/${id}/services`}
-          className="rounded-full border border-dark-sage px-5 py-2 text-sm font-medium text-dark-sage transition-colors hover:bg-sage/10"
-        >
-          Gérer services
-        </Link>
-      </div>
+      <h1 className="text-3xl font-semibold tracking-tight">Modifier le service</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -129,20 +124,52 @@ export default function ManagerSalonDetailPage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="adresse" className="text-sm font-medium">
-            Adresse
+          <label htmlFor="prix" className="text-sm font-medium">
+            Prix (€)
           </label>
           <input
-            id="adresse"
+            id="prix"
+            type="number"
+            min="0"
+            step="0.01"
             required
-            value={adresse}
-            onChange={(e) => setAdresse(e.target.value)}
+            value={prix}
+            onChange={(e) => setPrix(e.target.value)}
+            className="rounded-md border border-sage/40 px-3 py-2"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="duree" className="text-sm font-medium">
+            Durée (min)
+          </label>
+          <input
+            id="duree"
+            type="number"
+            min="0"
+            step="1"
+            required
+            value={duree}
+            onChange={(e) => setDuree(e.target.value)}
+            className="rounded-md border border-sage/40 px-3 py-2"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="categorie" className="text-sm font-medium">
+            Catégorie
+          </label>
+          <input
+            id="categorie"
+            required
+            value={categorie}
+            onChange={(e) => setCategorie(e.target.value)}
             className="rounded-md border border-sage/40 px-3 py-2"
           />
         </div>
 
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
-        {success && <p className="text-sm text-green-600">Salon mis à jour !</p>}
+        {success && <p className="text-sm text-green-600">Service mis à jour !</p>}
 
         <button
           type="submit"

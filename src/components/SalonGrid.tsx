@@ -7,7 +7,7 @@ export default function SalonGrid() {
   const { salons, loading, error } = useSalons();
 
   if (loading) {
-    return <p className="text-zinc-600 dark:text-zinc-400">Chargement des salons...</p>;
+    return <p className="text-anthracite/70">Chargement des salons...</p>;
   }
 
   if (error) {
@@ -15,7 +15,7 @@ export default function SalonGrid() {
   }
 
   if (salons.length === 0) {
-    return <p className="text-zinc-600 dark:text-zinc-400">Aucun salon disponible.</p>;
+    return <p className="text-anthracite/70">Aucun salon disponible.</p>;
   }
 
   return (
@@ -23,15 +23,15 @@ export default function SalonGrid() {
       {salons.map((salon) => (
         <div
           key={salon.id}
-          className="flex flex-col gap-3 rounded-lg border border-black/[.08] p-6 dark:border-white/[.145]"
+          className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-6"
         >
-          <h2 className="text-lg font-semibold">{salon.nom}</h2>
-          <p className="flex-1 text-sm text-zinc-600 dark:text-zinc-400">
+          <h2 className="text-lg font-semibold text-anthracite">{salon.nom}</h2>
+          <p className="flex-1 text-sm text-anthracite/70">
             {salon.description}
           </p>
           <Link
             href={`/salons/${salon.id}`}
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+            className="mt-2 inline-flex items-center justify-center rounded-full bg-dark-sage px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage"
           >
             Voir détails
           </Link>

@@ -54,11 +54,11 @@ export default function ClientAppointmentsPage() {
     <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
       <h1 className="text-3xl font-semibold tracking-tight">Mes réservations</h1>
 
-      {loading && <p className="text-zinc-600 dark:text-zinc-400">Chargement...</p>}
+      {loading && <p className="text-anthracite/70">Chargement...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && appointments.length === 0 && (
-        <p className="text-zinc-600 dark:text-zinc-400">Vous n&apos;avez aucune réservation.</p>
+        <p className="text-anthracite/70">Vous n&apos;avez aucune réservation.</p>
       )}
 
       <div className="flex flex-col gap-4">
@@ -70,11 +70,11 @@ export default function ClientAppointmentsPage() {
           return (
             <div
               key={appointment.id}
-              className="flex flex-col gap-3 rounded-lg border border-black/[.08] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[.145]"
+              className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="flex flex-col gap-1">
-                <p className="font-semibold">{appointment.salon}</p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="font-semibold text-anthracite">{appointment.salon}</p>
+                <p className="text-sm text-anthracite/70">
                   {appointment.service} — {appointment.date} à {appointment.heure}
                 </p>
                 <AppointmentStatusBadge status={appointment.statut} />

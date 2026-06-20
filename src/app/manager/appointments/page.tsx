@@ -61,22 +61,22 @@ export default function ManagerAppointmentsPage() {
     <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
       <h1 className="text-3xl font-semibold tracking-tight">Rendez-vous</h1>
 
-      {loading && <p className="text-zinc-600 dark:text-zinc-400">Chargement...</p>}
+      {loading && <p className="text-anthracite/70">Chargement...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && appointments.length === 0 && (
-        <p className="text-zinc-600 dark:text-zinc-400">Aucun rendez-vous pour le moment.</p>
+        <p className="text-anthracite/70">Aucun rendez-vous pour le moment.</p>
       )}
 
       <div className="flex flex-col gap-4">
         {appointments.map((appointment) => (
           <div
             key={appointment.id}
-            className="flex flex-col gap-3 rounded-lg border border-black/[.08] p-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/[.145]"
+            className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div className="flex flex-col gap-1">
-              <p className="font-semibold">{appointment.client}</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="font-semibold text-anthracite">{appointment.client}</p>
+              <p className="text-sm text-anthracite/70">
                 {appointment.service} — {appointment.date} à {appointment.heure}
               </p>
               <AppointmentStatusBadge status={appointment.statut} />
@@ -89,7 +89,7 @@ export default function ManagerAppointmentsPage() {
                     type="button"
                     disabled={updatingId === appointment.id}
                     onClick={() => handleStatusChange(appointment.id, "confirmed")}
-                    className="rounded-full border border-black/[.08] px-4 py-2 text-sm font-medium transition-colors hover:bg-black/[.04] disabled:opacity-50 dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
+                    className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-dark-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
                   >
                     Confirmer
                   </button>
@@ -110,7 +110,7 @@ export default function ManagerAppointmentsPage() {
                     type="button"
                     disabled={updatingId === appointment.id}
                     onClick={() => handleStatusChange(appointment.id, "completed")}
-                    className="rounded-full border border-black/[.08] px-4 py-2 text-sm font-medium transition-colors hover:bg-black/[.04] disabled:opacity-50 dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
+                    className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-dark-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
                   >
                     Marquer terminé
                   </button>
