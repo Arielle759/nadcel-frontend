@@ -61,13 +61,13 @@ export default function BecomePartnerPage() {
 
   return (
     <div className="flex flex-1 flex-col bg-gradient-to-br from-beige via-beige to-sage/20 lg:flex-row">
-      <main className="flex flex-1 flex-col items-center px-5 py-12 sm:px-8 lg:px-12 lg:py-16">
-        <div className="mb-9 w-full max-w-2xl text-center lg:text-left">
+      <main className="flex flex-1 flex-col items-center px-5 py-8 sm:px-8 lg:px-10 lg:py-9">
+        <div className="mb-5 w-full max-w-3xl text-center lg:text-left">
           <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-terracotta"><Sparkles size={16} />Développez votre activité</span>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-forest sm:text-5xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
             Rejoignez les salons partenaires Nadcel
           </h1>
-          <p className="mt-4 max-w-xl leading-7 text-anthracite/70">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-anthracite/70">
             Créez la fiche de votre salon en quelques minutes. Une fois soumise, elle sera
             examinée par notre équipe avant d&apos;être visible par les clients.
           </p>
@@ -75,16 +75,16 @@ export default function BecomePartnerPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-2xl flex-col gap-8 rounded-3xl border border-sage/20 bg-beige/90 p-6 shadow-[0_20px_55px_rgba(45,59,40,0.1)] sm:p-8"
+          className="flex w-full max-w-3xl flex-col gap-5 rounded-3xl border border-sage/20 bg-beige/90 p-5 shadow-[0_20px_55px_rgba(45,59,40,0.1)] sm:p-6"
         >
           {!alreadyAuthenticated && (
-            <section className="flex flex-col gap-5">
-              <div className="flex items-center gap-3 border-b border-sage/20 pb-4">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-forest text-sm font-bold text-beige">1</span>
+            <section className="flex flex-col gap-3">
+              <div className="flex items-center gap-3 border-b border-sage/20 pb-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-forest text-xs font-bold text-beige">1</span>
                 <div><h2 className="font-semibold text-forest">Votre compte</h2><p className="text-xs text-anthracite/55">Vos informations de connexion</p></div>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-              <div className="flex flex-col gap-2">
+              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-1">
                 <label htmlFor="name" className="text-sm font-semibold text-anthracite/80">
                   Nom
                 </label>
@@ -94,10 +94,10 @@ export default function BecomePartnerPage() {
                   autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-3 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
                 /></div>
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <label htmlFor="email" className="text-sm font-semibold text-anthracite/80">
                   Email
                 </label>
@@ -108,7 +108,7 @@ export default function BecomePartnerPage() {
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-3 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
                 /></div>
               </div>
               <div className="sm:col-span-2">
@@ -124,13 +124,13 @@ export default function BecomePartnerPage() {
             </section>
           )}
 
-          <section className="flex flex-col gap-5">
-            <div className="flex items-center gap-3 border-b border-sage/20 pb-4">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-champagne text-sm font-bold text-forest">{alreadyAuthenticated ? "1" : "2"}</span>
+          <section className="flex flex-col gap-3">
+            <div className="flex items-center gap-3 border-b border-sage/20 pb-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-champagne text-xs font-bold text-forest">{alreadyAuthenticated ? "1" : "2"}</span>
               <div><h2 className="font-semibold text-forest">Votre salon</h2><p className="text-xs text-anthracite/55">Les informations visibles par vos futurs clients</p></div>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2">
-            <div className="flex flex-col gap-2 sm:col-span-2">
+            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-col gap-1">
               <label htmlFor="salonName" className="text-sm font-semibold text-anthracite/80">
                 Nom du salon
               </label>
@@ -139,10 +139,10 @@ export default function BecomePartnerPage() {
                 required
                 value={salonName}
                 onChange={(e) => setSalonName(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-3 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
               /></div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <label htmlFor="address" className="text-sm font-semibold text-anthracite/80">
                 Adresse
               </label>
@@ -151,10 +151,10 @@ export default function BecomePartnerPage() {
                 required
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-3 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
               /></div>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <label htmlFor="city" className="text-sm font-semibold text-anthracite/80">
                 Ville
               </label>
@@ -163,10 +163,10 @@ export default function BecomePartnerPage() {
                 required
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 px-4 py-3 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className="w-full rounded-xl border border-sage/35 bg-white/70 px-4 py-2.5 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
               />
             </div>
-            <div className="flex flex-col gap-2 sm:col-span-2">
+            <div className="flex flex-col gap-1">
               <label htmlFor="phone" className="text-sm font-semibold text-anthracite/80">
                 Téléphone
               </label>
@@ -176,10 +176,10 @@ export default function BecomePartnerPage() {
                 required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-3 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
               /></div>
             </div>
-            <div className="flex flex-col gap-2 sm:col-span-2">
+            <div className="flex flex-col gap-1 sm:col-span-2">
               <label htmlFor="description" className="text-sm font-semibold text-anthracite/80">
                 Description
               </label>
@@ -188,9 +188,9 @@ export default function BecomePartnerPage() {
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                rows={4}
+                rows={3}
                 placeholder="Présentez votre univers, vos spécialités et ce qui rend votre salon unique."
-                className="resize-none rounded-xl border border-sage/35 bg-white/70 px-4 py-3 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className="resize-none rounded-xl border border-sage/35 bg-white/70 px-4 py-2.5 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
               />
             </div>
             </div>
@@ -201,7 +201,7 @@ export default function BecomePartnerPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-3 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-2.5 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
           >
             {submitting ? "Envoi en cours..." : "Inscrire mon salon"}
             {!submitting && <ArrowRight size={18} aria-hidden="true" />}
@@ -209,19 +209,21 @@ export default function BecomePartnerPage() {
         </form>
       </main>
 
-      <aside className="relative hidden w-full overflow-hidden bg-forest p-10 lg:flex lg:w-[38%] lg:flex-col lg:justify-center xl:p-14">
-        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sage/15 blur-3xl" />
+      <aside className="relative hidden min-h-[760px] w-full overflow-hidden bg-forest lg:sticky lg:top-[72px] lg:flex lg:h-[calc(100vh-72px)] lg:w-[40%] lg:flex-col lg:justify-end">
         <Image
-          src="/images/logo-full.png"
-          alt="Nadcel"
-          width={640}
-          height={640}
-          className="relative h-auto w-full max-w-xs self-center brightness-0 invert"
+          src="/images/services/coiffure.jpg"
+          alt="Professionnelle dans un salon de beauté"
+          fill
+          priority
+          sizes="40vw"
+          className="object-cover object-center"
         />
-        <div className="relative mt-10 max-w-md">
+        <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/55 to-forest/10" />
+        <div className="relative p-9 xl:p-12">
+          <Image src="/images/logo-icon.png" alt="" width={60} height={44} className="mb-6 h-11 w-auto brightness-0 invert" />
           <h2 className="text-3xl font-semibold text-beige">Faites rayonner votre savoir-faire.</h2>
           <p className="mt-3 leading-7 text-beige/65">Rejoignez une plateforme pensée pour simplifier votre quotidien et développer votre visibilité.</p>
-          <div className="mt-7 space-y-4 text-sm text-beige/80">
+          <div className="mt-6 space-y-3 text-sm text-beige/80">
             <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une vitrine professionnelle en ligne</p>
             <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une gestion centralisée des rendez-vous</p>
             <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une présence auprès de nouveaux clients</p>
