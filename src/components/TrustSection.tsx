@@ -24,11 +24,11 @@ export default function TrustSection() {
   ];
 
   return (
-    <section className="bg-sage/10 px-6 py-10 sm:px-16">
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+    <section className="relative z-10 mx-4 -mt-8 rounded-3xl border border-sage/20 bg-beige px-6 py-7 shadow-[0_18px_50px_rgba(45,59,40,0.12)] sm:mx-8 sm:px-10 lg:mx-auto lg:max-w-6xl">
+      <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:divide-x md:divide-sage/20">
         {STATS.map(({ icon: Icon, value, label }) => (
-          <div key={label} className="flex flex-col items-center gap-2 text-center">
-            <Icon className="h-7 w-7 text-link-sage" />
+          <div key={label} className="flex flex-col items-center gap-2 px-3 text-center">
+            <Icon className="h-6 w-6 text-link-sage" />
             {value && <span className="text-2xl font-bold text-forest">{value}</span>}
             <span className="text-sm text-anthracite/75">{label}</span>
           </div>

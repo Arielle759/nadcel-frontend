@@ -69,26 +69,31 @@ const FEATURES = [
 
 export default function FeaturesSection() {
   return (
-    <section className="px-6 pt-20 pb-8 sm:px-16">
+    <section className="bg-beige px-6 py-20 sm:px-10 lg:px-16">
+      <div className="mx-auto mb-12 max-w-2xl text-center">
+        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-terracotta">Pourquoi Nadcel</span>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Votre rendez-vous beauté, sans complication</h2>
+        <p className="mt-4 leading-7 text-anthracite/70">Une expérience pensée pour vous faire gagner du temps et réserver en toute confiance.</p>
+      </div>
       <motion.div
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-80px" }}
         variants={containerVariants}
-        className="grid grid-cols-1 gap-10 sm:grid-cols-3"
+        className="mx-auto grid max-w-6xl grid-cols-1 gap-5 sm:grid-cols-3"
       >
         {FEATURES.map(({ title, description, Icon }) => (
           <motion.div
             key={title}
             variants={itemVariants}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="flex flex-col items-center gap-3 text-center"
+            className="group flex flex-col items-center gap-4 rounded-2xl border border-sage/20 bg-gradient-to-b from-beige to-sage/10 p-7 text-center shadow-[0_10px_30px_rgba(45,59,40,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(45,59,40,0.1)]"
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sage/20 text-link-sage">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-forest text-beige shadow-md transition-transform group-hover:rotate-3 group-hover:scale-105">
               <Icon className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-semibold text-anthracite">{title}</h3>
-            <p className="text-sm text-anthracite/75">{description}</p>
+            <h3 className="text-xl font-semibold text-forest">{title}</h3>
+            <p className="text-sm leading-6 text-anthracite/70">{description}</p>
           </motion.div>
         ))}
       </motion.div>
