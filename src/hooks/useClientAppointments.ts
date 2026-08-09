@@ -1,14 +1,45 @@
 import { useCallback, useState } from "react";
-import { api } from "@/lib/api";
-import type { AppointmentStatus } from "@/hooks/useManagerAppointments";
+import { api, toErrorMessage } from "@/lib/api";
+import type { AppointmentStatus, PaymentStatus } from "@/hooks/useManagerAppointments";
+
+export interface ClientAppointmentSalon {
+  id: number;
+  name: string;
+}
+
+export interface ClientAppointmentService {
+  id: number;
+  name: string;
+  duration: number;
+}
+
+export interface ClientAppointmentEmployee {
+  id: number;
+  name: string;
+}
+
+export interface ClientAppointmentReview {
+  id: number;
+  rating: number;
+  comment: string;
+}
 
 export interface ClientAppointment {
   id: number;
-  salon: string;
-  service: string;
-  date: string;
-  heure: string;
-  statut: AppointmentStatus;
+  scheduled_at: string;
+  duration: number;
+  status: AppointmentStatus;
+  price: string;
+  payment_status: PaymentStatus;
+  salon: ClientAppointmentSalon;
+  service: ClientAppointmentService;
+  employee: ClientAppointmentEmployee;
+  review: ClientAppointmentReview | null;
+}
+
+export interface CreateReviewData {
+  rating: number;
+  comment: string;
 }
 
 interface PaginatedResponse<T> {
@@ -18,7 +49,8 @@ interface PaginatedResponse<T> {
 
 interface UseClientAppointmentsResult {
   getMyAppointments: () => Promise<ClientAppointment[]>;
-  cancelAppointment: (id: number | string) => Promise<void>;
+  cancelAppointment: (id: number | string) => Promise<ClientAppointment>;
+  submitReview: (id: number | string, data: CreateReviewData) => Promise<void>;
   loading: boolean;
   error: string | null;
 }
@@ -33,26 +65,51 @@ export function useClientAppointments(): UseClientAppointmentsResult {
     try {
       const { data } = await api.get<PaginatedResponse<ClientAppointment>>("/appointments");
       return data.data;
-    } catch {
-      setError("Impossible de charger vos réservations.");
-      throw new Error("Impossible de charger vos réservations.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de charger vos réservations.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const cancelAppointment = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/appointments/${id}`);
-    } catch {
-      setError("Impossible d'annuler la réservation.");
-      throw new Error("Impossible d'annuler la réservation.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const cancelAppointment = useCallback(
+    async (id: number | string): Promise<ClientAppointment> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.put<ClientAppointment>(`/appointments/${id}`, {
+          status: "cancelled",
+        });
+        return data;
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible d'annuler la réservation.");
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  return { getMyAppointments, cancelAppointment, loading, error };
+  const submitReview = useCallback(
+    async (id: number | string, data: CreateReviewData): Promise<void> => {
+      setLoading(true);
+      setError(null);
+      try {
+        await api.post("/reviews", { appointment_id: id, ...data });
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible d'envoyer l'avis.");
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  return { getMyAppointments, cancelAppointment, submitReview, loading, error };
 }

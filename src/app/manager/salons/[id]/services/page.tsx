@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Service, useServices } from "@/hooks/useServices";
+import { formatCurrency } from "@/lib/currency";
+import { formatDuration } from "@/lib/duration";
 
 export default function ManagerServicesPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +29,9 @@ export default function ManagerServicesPage() {
   }, [getServices, id]);
 
   useEffect(() => {
-    fetchServices();
+    queueMicrotask(() => {
+      fetchServices();
+    });
   }, [fetchServices]);
 
   async function handleDelete(serviceId: number) {
@@ -42,16 +46,16 @@ export default function ManagerServicesPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
+    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
       <Link
         href={`/manager/salons/${id}`}
-        className="self-start text-sm text-dark-sage hover:underline"
+        className="self-start text-sm text-link-sage hover:underline"
       >
         ← Retour au salon
       </Link>
 
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">Services</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-forest">Services</h1>
         <Link
           href={`/manager/salons/${id}/services/new`}
           className="rounded-full bg-dark-sage px-5 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage"
@@ -60,14 +64,14 @@ export default function ManagerServicesPage() {
         </Link>
       </div>
 
-      {loading && <p className="text-anthracite/70">Chargement des services...</p>}
+      {loading && <p className="text-anthracite/75">Chargement des services...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && services.length === 0 && (
-        <p className="text-anthracite/70">Aucun service pour ce salon.</p>
+        <p className="text-anthracite/75">Aucun service pour ce salon.</p>
       )}
 
-      <ul className="flex flex-col gap-4">
+      <ul className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
         {services.map((service) => (
           <li
             key={service.id}
@@ -75,17 +79,17 @@ export default function ManagerServicesPage() {
           >
             <div>
               <p className="font-semibold text-anthracite">
-                {service.name} <span className="text-anthracite/60">— {service.category}</span>
+                {service.name} <span className="text-anthracite/75">— {service.category}</span>
               </p>
-              <p className="text-sm text-anthracite/70">{service.description}</p>
-              <p className="text-sm text-anthracite/70">
-                {service.price} € · {service.duration} min
+              <p className="text-sm text-anthracite/75">{service.description}</p>
+              <p className="text-sm text-anthracite/75">
+                {formatCurrency(service.price)} · {formatDuration(service.duration)}
               </p>
             </div>
             <div className="flex gap-2">
               <Link
                 href={`/manager/salons/${id}/services/${service.id}`}
-                className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-dark-sage transition-colors hover:bg-sage/10"
+                className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10"
               >
                 Modifier
               </Link>
@@ -93,7 +97,7 @@ export default function ManagerServicesPage() {
                 type="button"
                 onClick={() => handleDelete(service.id)}
                 disabled={deletingId === service.id}
-                className="rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-600 hover:text-white disabled:opacity-50"
+                className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-90 disabled:opacity-50"
               >
                 {deletingId === service.id ? "Suppression..." : "Supprimer"}
               </button>

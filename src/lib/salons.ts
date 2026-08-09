@@ -3,9 +3,13 @@ import type { Service } from "@/hooks/useServices";
 
 export interface SalonDetail {
   id: number;
-  nom: string;
+  name: string;
   description: string;
-  adresse: string;
+  address: string;
+  city: string;
+  cover: string | null;
+  logo: string | null;
+  rating: string | null;
   services: Service[];
 }
 

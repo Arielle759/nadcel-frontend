@@ -2,7 +2,9 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
-import { useServices } from "@/hooks/useServices";
+import { Service, useServices } from "@/hooks/useServices";
+import { resolveServiceImage } from "@/lib/serviceImage";
+import ImageUploadInput from "@/components/ImageUploadInput";
 
 export default function EditServicePage() {
   const { id, serviceId } = useParams<{ id: string; serviceId: string }>();
@@ -11,12 +13,14 @@ export default function EditServicePage() {
 
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [service, setService] = useState<Service | null>(null);
 
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [prix, setPrix] = useState("");
   const [duree, setDuree] = useState("");
   const [categorie, setCategorie] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
@@ -25,16 +29,17 @@ export default function EditServicePage() {
     getServices(id)
       .then((services) => {
         if (!isMounted) return;
-        const service = services.find((s) => String(s.id) === serviceId);
-        if (!service) {
+        const found = services.find((s) => String(s.id) === serviceId);
+        if (!found) {
           setFetchError("Service introuvable.");
           return;
         }
-        setNom(service.name);
-        setDescription(service.description);
-        setPrix(String(service.price));
-        setDuree(String(service.duration));
-        setCategorie(service.category);
+        setService(found);
+        setNom(found.name);
+        setDescription(found.description);
+        setPrix(String(found.price));
+        setDuree(String(found.duration));
+        setCategorie(found.category);
       })
       .catch(() => {
         if (isMounted) setFetchError("Impossible de charger le service.");
@@ -52,13 +57,15 @@ export default function EditServicePage() {
     e.preventDefault();
     setSuccess(false);
     try {
-      await updateService(serviceId, {
+      const updated = await updateService(serviceId, {
         name: nom,
         description,
-        price: Number(prix),
+        price: Math.round(Number(prix)),
         duration: Number(duree),
         category: categorie,
+        image,
       });
+      setService(updated);
       setSuccess(true);
     } catch {
       // error state is exposed via useServices
@@ -68,7 +75,7 @@ export default function EditServicePage() {
   if (fetching) {
     return (
       <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-anthracite/70">Chargement du service...</p>
+        <p className="text-anthracite/75">Chargement du service...</p>
       </main>
     );
   }
@@ -86,12 +93,12 @@ export default function EditServicePage() {
       <button
         type="button"
         onClick={() => router.push(`/manager/salons/${id}/services`)}
-        className="self-start text-sm text-dark-sage hover:underline"
+        className="self-start text-sm text-link-sage hover:underline"
       >
         ← Retour aux services
       </button>
 
-      <h1 className="text-3xl font-semibold tracking-tight">Modifier le service</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-forest">Modifier le service</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -125,13 +132,13 @@ export default function EditServicePage() {
 
         <div className="flex flex-col gap-1">
           <label htmlFor="prix" className="text-sm font-medium">
-            Prix (€)
+            Prix (FCFA)
           </label>
           <input
             id="prix"
             type="number"
             min="0"
-            step="0.01"
+            step="100"
             required
             value={prix}
             onChange={(e) => setPrix(e.target.value)}
@@ -167,6 +174,11 @@ export default function EditServicePage() {
             className="rounded-md border border-sage/40 px-3 py-2"
           />
         </div>
+
+        <ImageUploadInput
+          currentImageUrl={service ? resolveServiceImage(service) : undefined}
+          onChange={setImage}
+        />
 
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
         {success && <p className="text-sm text-green-600">Service mis à jour !</p>}

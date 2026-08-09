@@ -1,15 +1,31 @@
 import { useCallback, useState } from "react";
-import { api } from "@/lib/api";
+import { api, toErrorMessage } from "@/lib/api";
+import type { Service } from "@/hooks/useServices";
 
-export type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled";
+export type AppointmentStatus =
+  | "pending"
+  | "confirmed"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+export type PaymentStatus = "unpaid" | "paid";
+export type PaymentMethod = "cash" | "card";
+
+export interface ManagerAppointmentClient {
+  id: number;
+  name: string;
+  email: string;
+}
 
 export interface ManagerAppointment {
   id: number;
-  client: string;
-  service: string;
-  date: string;
-  heure: string;
-  statut: AppointmentStatus;
+  client: ManagerAppointmentClient;
+  service: Service;
+  scheduled_at: string;
+  status: AppointmentStatus;
+  payment_status: PaymentStatus;
+  payment_method: PaymentMethod | null;
 }
 
 interface PaginatedResponse<T> {
@@ -23,7 +39,10 @@ interface UseManagerAppointmentsResult {
     id: number | string,
     status: AppointmentStatus
   ) => Promise<ManagerAppointment>;
-  cancelAppointment: (id: number | string) => Promise<void>;
+  markAppointmentPaid: (
+    id: number | string,
+    method: PaymentMethod
+  ) => Promise<ManagerAppointment>;
   loading: boolean;
   error: string | null;
 }
@@ -38,9 +57,10 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     try {
       const { data } = await api.get<PaginatedResponse<ManagerAppointment>>("/appointments");
       return data.data;
-    } catch {
-      setError("Impossible de charger les rendez-vous.");
-      throw new Error("Impossible de charger les rendez-vous.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de charger les rendez-vous.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -52,12 +72,13 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
       setError(null);
       try {
         const { data } = await api.put<ManagerAppointment>(`/appointments/${id}`, {
-          statut: status,
+          status,
         });
         return data;
-      } catch {
-        setError("Impossible de mettre à jour le statut.");
-        throw new Error("Impossible de mettre à jour le statut.");
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de mettre à jour le statut.");
+        setError(message);
+        throw new Error(message);
       } finally {
         setLoading(false);
       }
@@ -65,18 +86,31 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     []
   );
 
-  const cancelAppointment = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/appointments/${id}`);
-    } catch {
-      setError("Impossible d'annuler le rendez-vous.");
-      throw new Error("Impossible d'annuler le rendez-vous.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const markAppointmentPaid = useCallback(
+    async (id: number | string, method: PaymentMethod): Promise<ManagerAppointment> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.patch<ManagerAppointment>(`/appointments/${id}/pay`, {
+          payment_method: method,
+        });
+        return data;
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de mettre à jour le paiement.");
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  return { getAppointments, updateAppointmentStatus, cancelAppointment, loading, error };
+  return {
+    getAppointments,
+    updateAppointmentStatus,
+    markAppointmentPaid,
+    loading,
+    error,
+  };
 }

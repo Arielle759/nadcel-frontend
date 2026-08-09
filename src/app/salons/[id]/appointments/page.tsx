@@ -19,21 +19,21 @@ export default async function AppointmentsPage({
     <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
       <Link
         href={`/salons/${salon.id}`}
-        className="text-sm text-dark-sage hover:underline"
+        className="text-sm text-link-sage hover:underline"
       >
         ← Retour au salon
       </Link>
 
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Réserver chez {salon.nom}
+        <h1 className="text-3xl font-semibold tracking-tight text-forest">
+          Réserver chez {salon.name}
         </h1>
-        <p className="text-anthracite/70">
+        <p className="text-anthracite/75">
           Services disponibles : {salon.services.map((s) => s.name).join(", ")}
         </p>
       </div>
 
-      <AppointmentForm salonId={salon.id} services={salon.services} />
+      <AppointmentForm salonId={salon.id} salonName={salon.name} salonCover={salon.cover} services={salon.services} />
     </main>
   );
 }

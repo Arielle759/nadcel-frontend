@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { api } from "@/lib/api";
+import { api, toErrorMessage } from "@/lib/api";
 
 export interface Service {
   id: number;
@@ -22,6 +22,7 @@ export interface CreateServiceData {
   price: number;
   duration: number;
   category: string;
+  image?: File | null;
 }
 
 export interface UpdateServiceData {
@@ -30,6 +31,27 @@ export interface UpdateServiceData {
   price: number;
   duration: number;
   category: string;
+  image?: File | null;
+}
+
+function toServiceFormData(data: {
+  salon_id?: number;
+  name: string;
+  description: string;
+  price: number;
+  duration: number;
+  category: string;
+  image?: File | null;
+}): FormData {
+  const formData = new FormData();
+  if (data.salon_id !== undefined) formData.append("salon_id", String(data.salon_id));
+  formData.append("name", data.name);
+  formData.append("description", data.description);
+  formData.append("price", String(data.price));
+  formData.append("duration", String(data.duration));
+  formData.append("category", data.category);
+  if (data.image) formData.append("image", data.image);
+  return formData;
 }
 
 interface PaginatedResponse<T> {
@@ -58,9 +80,10 @@ export function useServices(): UseServicesResult {
         params: { salon_id: salonId },
       });
       return data.data;
-    } catch {
-      setError("Impossible de charger les services.");
-      throw new Error("Impossible de charger les services.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de charger les services.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -70,11 +93,31 @@ export function useServices(): UseServicesResult {
     setLoading(true);
     setError(null);
     try {
-      const { data: service } = await api.post<Service>("/services", data);
+      // Photo-less creation keeps sending plain JSON, exactly as before (no
+      // `image` key at all — not even `null` — since a `sometimes` validation
+      // rule on the backend only skips validation when the key is absent).
+      // The shared `api` instance defaults to Content-Type: application/json,
+      // which overrides axios's usual FormData auto-detection and makes it
+      // JSON.stringify the FormData instead of sending it as multipart —
+      // clearing the header here lets the browser set its own boundary.
+      const { salon_id, name, description, price, duration, category } = data;
+      const { data: service } = data.image
+        ? await api.post<Service>("/services", toServiceFormData(data), {
+            headers: { "Content-Type": undefined },
+          })
+        : await api.post<Service>("/services", {
+            salon_id,
+            name,
+            description,
+            price,
+            duration,
+            category,
+          });
       return service;
-    } catch {
-      setError("Impossible de créer le service.");
-      throw new Error("Impossible de créer le service.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de créer le service.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -85,11 +128,33 @@ export function useServices(): UseServicesResult {
       setLoading(true);
       setError(null);
       try {
-        const { data: service } = await api.put<Service>(`/services/${id}`, data);
+        let service: Service;
+        if (data.image) {
+          // PHP never populates the uploaded-file data on a raw PUT request
+          // body, multipart or not — Laravel's documented workaround is to
+          // POST with a `_method` override field instead.
+          const formData = toServiceFormData(data);
+          formData.append("_method", "PUT");
+          const { data: updated } = await api.post<Service>(`/services/${id}`, formData, {
+            headers: { "Content-Type": undefined },
+          });
+          service = updated;
+        } else {
+          const { name, description, price, duration, category } = data;
+          const { data: updated } = await api.put<Service>(`/services/${id}`, {
+            name,
+            description,
+            price,
+            duration,
+            category,
+          });
+          service = updated;
+        }
         return service;
-      } catch {
-        setError("Impossible de mettre à jour le service.");
-        throw new Error("Impossible de mettre à jour le service.");
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de mettre à jour le service.");
+        setError(message);
+        throw new Error(message);
       } finally {
         setLoading(false);
       }
@@ -102,9 +167,10 @@ export function useServices(): UseServicesResult {
     setError(null);
     try {
       await api.delete(`/services/${id}`);
-    } catch {
-      setError("Impossible de supprimer le service.");
-      throw new Error("Impossible de supprimer le service.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de supprimer le service.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }

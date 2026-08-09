@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, toErrorMessage } from "@/lib/api";
 
 export interface Salon {
   id: number;
-  nom: string;
+  name: string;
   description: string;
+  address: string;
+  city: string;
+  cover: string | null;
+  logo: string | null;
+  rating: string | null;
+  service_categories: string[];
 }
 
 interface UseSalonsResult {
@@ -30,15 +36,17 @@ export function useSalons(): UseSalonsResult {
     try {
       const { data } = await api.get<PaginatedResponse<Salon>>("/salons");
       setSalons(data.data);
-    } catch {
-      setError("Impossible de charger les salons.");
+    } catch (err) {
+      setError(toErrorMessage(err, "Impossible de charger les salons."));
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSalons();
+    queueMicrotask(() => {
+      fetchSalons();
+    });
   }, [fetchSalons]);
 
   return { salons, loading, error, refetch: fetchSalons };

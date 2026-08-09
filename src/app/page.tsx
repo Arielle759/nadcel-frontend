@@ -1,15 +1,29 @@
-import SalonGrid from "@/components/SalonGrid";
+import { Suspense } from "react";
+import FadeIn from "@/components/FadeIn";
+import HeroSection from "@/components/HeroSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import PopularSalons from "@/components/PopularSalons";
+import TrustSection from "@/components/TrustSection";
+import FaqSection from "@/components/FaqSection";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight">Nos salons</h1>
-        <p className="text-anthracite/70">
-          Découvrez les salons disponibles et réservez votre prochain rendez-vous.
-        </p>
-      </div>
-      <SalonGrid />
+    <main className="flex flex-1 flex-col">
+      <HeroSection />
+      <FadeIn>
+        <TrustSection />
+      </FadeIn>
+      <FadeIn>
+        <FeaturesSection />
+      </FadeIn>
+      <FadeIn>
+        <Suspense fallback={null}>
+          <PopularSalons />
+        </Suspense>
+      </FadeIn>
+      <FadeIn>
+        <FaqSection />
+      </FadeIn>
     </main>
   );
 }

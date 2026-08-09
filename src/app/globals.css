@@ -10,14 +10,53 @@
   --color-foreground: var(--foreground);
   --color-sage: #a3b18a;
   --color-dark-sage: #588157;
+  /* Darkened dark-sage for use as text/link color — dark-sage itself is only
+     3.97:1 on beige (fails WCAG AA 4.5:1); this variant clears 4.73:1 while
+     staying in the same hue. Buttons/borders keep using dark-sage as-is. */
+  --color-link-sage: #4f744e;
   --color-beige: #f5f1e8;
   --color-anthracite: #374151;
+  --color-forest: #2d3b28;
+  --color-champagne: #9c7635;
+  --color-terracotta: #9c5236;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-fraunces);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-fraunces), Georgia, serif;
+}
+
+.appointment-calendar.rdp-root {
+  --rdp-accent-color: var(--color-beige);
+  --rdp-accent-background-color: var(--color-dark-sage);
+  --rdp-today-color: var(--color-dark-sage);
+  --rdp-day_button-border-radius: 9999px;
+  --rdp-selected-border: 2px solid var(--color-dark-sage);
+  --rdp-outside-opacity: 0.4;
+  --rdp-disabled-opacity: 0.35;
+  color: var(--color-anthracite);
+  font-family: inherit;
+}
+
+.appointment-calendar .rdp-day_button:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--color-sage) 20%, transparent);
+}
+
+.appointment-calendar .rdp-selected .rdp-day_button {
+  background-color: var(--color-dark-sage);
+  color: var(--color-beige);
+}
+
+.appointment-calendar .rdp-chevron {
+  fill: var(--color-dark-sage);
 }

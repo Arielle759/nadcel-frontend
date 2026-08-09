@@ -1,21 +1,49 @@
 import { useCallback, useState } from "react";
-import { api } from "@/lib/api";
+import { api, toErrorMessage } from "@/lib/api";
 import type { SalonDetail } from "@/lib/salons";
+import type { AdminStatsAppointments, AdminStatsRevenue } from "@/hooks/useAdmin";
 
-export interface SalonStats {
-  nombreSalons: number;
-  rdvAujourdhui: number;
-  avis: number;
+export interface ManagerStats {
+  salons_count: number;
+  appointments: AdminStatsAppointments;
+  revenue: AdminStatsRevenue;
 }
 
 export interface UpdateSalonData {
-  nom: string;
+  name: string;
   description: string;
-  adresse: string;
+  address: string;
+  city: string;
+  cover?: File | null;
+}
+
+function toSalonFormData(data: {
+  name: string;
+  description: string;
+  address: string;
+  city: string;
+  cover?: File | null;
+}): FormData {
+  const formData = new FormData();
+  formData.append("name", data.name);
+  formData.append("description", data.description);
+  formData.append("address", data.address);
+  formData.append("city", data.city);
+  if (data.cover) formData.append("cover", data.cover);
+  return formData;
+}
+
+export interface CreateSalonData {
+  name: string;
+  address: string;
+  city: string;
+  phone: string;
+  description: string;
 }
 
 interface UseManagerResult {
-  getSalonStats: () => Promise<SalonStats>;
+  getSalonStats: () => Promise<ManagerStats>;
+  createSalon: (data: CreateSalonData) => Promise<SalonDetail>;
   updateSalon: (id: number | string, data: UpdateSalonData) => Promise<SalonDetail>;
   deleteSalon: (id: number | string) => Promise<void>;
   loading: boolean;
@@ -26,15 +54,31 @@ export function useManager(): UseManagerResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getSalonStats = useCallback(async (): Promise<SalonStats> => {
+  const getSalonStats = useCallback(async (): Promise<ManagerStats> => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<SalonStats>("/manager/stats");
+      const { data } = await api.get<ManagerStats>("/manager/stats");
       return data;
-    } catch {
-      setError("Impossible de charger les statistiques.");
-      throw new Error("Impossible de charger les statistiques.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de charger les statistiques.");
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const createSalon = useCallback(async (data: CreateSalonData): Promise<SalonDetail> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: salon } = await api.post<SalonDetail>("/salons", data);
+      return salon;
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de créer le salon.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -45,11 +89,36 @@ export function useManager(): UseManagerResult {
       setLoading(true);
       setError(null);
       try {
-        const { data: salon } = await api.put<SalonDetail>(`/salons/${id}`, data);
+        let salon: SalonDetail;
+        if (data.cover) {
+          // PHP never populates uploaded-file data on a raw PUT request body,
+          // multipart or not — Laravel's documented workaround is to POST
+          // with a `_method` override field instead.
+          const formData = toSalonFormData(data);
+          formData.append("_method", "PUT");
+          const { data: updated } = await api.post<SalonDetail>(`/salons/${id}`, formData, {
+            // The shared `api` instance defaults to Content-Type:
+            // application/json, which overrides axios's usual FormData
+            // auto-detection — clearing it lets the browser set its own
+            // multipart boundary.
+            headers: { "Content-Type": undefined },
+          });
+          salon = updated;
+        } else {
+          const { name, description, address, city } = data;
+          const { data: updated } = await api.put<SalonDetail>(`/salons/${id}`, {
+            name,
+            description,
+            address,
+            city,
+          });
+          salon = updated;
+        }
         return salon;
-      } catch {
-        setError("Impossible de mettre à jour le salon.");
-        throw new Error("Impossible de mettre à jour le salon.");
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de mettre à jour le salon.");
+        setError(message);
+        throw new Error(message);
       } finally {
         setLoading(false);
       }
@@ -62,13 +131,14 @@ export function useManager(): UseManagerResult {
     setError(null);
     try {
       await api.delete(`/salons/${id}`);
-    } catch {
-      setError("Impossible de supprimer le salon.");
-      throw new Error("Impossible de supprimer le salon.");
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible de supprimer le salon.");
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  return { getSalonStats, updateSalon, deleteSalon, loading, error };
+  return { getSalonStats, createSalon, updateSalon, deleteSalon, loading, error };
 }

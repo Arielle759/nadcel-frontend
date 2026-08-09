@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useServices } from "@/hooks/useServices";
+import ImageUploadInput from "@/components/ImageUploadInput";
 
 export default function NewServicePage() {
   const { id } = useParams<{ id: string }>();
@@ -12,8 +13,9 @@ export default function NewServicePage() {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [prix, setPrix] = useState("");
-  const [duree, setDuree] = useState("");
+  const [duree, setDuree] = useState("30");
   const [categorie, setCategorie] = useState("");
+  const [image, setImage] = useState<File | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -22,9 +24,10 @@ export default function NewServicePage() {
         salon_id: Number(id),
         name: nom,
         description,
-        price: Number(prix),
+        price: Math.round(Number(prix)),
         duration: Number(duree),
         category: categorie,
+        image,
       });
       router.push(`/manager/salons/${id}/services`);
     } catch {
@@ -34,7 +37,7 @@ export default function NewServicePage() {
 
   return (
     <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight">Ajouter un service</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-forest">Ajouter un service</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -68,13 +71,13 @@ export default function NewServicePage() {
 
         <div className="flex flex-col gap-1">
           <label htmlFor="prix" className="text-sm font-medium">
-            Prix (€)
+            Prix (FCFA)
           </label>
           <input
             id="prix"
             type="number"
             min="0"
-            step="0.01"
+            step="100"
             required
             value={prix}
             onChange={(e) => setPrix(e.target.value)}
@@ -89,7 +92,7 @@ export default function NewServicePage() {
           <input
             id="duree"
             type="number"
-            min="0"
+            min="15"
             step="1"
             required
             value={duree}
@@ -110,6 +113,8 @@ export default function NewServicePage() {
             className="rounded-md border border-sage/40 px-3 py-2"
           />
         </div>
+
+        <ImageUploadInput onChange={setImage} />
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
