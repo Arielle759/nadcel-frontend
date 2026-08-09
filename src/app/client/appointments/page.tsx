@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar } from "lucide-react";
+import { Banknote, Calendar, CircleCheckBig, Scissors } from "lucide-react";
 import { ClientAppointment, useClientAppointments } from "@/hooks/useClientAppointments";
 import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
 import EmptyState from "@/components/EmptyState";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { formatDateTime } from "@/lib/date";
 import { formatCurrency } from "@/lib/currency";
+import AppointmentDateTime from "@/components/AppointmentDateTime";
 
 const CANCELLABLE_STATUSES = new Set(["pending", "confirmed"]);
 
@@ -88,9 +89,23 @@ export default function ClientAppointmentsPage() {
 
   return (
     <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Mes réservations</h1>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-terracotta">
+          Votre espace
+        </span>
+        <h1 className="text-3xl font-semibold tracking-tight text-forest">Mes réservations</h1>
+        <p className="max-w-2xl text-anthracite/70">
+          Retrouvez vos prochains rendez-vous et suivez leur confirmation en un coup d&apos;œil.
+        </p>
+      </div>
 
-      {loading && <p className="text-anthracite/75">Chargement...</p>}
+      {loading && (
+        <div className="space-y-4" aria-label="Chargement des réservations" aria-busy="true">
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-44 animate-pulse rounded-2xl border border-sage/20 bg-sage/10" />
+          ))}
+        </div>
+      )}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && appointments.length === 0 && (
@@ -100,7 +115,7 @@ export default function ClientAppointmentsPage() {
         />
       )}
 
-      <div className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
+      <div className="flex flex-col gap-5">
         {appointments.map((appointment) => {
           const canCancel =
             mounted &&
@@ -117,22 +132,29 @@ export default function ClientAppointmentsPage() {
           return (
             <div
               key={appointment.id}
-              className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-start sm:justify-between"
+              className="flex flex-col gap-5 rounded-2xl border border-sage/20 bg-beige p-5 shadow-[0_10px_30px_rgba(45,59,40,0.07)] transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_16px_38px_rgba(45,59,40,0.12)] sm:flex-row sm:items-start sm:justify-between sm:p-6"
             >
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold text-anthracite">{appointment.salon.name}</p>
-                <p className="text-sm text-anthracite/75">{appointment.service.name}</p>
-                <p className="text-sm text-anthracite/75">
-                  {formatDateTime(appointment.scheduled_at)}
-                </p>
-                <p className="text-sm text-anthracite/75">
+              <div className="flex flex-1 flex-col gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xl font-semibold text-forest">{appointment.salon.name}</p>
+                    <p className="mt-1 inline-flex items-center gap-2 text-sm text-anthracite/75">
+                      <Scissors size={16} className="text-terracotta" aria-hidden="true" />
+                      {appointment.service.name}
+                    </p>
+                  </div>
+                  <AppointmentStatusBadge status={appointment.status} />
+                </div>
+                <AppointmentDateTime scheduledAt={appointment.scheduled_at} />
+                <p className="inline-flex items-center gap-2 text-sm font-semibold text-anthracite">
+                  <Banknote size={17} className="text-link-sage" aria-hidden="true" />
                   {formatCurrency(Number(appointment.price))}
                 </p>
-                <AppointmentStatusBadge status={appointment.status} />
                 {appointment.status === "confirmed" && (
-                  <p className="text-sm text-forest">
-                    Votre rendez-vous est prévu le {formatDateTime(appointment.scheduled_at)}.
-                  </p>
+                  <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-4 py-3 text-sm text-emerald-900">
+                    <CircleCheckBig size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+                    <p>Votre rendez-vous est prévu le {formatDateTime(appointment.scheduled_at)}.</p>
+                  </div>
                 )}
               </div>
 

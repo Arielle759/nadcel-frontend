@@ -1,8 +1,8 @@
 import type { PaymentMethod, PaymentStatus } from "@/hooks/useManagerAppointments";
 
 const PAYMENT_STYLES: Record<PaymentStatus, string> = {
-  unpaid: "bg-gray-100 text-gray-700",
-  paid: "bg-emerald-100 text-emerald-800",
+  unpaid: "border-stone-200 bg-stone-50 text-stone-700",
+  paid: "border-emerald-200 bg-emerald-50 text-emerald-800",
 };
 
 const PAYMENT_LABELS: Record<PaymentStatus, string> = {
@@ -24,7 +24,7 @@ export default function PaymentStatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium ${PAYMENT_STYLES[status]}`}
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${PAYMENT_STYLES[status]}`}
     >
       {PAYMENT_LABELS[status]}
       {status === "paid" && method ? ` (${PAYMENT_METHOD_LABELS[method]})` : ""}

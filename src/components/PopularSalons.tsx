@@ -17,10 +17,12 @@ import {
   CalendarX,
   Clock,
   Mail,
+  ArrowUpRight,
 } from "lucide-react";
 import { useSalons } from "@/hooks/useSalons";
 import { assetUrl } from "@/lib/api";
 import SalonCategoryTags from "@/components/SalonCategoryTags";
+import CardSkeletons from "@/components/CardSkeletons";
 
 const containerVariants = {
   hidden: {},
@@ -134,7 +136,7 @@ export default function PopularSalons() {
         </div>
       </div>
 
-      {loading && <p className="text-center text-anthracite/75">Chargement...</p>}
+      {loading && <CardSkeletons count={4} />}
       {error && <p className="text-center text-sm text-red-600">{error}</p>}
 
       {!loading && !error && filtered.length === 0 && (
@@ -143,7 +145,7 @@ export default function PopularSalons() {
         </p>
       )}
 
-      <motion.div
+      {!loading && !error && <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -151,36 +153,42 @@ export default function PopularSalons() {
       >
         {filtered.map((salon) => (
           <motion.div key={salon.id} variants={cardVariants} transition={{ duration: 0.4, ease: "easeOut" }}>
-            <div className="group flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-sage/30 bg-beige shadow-md transition-shadow duration-300 ease-out hover:shadow-lg">
+            <div className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-sage/20 bg-beige shadow-[0_12px_35px_rgba(45,59,40,0.08)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-sage/40 hover:shadow-[0_18px_45px_rgba(45,59,40,0.14)]">
               <Link href={`/salons/${salon.id}`} className="flex h-full flex-col">
-                <div className="flex aspect-[4/3] w-full shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-sage/40 to-dark-sage/40 text-4xl">
+                <div className="relative flex aspect-[4/3] w-full shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-sage/40 to-dark-sage/40 text-4xl">
                   {assetUrl(salon.cover ?? salon.logo) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={assetUrl(salon.cover ?? salon.logo)}
                       alt={salon.name}
-                      className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                      className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                   ) : (
                     <span>💆</span>
                   )}
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-forest/45 to-transparent" />
+                  <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-beige/95 px-3 py-1.5 text-xs font-semibold text-forest shadow-sm backdrop-blur-sm">
+                    <Star size={14} className="fill-champagne text-champagne" aria-hidden="true" />
+                    {salon.rating || "Nouveau"}
+                  </span>
                 </div>
-                <div className="flex flex-1 flex-col gap-1 p-4">
-                  <h3 className="font-semibold text-anthracite">{salon.name}</h3>
-                  <p className="text-sm text-anthracite/75">
-                    <span className="text-champagne">★</span> {salon.rating || "--"}
+                <div className="flex flex-1 flex-col gap-2 p-5">
+                  <h3 className="text-lg font-semibold text-forest">{salon.name}</h3>
+                  <p className="inline-flex items-center gap-1.5 text-sm text-anthracite/70">
+                    <MapPin size={15} className="text-terracotta" aria-hidden="true" />
+                    {salon.city}
                   </p>
-                  <p className="text-xs text-anthracite/75">{salon.city}</p>
                   <SalonCategoryTags categories={salon.service_categories} />
-                  <span className="mt-auto inline-flex w-fit items-center pt-2 text-sm font-medium text-link-sage opacity-65 transition-opacity duration-300 ease-out group-hover:opacity-100">
-                    Voir détails →
+                  <span className="mt-auto inline-flex w-fit items-center gap-1.5 pt-3 text-sm font-semibold text-link-sage transition-colors group-hover:text-forest">
+                    Découvrir
+                    <ArrowUpRight size={15} aria-hidden="true" />
                   </span>
                 </div>
               </Link>
             </div>
           </motion.div>
         ))}
-      </motion.div>
+      </motion.div>}
 
       <div className="mt-14 grid grid-cols-2 gap-6 border-t border-sage/20 pt-10 md:grid-cols-4">
         {REASSURANCE_ITEMS.map(({ icon: Icon, label }) => (

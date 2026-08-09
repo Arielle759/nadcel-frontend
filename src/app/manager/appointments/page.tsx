@@ -7,13 +7,13 @@ import {
   PaymentMethod,
   useManagerAppointments,
 } from "@/hooks/useManagerAppointments";
-import { Calendar } from "lucide-react";
+import { Calendar, Scissors, UserRound } from "lucide-react";
 import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
 import PaymentStatusBadge from "@/components/PaymentStatusBadge";
 import EmptyState from "@/components/EmptyState";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
-import { formatDateTime } from "@/lib/date";
+import AppointmentDateTime from "@/components/AppointmentDateTime";
 
 export default function ManagerAppointmentsPage() {
   const { getAppointments, updateAppointmentStatus, markAppointmentPaid } =
@@ -73,27 +73,47 @@ export default function ManagerAppointmentsPage() {
 
   return (
     <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Rendez-vous</h1>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-terracotta">
+          Gestion du salon
+        </span>
+        <h1 className="text-3xl font-semibold tracking-tight text-forest">Rendez-vous</h1>
+        <p className="max-w-2xl text-anthracite/70">
+          Confirmez les demandes, suivez les prestations et enregistrez les paiements.
+        </p>
+      </div>
 
-      {loading && <p className="text-anthracite/75">Chargement...</p>}
+      {loading && (
+        <div className="space-y-4" aria-label="Chargement des rendez-vous" aria-busy="true">
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-40 animate-pulse rounded-2xl border border-sage/20 bg-sage/10" />
+          ))}
+        </div>
+      )}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && appointments.length === 0 && (
         <EmptyState message="Aucun rendez-vous prévu pour le moment." icon={Calendar} />
       )}
 
-      <div className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
+      <div className="flex flex-col gap-5">
         {appointments.map((appointment) => (
           <div
             key={appointment.id}
-            className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex flex-col gap-5 rounded-2xl border border-sage/20 bg-beige p-5 shadow-[0_10px_30px_rgba(45,59,40,0.07)] transition-all duration-300 hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-[0_16px_38px_rgba(45,59,40,0.12)] sm:flex-row sm:items-center sm:justify-between sm:p-6"
           >
-            <div className="flex flex-col gap-1">
-              <p className="font-semibold text-anthracite">{appointment.client.name}</p>
-              <p className="text-sm text-anthracite/75">{appointment.service.name}</p>
-              <p className="text-sm text-anthracite/75">
-                {formatDateTime(appointment.scheduled_at)}
+            <div className="flex flex-1 flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sage/15 text-link-sage">
+                  <UserRound size={18} aria-hidden="true" />
+                </span>
+                <p className="text-lg font-semibold text-forest">{appointment.client.name}</p>
+              </div>
+              <p className="inline-flex items-center gap-2 text-sm text-anthracite/75">
+                <Scissors size={16} className="text-terracotta" aria-hidden="true" />
+                {appointment.service.name}
               </p>
+              <AppointmentDateTime scheduledAt={appointment.scheduled_at} />
               <div className="flex flex-wrap items-center gap-2">
                 <AppointmentStatusBadge status={appointment.status} />
                 <PaymentStatusBadge

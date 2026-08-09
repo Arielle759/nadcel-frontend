@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { register } from "@/lib/auth";
+import PasswordField from "@/components/PasswordField";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -76,33 +77,21 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="text-sm font-medium">
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-sage/40 px-3 py-2"
-            />
-          </div>
+          <PasswordField
+            id="password"
+            label="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+          />
 
-          <div className="flex flex-col gap-1">
-            <label htmlFor="passwordConfirmation" className="text-sm font-medium">
-              Confirmer le mot de passe
-            </label>
-            <input
-              id="passwordConfirmation"
-              type="password"
-              required
-              value={passwordConfirmation}
-              onChange={(e) => setPasswordConfirmation(e.target.value)}
-              className="rounded-md border border-sage/40 px-3 py-2"
-            />
-          </div>
+          <PasswordField
+            id="passwordConfirmation"
+            label="Confirmer le mot de passe"
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            autoComplete="new-password"
+          />
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 
