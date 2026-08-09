@@ -62,7 +62,7 @@ export default function BecomePartnerPage() {
   return (
     <div className="flex flex-1 flex-col bg-gradient-to-br from-beige via-beige to-sage/20 lg:flex-row">
       <main className="flex flex-1 flex-col items-center px-5 py-8 sm:px-8 lg:px-10 lg:py-9">
-        <div className="mb-5 w-full max-w-3xl text-center lg:text-left">
+        <div className="mb-5 w-full max-w-2xl text-center lg:text-left">
           <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-terracotta"><Sparkles size={16} />Développez votre activité</span>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
             Rejoignez les salons partenaires Nadcel
@@ -75,7 +75,7 @@ export default function BecomePartnerPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-3xl flex-col gap-5 rounded-3xl border border-sage/20 bg-beige/90 p-5 shadow-[0_20px_55px_rgba(45,59,40,0.1)] sm:p-6"
+          className="flex w-full max-w-2xl flex-col gap-5 rounded-3xl border border-sage/20 bg-beige/90 p-5 shadow-[0_20px_55px_rgba(45,59,40,0.1)] sm:p-6"
         >
           {!alreadyAuthenticated && (
             <section className="flex flex-col gap-3">
