@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Banknote, Building2, Calendar, PieChart as PieChartIcon, Users } from "lucide-react";
+import { ArrowUpRight, Banknote, Building2, Calendar, MessageSquare, PieChart as PieChartIcon, ShieldCheck, Users } from "lucide-react";
 import { AdminStats, useAdmin } from "@/hooks/useAdmin";
 import { formatCurrency } from "@/lib/currency";
 import StatCard from "@/components/StatCard";
@@ -47,14 +47,33 @@ export default function AdminDashboardPage() {
   }, [getStats]);
 
   return (
-    <main className="flex flex-1 flex-col gap-4 bg-gradient-to-br from-beige to-sage/20 px-6 py-6 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Administration</h1>
+    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige via-beige to-sage/20 px-6 py-10 sm:px-10 lg:px-14">
+      <div className="relative overflow-hidden rounded-3xl bg-forest px-6 py-8 text-beige shadow-[0_18px_50px_rgba(45,59,40,0.18)] sm:px-8">
+        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sage/20 blur-2xl" />
+        <div className="absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-champagne/15 blur-2xl" />
+        <div className="relative max-w-2xl">
+          <span className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-champagne">
+            <ShieldCheck size={16} aria-hidden="true" />
+            Centre de contrôle
+          </span>
+          <h1 className="text-3xl font-semibold tracking-tight text-beige sm:text-4xl">Administration</h1>
+          <p className="mt-3 text-sm leading-6 text-beige/75 sm:text-base">
+            Supervisez l&apos;activité de la plateforme et accédez aux actions prioritaires.
+          </p>
+        </div>
+      </div>
 
-      {loading && <p className="text-anthracite/75">Chargement...</p>}
+      {loading && (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4" aria-label="Chargement du tableau de bord" aria-busy="true">
+          {[0, 1, 2, 3].map((item) => (
+            <div key={item} className="h-32 animate-pulse rounded-2xl border border-sage/20 bg-sage/10" />
+          ))}
+        </div>
+      )}
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {stats && (
-        <div className="border-t-4 border-t-champagne pt-4">
+        <div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <div className="flex flex-col gap-4">
               <section className="flex flex-col gap-2">
@@ -126,18 +145,26 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      <div className="flex gap-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/admin/salons"
-          className="rounded-full bg-dark-sage px-5 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage"
+          className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
         >
-          Salons en attente
+          <span className="flex items-center gap-3 font-semibold text-forest">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-champagne/15 text-champagne"><Building2 size={19} /></span>
+            Salons en attente
+          </span>
+          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
         <Link
           href="/admin/reviews"
-          className="rounded-full border border-dark-sage px-5 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10"
+          className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
         >
-          Modérer les avis
+          <span className="flex items-center gap-3 font-semibold text-forest">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage/15 text-link-sage"><MessageSquare size={19} /></span>
+            Modérer les avis
+          </span>
+          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
       </div>
     </main>
