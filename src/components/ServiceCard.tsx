@@ -24,9 +24,8 @@ export default function ServiceCard({ service }: { service: Service }) {
       </div>
       <div className="flex min-h-[6.5rem] flex-1 flex-col justify-center gap-1 p-4">
         <p className="line-clamp-2 font-semibold text-anthracite">{service.name}</p>
-        <p className="text-sm text-anthracite/75">
-          {formatCurrency(service.price)} · {formatDuration(service.duration)}
-        </p>
+        <p className="text-sm text-anthracite/75">{formatCurrency(service.price)}</p>
+        <p className="text-sm text-anthracite/75">{formatDuration(service.duration)}</p>
       </div>
     </div>
   );

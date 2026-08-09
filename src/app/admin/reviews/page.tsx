@@ -69,10 +69,8 @@ export default function AdminReviewsPage() {
             className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p className="font-semibold text-anthracite">
-                {review.salon.name}{" "}
-                <span className="text-anthracite/75">— {review.client.name}</span>
-              </p>
+              <p className="font-semibold text-anthracite">{review.salon.name}</p>
+              <p className="text-sm text-anthracite/75">{review.client.name}</p>
               <p className="text-sm text-anthracite/75">
                 <span className="text-champagne">★</span> {review.rating}/5
               </p>

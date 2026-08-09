@@ -27,7 +27,7 @@ export default function PaymentStatusBadge({
       className={`inline-flex items-center rounded-lg px-3 py-1 text-xs font-medium ${PAYMENT_STYLES[status]}`}
     >
       {PAYMENT_LABELS[status]}
-      {status === "paid" && method ? ` · ${PAYMENT_METHOD_LABELS[method]}` : ""}
+      {status === "paid" && method ? ` (${PAYMENT_METHOD_LABELS[method]})` : ""}
     </span>
   );
 }

@@ -121,11 +121,19 @@ export default function ClientAppointmentsPage() {
             >
               <div className="flex flex-col gap-1">
                 <p className="font-semibold text-anthracite">{appointment.salon.name}</p>
+                <p className="text-sm text-anthracite/75">{appointment.service.name}</p>
                 <p className="text-sm text-anthracite/75">
-                  {appointment.service.name} — {formatDateTime(appointment.scheduled_at)} —{" "}
+                  {formatDateTime(appointment.scheduled_at)}
+                </p>
+                <p className="text-sm text-anthracite/75">
                   {formatCurrency(Number(appointment.price))}
                 </p>
                 <AppointmentStatusBadge status={appointment.status} />
+                {appointment.status === "confirmed" && (
+                  <p className="text-sm text-forest">
+                    Votre rendez-vous est prévu le {formatDateTime(appointment.scheduled_at)}.
+                  </p>
+                )}
               </div>
 
               {(canCancel || canReview || isReviewing) && (

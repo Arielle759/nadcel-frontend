@@ -78,13 +78,11 @@ export default function ManagerServicesPage() {
             className="flex items-center justify-between gap-4 rounded-lg border border-sage/30 bg-beige p-4"
           >
             <div>
-              <p className="font-semibold text-anthracite">
-                {service.name} <span className="text-anthracite/75">— {service.category}</span>
-              </p>
+              <p className="font-semibold text-anthracite">{service.name}</p>
+              <p className="text-sm text-anthracite/75">{service.category}</p>
               <p className="text-sm text-anthracite/75">{service.description}</p>
-              <p className="text-sm text-anthracite/75">
-                {formatCurrency(service.price)} · {formatDuration(service.duration)}
-              </p>
+              <p className="text-sm text-anthracite/75">{formatCurrency(service.price)}</p>
+              <p className="text-sm text-anthracite/75">{formatDuration(service.duration)}</p>
             </div>
             <div className="flex gap-2">
               <Link

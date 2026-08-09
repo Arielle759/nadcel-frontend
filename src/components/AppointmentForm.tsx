@@ -172,7 +172,7 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
           >
             {services.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name} — {formatCurrency(s.price)}
+                {s.name} ({formatCurrency(s.price)})
               </option>
             ))}
           </select>
@@ -300,7 +300,6 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
                   <span className="text-base font-semibold text-champagne">
                     {formatCurrency(selectedService.price)}
                   </span>
-                  <span className="text-anthracite/30">·</span>
                   <span className="text-sm text-anthracite/60">
                     {formatDuration(selectedService.duration)}
                   </span>

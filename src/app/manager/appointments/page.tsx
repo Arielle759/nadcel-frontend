@@ -90,8 +90,9 @@ export default function ManagerAppointmentsPage() {
           >
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-anthracite">{appointment.client.name}</p>
+              <p className="text-sm text-anthracite/75">{appointment.service.name}</p>
               <p className="text-sm text-anthracite/75">
-                {appointment.service.name} — {formatDateTime(appointment.scheduled_at)}
+                {formatDateTime(appointment.scheduled_at)}
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 <AppointmentStatusBadge status={appointment.status} />
