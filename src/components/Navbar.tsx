@@ -23,6 +23,8 @@ export default function Navbar() {
       ? "/manager/dashboard"
       : "/client/appointments";
   const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/manager") || pathname.startsWith("/client");
+  const showPublicSalonLinks = !isAdmin && !isGerant;
+  const showPartnerLink = !authed || (!isAdmin && !isGerant);
 
   function handleLogout() {
     logout();
@@ -45,16 +47,18 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-2 text-sm font-medium lg:flex">
-          <Link href="/salons" className="rounded-full px-4 py-2 text-anthracite/75 transition-colors hover:bg-sage/10 hover:text-forest">
-            Nos salons
-          </Link>
+          {showPublicSalonLinks && (
+            <Link href="/salons" className="rounded-full px-4 py-2 text-anthracite/75 transition-colors hover:bg-sage/10 hover:text-forest">
+              Nos salons
+            </Link>
+          )}
           {authed && (
             <Link href={dashboardHref} className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-anthracite/75 transition-colors hover:bg-sage/10 hover:text-forest">
               {isGerant || isAdmin ? <LayoutDashboard size={16} /> : <CalendarDays size={16} />}
               {dashboardLabel}
             </Link>
           )}
-          {!(authed && isAdmin) && (
+          {showPartnerLink && (
             <Link href="/devenir-partenaire" className="inline-flex items-center gap-2 rounded-full border border-dark-sage/35 px-4 py-2 text-link-sage transition-colors hover:bg-sage/10">
               <Store size={16} />
               Inscrire mon salon
@@ -86,9 +90,9 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-sage/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
           <div className="mx-auto flex max-w-[1600px] flex-col gap-2 text-sm font-medium">
-            <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Nos salons</Link>
+            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Nos salons</Link>}
             {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">{dashboardLabel}</Link>}
-            {!(authed && isAdmin) && <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Inscrire mon salon</Link>}
+            {showPartnerLink && <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Inscrire mon salon</Link>}
             {authed ? (
               <button type="button" onClick={handleLogout} className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-forest px-4 py-3 text-beige"><LogOut size={16} />Se déconnecter</button>
             ) : (

@@ -22,8 +22,8 @@ export default function PasswordField({
   const actionLabel = isVisible ? "Masquer le mot de passe" : "Afficher le mot de passe";
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="text-sm font-medium">
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="text-sm font-semibold text-anthracite/80">
         {label}
       </label>
       <div className="relative">
@@ -34,7 +34,7 @@ export default function PasswordField({
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
-          className="w-full rounded-md border border-sage/40 px-3 py-2 pr-11"
+          className="w-full rounded-xl border border-sage/35 bg-white/70 px-4 py-3 pr-12 text-anthracite outline-none transition-all placeholder:text-anthracite/35 focus:border-dark-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
         />
         <button
           type="button"
