@@ -8,6 +8,11 @@ import { CalendarDays, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucid
 import { logout } from "@/lib/auth";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/useAuthState";
 
+const navLink =
+  "rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sage/10 hover:text-forest";
+const partnerButton =
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-champagne-light px-5 font-semibold text-forest shadow-sm transition-colors hover:bg-[#cca35a]";
+
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -46,56 +51,64 @@ export default function Navbar() {
           )}
         </Link>
 
-        <div className="hidden items-center gap-2 text-sm font-medium lg:flex">
+        {/* Hiérarchie : « Inscrire mon salon » est l'action mise en avant (doré),
+            la recherche et le compte restent des liens discrets. */}
+        <div className="hidden items-center gap-1 text-sm font-medium lg:flex">
           {showPublicSalonLinks && (
-            <Link href="/salons" className="rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sage/10 hover:text-forest">
+            <Link href="/salons" className={navLink}>
               Trouver un salon
             </Link>
           )}
           {authed && (
-            <Link href={dashboardHref} className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-anthracite/75 transition-colors hover:bg-sage/10 hover:text-forest">
-              {isGerant || isAdmin ? <LayoutDashboard size={16} /> : <CalendarDays size={16} />}
+            <Link href={dashboardHref} className={`${navLink} inline-flex items-center gap-2`}>
+              {isGerant || isAdmin ? <LayoutDashboard size={16} aria-hidden="true" /> : <CalendarDays size={16} aria-hidden="true" />}
               {dashboardLabel}
-            </Link>
-          )}
-          {showPartnerLink && (
-            <Link href="/devenir-partenaire" className="inline-flex items-center rounded-full border border-forest/25 px-4 py-2 text-forest transition-colors hover:border-forest/50 hover:bg-forest/5">
-              Inscrire mon salon
             </Link>
           )}
           {authed ? (
             <>
-              <span className="inline-flex items-center gap-2 px-2 text-anthracite/65">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-beige"><UserRound size={15} /></span>
+              <span className="ml-2 inline-flex items-center gap-2 px-2 text-anthracite/75">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-beige" aria-hidden="true">
+                  <UserRound size={15} />
+                </span>
                 {user?.name ?? "Mon compte"}
               </span>
-              <button type="button" onClick={handleLogout} className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-beige transition-colors hover:bg-dark-sage">
-                <LogOut size={16} />
+              <button type="button" onClick={handleLogout} className={`${navLink} inline-flex items-center gap-2`}>
+                <LogOut size={16} aria-hidden="true" />
                 Déconnexion
               </button>
             </>
           ) : (
-            <Link href="/login" className="rounded-full bg-forest px-5 py-2 text-beige transition-colors hover:bg-dark-sage">
+            <Link href="/login" className={navLink}>
               Se connecter
+            </Link>
+          )}
+          {showPartnerLink && (
+            <Link href="/devenir-partenaire" className={`${partnerButton} ml-2`}>
+              Inscrire mon salon
             </Link>
           )}
         </div>
 
-        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"} className="flex h-10 w-10 items-center justify-center rounded-full border border-sage/30 text-forest lg:hidden">
+        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"} className="flex h-11 w-11 items-center justify-center rounded-full border border-sage/30 text-forest lg:hidden">
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </nav>
 
       {menuOpen && (
         <div className="border-t border-sage/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
-          <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm font-medium">
+          <div className="mx-auto flex max-w-6xl flex-col gap-1 text-sm font-medium">
             {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Trouver un salon</Link>}
             {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">{dashboardLabel}</Link>}
-            {showPartnerLink && <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Inscrire mon salon</Link>}
             {authed ? (
-              <button type="button" onClick={handleLogout} className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-forest px-4 py-3 text-beige"><LogOut size={16} />Se déconnecter</button>
+              <button type="button" onClick={handleLogout} className="rounded-xl px-4 py-3 text-left hover:bg-sage/10">Se déconnecter</button>
             ) : (
-              <Link href="/login" onClick={() => setMenuOpen(false)} className="mt-2 rounded-xl bg-forest px-4 py-3 text-center text-beige">Se connecter</Link>
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Se connecter</Link>
+            )}
+            {showPartnerLink && (
+              <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className={`${partnerButton} mt-2 w-full`}>
+                Inscrire mon salon
+              </Link>
             )}
           </div>
         </div>
