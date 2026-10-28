@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSalon } from "@/lib/salons";
 import ServiceCard from "@/components/ServiceCard";
+import SalonRating from "@/components/SalonRating";
 import { assetUrl } from "@/lib/api";
 
 export default async function SalonDetailPage({
@@ -41,7 +42,10 @@ export default async function SalonDetailPage({
       </div>
 
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-forest">{salon.name}</h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-semibold tracking-tight text-forest">{salon.name}</h1>
+          <SalonRating average={salon.reviews_avg_rating} count={salon.reviews_count} />
+        </div>
         <p className="text-anthracite/75">{salon.description}</p>
       </div>
 

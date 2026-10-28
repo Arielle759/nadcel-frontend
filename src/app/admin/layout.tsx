@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
-      <aside className="flex w-full flex-col gap-4 bg-gradient-to-b from-forest to-[#1f2d1c] px-4 py-4 text-beige shadow-xl md:sticky md:top-0 md:h-screen md:w-72 md:shrink-0 md:gap-7 md:px-5 md:py-8">
+      <aside className="flex w-full flex-col gap-4 bg-gradient-to-b from-forest to-[#1f2d1c] px-4 py-4 text-beige shadow-xl md:sticky md:top-[73px] md:h-[calc(100vh-73px)] md:w-72 md:shrink-0 md:self-start md:gap-7 md:px-5 md:py-8 md:overflow-y-auto">
         <div className="flex items-center gap-3 rounded-2xl border border-beige/10 bg-beige/5 p-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-champagne text-sm font-bold text-forest">
             AD

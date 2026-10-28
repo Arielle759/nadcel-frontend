@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPin, Star } from "lucide-react";
-import { useSalons } from "@/hooks/useSalons";
+import { ArrowUpRight, MapPin } from "lucide-react";
+import type { Salon } from "@/hooks/useSalons";
 import { assetUrl } from "@/lib/api";
 import SalonCategoryTags from "@/components/SalonCategoryTags";
+import SalonRating from "@/components/SalonRating";
 import CardSkeletons from "@/components/CardSkeletons";
 
 const containerVariants = {
@@ -18,9 +19,17 @@ const cardVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function SalonGrid() {
-  const { salons, loading, error } = useSalons();
-
+export default function SalonGrid({
+  salons,
+  loading,
+  error,
+  emptyMessage = "Aucun salon disponible.",
+}: {
+  salons: Salon[];
+  loading: boolean;
+  error: string | null;
+  emptyMessage?: string;
+}) {
   if (loading) {
     return <CardSkeletons />;
   }
@@ -30,7 +39,7 @@ export default function SalonGrid() {
   }
 
   if (salons.length === 0) {
-    return <p className="text-anthracite/75">Aucun salon disponible.</p>;
+    return <p className="text-center text-anthracite/75">{emptyMessage}</p>;
   }
 
   return (
@@ -48,43 +57,39 @@ export default function SalonGrid() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-sage/20 bg-beige shadow-[0_12px_35px_rgba(45,59,40,0.08)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-sage/40 hover:shadow-[0_18px_45px_rgba(45,59,40,0.14)]"
         >
-          <div className="relative flex aspect-[4/3] w-full shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-sage/40 to-dark-sage/40 text-4xl">
-            {assetUrl(salon.cover ?? salon.logo) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={assetUrl(salon.cover ?? salon.logo)}
-                alt={salon.name}
-                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-              />
-            ) : (
-              <span>💆</span>
-            )}
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forest/45 to-transparent" />
-            <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full bg-beige/95 px-3 py-1.5 text-xs font-semibold text-forest shadow-sm backdrop-blur-sm">
-              <Star size={14} className="fill-champagne text-champagne" aria-hidden="true" />
-              {salon.rating || "Nouveau"}
-            </span>
-          </div>
-          <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold text-forest">{salon.name}</h2>
-              <p className="inline-flex items-center gap-1.5 text-sm text-anthracite/70">
-                <MapPin size={15} className="text-terracotta" aria-hidden="true" />
-                {salon.city}
-              </p>
+          <Link href={`/salons/${salon.id}`} className="flex h-full flex-col">
+            <div className="relative flex aspect-[4/3] w-full shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-sage/40 to-dark-sage/40 text-4xl">
+              {assetUrl(salon.cover ?? salon.logo) ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={assetUrl(salon.cover ?? salon.logo)}
+                  alt={salon.name}
+                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+              ) : (
+                <span>💆</span>
+              )}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forest/45 to-transparent" />
+              <span className="absolute bottom-3 right-3 rounded-full bg-beige/95 px-3 py-1.5 shadow-sm backdrop-blur-sm">
+                <SalonRating average={salon.reviews_avg_rating} count={salon.reviews_count} />
+              </span>
             </div>
-            <SalonCategoryTags categories={salon.service_categories} />
-            <p className="line-clamp-3 flex-1 text-sm leading-6 text-anthracite/75">
-              {salon.description}
-            </p>
-            <Link
-              href={`/salons/${salon.id}`}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-dark-sage px-5 py-2.5 text-sm font-semibold text-beige shadow-sm transition-all hover:bg-forest hover:shadow-md"
-            >
-              Découvrir le salon
-              <ArrowUpRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
+            <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold text-forest">{salon.name}</h2>
+                <p className="inline-flex items-center gap-1.5 text-sm text-anthracite/70">
+                  <MapPin size={15} className="text-terracotta" aria-hidden="true" />
+                  {salon.city}
+                </p>
+              </div>
+              <SalonCategoryTags categories={salon.service_categories} />
+              <p className="line-clamp-3 flex-1 text-sm leading-6 text-anthracite/75">{salon.description}</p>
+              <span className="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-link-sage transition-colors group-hover:text-forest">
+                Découvrir le salon
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </span>
+            </div>
+          </Link>
         </motion.div>
       ))}
     </motion.div>

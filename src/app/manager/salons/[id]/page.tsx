@@ -6,12 +6,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { api, assetUrl } from "@/lib/api";
 import { useManager } from "@/hooks/useManager";
 import type { SalonDetail } from "@/lib/salons";
+import type { OpeningHours } from "@/lib/openingHours";
 import ImageUploadInput from "@/components/ImageUploadInput";
+import OpeningHoursEditor from "@/components/OpeningHoursEditor";
 
 export default function ManagerSalonDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { updateSalon, loading: saving, error: saveError } = useManager();
+  const { updateSalon, updateOpeningHours, loading: saving, error: saveError } = useManager();
 
   const [salon, setSalon] = useState<SalonDetail | null>(null);
   const [fetching, setFetching] = useState(true);
@@ -22,7 +24,9 @@ export default function ManagerSalonDetailPage() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [cover, setCover] = useState<File | null>(null);
+  const [openingHours, setOpeningHours] = useState<OpeningHours | null>(null);
   const [success, setSuccess] = useState(false);
+  const [hoursSuccess, setHoursSuccess] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -36,6 +40,7 @@ export default function ManagerSalonDetailPage() {
         setDescription(data.description);
         setAddress(data.address);
         setCity(data.city);
+        setOpeningHours(data.opening_hours);
       } catch {
         if (isMounted) setFetchError("Impossible de charger le salon.");
       } finally {
@@ -63,6 +68,17 @@ export default function ManagerSalonDetailPage() {
       });
       setSalon(updated);
       setSuccess(true);
+    } catch {
+      // error state is exposed via useManager
+    }
+  }
+
+  async function handleSaveHours() {
+    setHoursSuccess(false);
+    try {
+      const updated = await updateOpeningHours(id, openingHours);
+      setSalon(updated);
+      setHoursSuccess(true);
     } catch {
       // error state is exposed via useManager
     }
@@ -185,6 +201,21 @@ export default function ManagerSalonDetailPage() {
           {saving ? "Enregistrement..." : "Enregistrer"}
         </button>
       </form>
+
+      <div className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6">
+        <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />
+
+        {hoursSuccess && <p className="text-sm text-green-600">Horaires mis à jour !</p>}
+
+        <button
+          type="button"
+          onClick={handleSaveHours}
+          disabled={saving}
+          className="self-start rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
+        >
+          {saving ? "Enregistrement..." : "Enregistrer les horaires"}
+        </button>
+      </div>
     </main>
   );
 }

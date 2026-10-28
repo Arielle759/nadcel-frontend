@@ -13,6 +13,7 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDateTime } from "@/lib/date";
 import { formatDuration } from "@/lib/duration";
 import { isAuthenticated } from "@/lib/auth";
+import { clearBookingDraft, readBookingDraft, saveBookingDraft } from "@/lib/bookingDraft";
 
 interface AppointmentFormProps {
   salonId: number;
@@ -40,6 +41,11 @@ function startOfToday(): Date {
   return today;
 }
 
+function parseDateInputValue(value: string): Date {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 export default function AppointmentForm({ salonId, salonName, salonCover, services }: AppointmentFormProps) {
   const { createAppointment, loading, error } = useAppointments();
   const { getMonthAvailability, getDayAvailability } = useAvailability();
@@ -58,6 +64,24 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
   const [slotsError, setSlotsError] = useState<string | null>(null);
 
   const [authRequired, setAuthRequired] = useState(false);
+  const [restoredNotice, setRestoredNotice] = useState(false);
+
+  // Restaure la sélection service/date/heure si le client vient d'être
+  // redirigé ici après une inscription/connexion déclenchée en plein milieu
+  // de sa réservation (voir handleSubmit ci-dessous).
+  useEffect(() => {
+    const draft = readBookingDraft();
+    if (!draft || draft.salonId !== salonId) return;
+    clearBookingDraft();
+
+    if (services.some((s) => s.id === draft.serviceId)) {
+      setServiceId(draft.serviceId);
+    }
+    setSelectedDate(parseDateInputValue(draft.date));
+    setHeure(draft.heure);
+    setRestoredNotice(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!serviceId) return;
@@ -136,6 +160,12 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
     setAuthRequired(false);
     if (!selectedDate || !heure) return;
     if (!isAuthenticated()) {
+      saveBookingDraft({
+        salonId,
+        serviceId,
+        date: toDateInputValue(selectedDate),
+        heure,
+      });
       setAuthRequired(true);
       return;
     }
@@ -159,6 +189,12 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
         onSubmit={handleSubmit}
         className="flex w-full flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6 lg:max-w-md"
       >
+        {restoredNotice && (
+          <p className="rounded-md border border-dark-sage/30 bg-sage/10 px-3 py-2 text-sm text-forest">
+            Votre sélection a été restaurée : vérifiez le créneau ci-dessous et confirmez votre réservation.
+          </p>
+        )}
+
         <div className="flex flex-col gap-1">
           <label htmlFor="service" className="text-sm font-medium">
             Service

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { login } from "@/lib/auth";
+import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
 import { ArrowRight, CalendarCheck2, CheckCircle2, Mail } from "lucide-react";
 
@@ -21,7 +22,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login({ email, password });
-      router.push("/");
+      router.push(nextUrlForBookingDraft());
     } catch {
       setError("Identifiants invalides.");
     } finally {

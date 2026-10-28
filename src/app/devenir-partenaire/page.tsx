@@ -7,7 +7,7 @@ import { isAuthenticated, register } from "@/lib/auth";
 import { useManager } from "@/hooks/useManager";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import PasswordField from "@/components/PasswordField";
-import { ArrowRight, CheckCircle2, Mail, MapPin, Phone, Sparkles, Store, UserRound } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock3, Mail, MapPin, Phone, Sparkles, Store, UserRound } from "lucide-react";
 
 export default function BecomePartnerPage() {
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function BecomePartnerPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -36,14 +37,14 @@ export default function BecomePartnerPage() {
       if (!alreadyAuthenticated) {
         await register({ name, email, password, role: 'gerant' });
       }
-      const salon = await createSalon({
+      await createSalon({
         name: salonName,
         address,
         city,
         phone,
         description,
       });
-      router.push(`/manager/dashboard?newSalon=${salon.id}`);
+      setSubmitted(true);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Impossible de créer le salon.");
     } finally {
@@ -55,6 +56,28 @@ export default function BecomePartnerPage() {
     return (
       <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-beige to-sage/20 px-6 py-12">
         <p className="text-anthracite/75">Chargement...</p>
+      </main>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-beige to-sage/20 px-6 py-12">
+        <div className="flex max-w-md flex-col items-center gap-3 rounded-3xl border border-sage/20 bg-beige/90 p-8 text-center shadow-[0_20px_55px_rgba(45,59,40,0.1)]">
+          <Clock3 size={36} className="text-champagne" aria-hidden="true" />
+          <h1 className="text-2xl font-semibold tracking-tight text-forest">Votre salon a bien été soumis !</h1>
+          <p className="text-sm leading-6 text-anthracite/75">
+            Notre équipe va examiner votre demande. Dès qu&apos;elle sera validée, vous recevrez un accès
+            complet à votre espace gérant pour ajouter vos services, vos employés et gérer vos réservations.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            className="mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-2.5 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage"
+          >
+            Retour à l&apos;accueil
+          </button>
+        </div>
       </main>
     );
   }

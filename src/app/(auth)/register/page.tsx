@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { register } from "@/lib/auth";
+import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
 import { ArrowRight, CheckCircle2, Mail, Sparkles, UserRound } from "lucide-react";
 
@@ -29,7 +30,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({ name, email, password });
-      router.push("/");
+      router.push(nextUrlForBookingDraft());
     } catch {
       setError("Impossible de créer le compte. Vérifiez vos informations.");
     } finally {

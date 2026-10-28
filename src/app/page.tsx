@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import FadeIn from "@/components/FadeIn";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
@@ -17,9 +16,7 @@ export default function Home() {
         <FeaturesSection />
       </FadeIn>
       <FadeIn>
-        <Suspense fallback={null}>
-          <PopularSalons />
-        </Suspense>
+        <PopularSalons />
       </FadeIn>
       <FadeIn>
         <FaqSection />

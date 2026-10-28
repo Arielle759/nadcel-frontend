@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { api, toErrorMessage } from "@/lib/api";
 import type { SalonDetail } from "@/lib/salons";
 import type { AdminStatsAppointments, AdminStatsRevenue } from "@/hooks/useAdmin";
+import type { OpeningHours } from "@/lib/openingHours";
 
 export interface ManagerStats {
   salons_count: number;
@@ -45,6 +46,7 @@ interface UseManagerResult {
   getSalonStats: () => Promise<ManagerStats>;
   createSalon: (data: CreateSalonData) => Promise<SalonDetail>;
   updateSalon: (id: number | string, data: UpdateSalonData) => Promise<SalonDetail>;
+  updateOpeningHours: (id: number | string, openingHours: OpeningHours | null) => Promise<SalonDetail>;
   deleteSalon: (id: number | string) => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -126,6 +128,24 @@ export function useManager(): UseManagerResult {
     []
   );
 
+  const updateOpeningHours = useCallback(
+    async (id: number | string, openingHours: OpeningHours | null): Promise<SalonDetail> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.put<SalonDetail>(`/salons/${id}`, { opening_hours: openingHours });
+        return data;
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de mettre à jour les horaires.");
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   const deleteSalon = useCallback(async (id: number | string): Promise<void> => {
     setLoading(true);
     setError(null);
@@ -140,5 +160,5 @@ export function useManager(): UseManagerResult {
     }
   }, []);
 
-  return { getSalonStats, createSalon, updateSalon, deleteSalon, loading, error };
+  return { getSalonStats, createSalon, updateSalon, updateOpeningHours, deleteSalon, loading, error };
 }

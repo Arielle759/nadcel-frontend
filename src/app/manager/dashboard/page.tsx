@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ArrowUpRight, Banknote, Building2, Calendar, PieChart as PieChartIcon, Sparkles } from "lucide-react";
 import { useManager, ManagerStats } from "@/hooks/useManager";
 import { formatCurrency } from "@/lib/currency";
@@ -10,32 +9,6 @@ import StatCard from "@/components/StatCard";
 import SectionTitle from "@/components/SectionTitle";
 import AppointmentsPieChart from "@/components/AppointmentsPieChart";
 import RevenueBarChart from "@/components/RevenueBarChart";
-
-function NewSalonBanner() {
-  const searchParams = useSearchParams();
-  const newSalonId = searchParams.get("newSalon");
-
-  if (!newSalonId) return null;
-
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-dark-sage/25 bg-gradient-to-r from-sage/15 to-beige p-5 shadow-sm sm:p-6">
-      <p className="font-medium text-forest">
-        Votre salon a bien été créé et est en attente de validation par l&apos;équipe NADCEL.
-      </p>
-      <p className="text-sm text-anthracite/75">
-        En attendant, complétez votre profil : ajoutez vos services, vos employés et vos
-        horaires depuis la fiche de votre salon.
-      </p>
-      <Link
-        href={`/manager/salons/${newSalonId}/services`}
-        className="mt-1 inline-flex w-fit items-center gap-2 rounded-full bg-dark-sage px-4 py-2 text-sm font-semibold text-beige transition-colors hover:bg-forest"
-      >
-        Ajouter mes services
-        <ArrowUpRight size={16} aria-hidden="true" />
-      </Link>
-    </div>
-  );
-}
 
 export default function ManagerDashboardPage() {
   const { getSalonStats } = useManager();
@@ -80,10 +53,6 @@ export default function ManagerDashboardPage() {
           </p>
         </div>
       </div>
-
-      <Suspense fallback={null}>
-        <NewSalonBanner />
-      </Suspense>
 
       {loading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Chargement du tableau de bord" aria-busy="true">
