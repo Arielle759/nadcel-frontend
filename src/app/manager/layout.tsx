@@ -30,7 +30,7 @@ function useIsAdmin(): boolean {
 const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/manager/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/manager/salons", label: "Mes salons", icon: Building2, matchSubpaths: true },
-  { href: "/manager/appointments", label: "Mes réservations", icon: Calendar, matchSubpaths: true },
+  { href: "/manager/appointments", label: "Rendez-vous", icon: Calendar, matchSubpaths: true },
 ];
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {

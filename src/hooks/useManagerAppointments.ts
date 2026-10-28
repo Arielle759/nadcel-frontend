@@ -26,6 +26,8 @@ export interface ManagerAppointment {
   client: ManagerAppointmentClient;
   service: Service;
   scheduled_at: string;
+  duration: number; // minutes
+  employee: { id: number; name: string } | null;
   status: AppointmentStatus;
   price: string | number;
   payment_status: PaymentStatus;
@@ -61,7 +63,10 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<PaginatedResponse<ManagerAppointment>>("/appointments");
+      // Agenda du salon uniquement (sans les réservations personnelles du gérant).
+      const { data } = await api.get<PaginatedResponse<ManagerAppointment>>("/appointments", {
+        params: { scope: "salon", per_page: 100 },
+      });
       return data.data;
     } catch (err) {
       const message = toErrorMessage(err, "Impossible de charger les rendez-vous.");

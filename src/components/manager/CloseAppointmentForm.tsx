@@ -48,67 +48,72 @@ export default function CloseAppointmentForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full flex-col gap-3 rounded-2xl border border-sage/30 bg-white/60 p-4 sm:w-80"
       aria-label="Clôturer le rendez-vous"
+      className="flex flex-col gap-3 rounded-xl border border-sage/25 bg-sage/[0.06] px-4 py-3"
     >
-      <p className="text-sm font-semibold text-forest">Client venu : enregistrer le paiement</p>
-
-      <div className="flex flex-col gap-1">
-        <label htmlFor={amountId} className="text-xs font-semibold text-anthracite/70">
-          Montant encaissé (F CFA)
-        </label>
-        <input
-          id={amountId}
-          type="number"
-          inputMode="numeric"
-          min={0}
-          step={500}
-          required
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="rounded-xl border border-sage/35 bg-white px-3 py-2 text-sm outline-none focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-        />
-      </div>
-
-      <fieldset className="flex flex-col gap-1">
-        <legend className="mb-1 text-xs font-semibold text-anthracite/70">Moyen de paiement</legend>
-        <div className="flex flex-wrap gap-2">
-          {METHODS.map(({ value, label }) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={method === value}
-              onClick={() => setMethod(value)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-                method === value
-                  ? "border-forest bg-forest text-beige"
-                  : "border-dark-sage/40 text-link-sage hover:bg-sage/10"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
+      <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={amountId} className="text-[11px] font-semibold uppercase tracking-wide text-anthracite/60">
+            Montant encaissé
+          </label>
+          <div className="flex items-center rounded-lg border border-sage/35 bg-white focus-within:border-dark-sage focus-within:ring-4 focus-within:ring-sage/10">
+            <input
+              id={amountId}
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={500}
+              required
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-28 rounded-lg bg-transparent px-3 py-1.5 text-sm outline-none"
+            />
+            <span className="pr-3 text-xs text-anthracite/55">F CFA</span>
+          </div>
         </div>
-      </fieldset>
+
+        <fieldset className="flex flex-col gap-1">
+          <legend className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-anthracite/60">
+            Payé par
+          </legend>
+          <div className="flex flex-wrap gap-1.5">
+            {METHODS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={method === value}
+                onClick={() => setMethod(value)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  method === value
+                    ? "border-forest bg-forest text-beige"
+                    : "border-sage/40 bg-white text-anthracite/75 hover:border-dark-sage"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <div className="ml-auto flex items-center gap-2">
+          <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-xs font-medium text-anthracite/65 hover:bg-sage/10">
+            Annuler
+          </button>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-lg bg-forest px-4 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-dark-sage disabled:opacity-50"
+          >
+            {submitting ? "Enregistrement..." : "Valider la clôture"}
+          </button>
+        </div>
+      </div>
 
       {error && (
         <p role="alert" className="text-xs text-red-700">
           {error}
         </p>
       )}
-
-      <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-beige transition-colors hover:bg-dark-sage disabled:opacity-50"
-        >
-          {submitting ? "Enregistrement..." : "Clôturer le rendez-vous"}
-        </button>
-        <button type="button" onClick={onCancel} className="text-xs text-anthracite/70 hover:underline">
-          Annuler
-        </button>
-      </div>
     </form>
   );
 }
