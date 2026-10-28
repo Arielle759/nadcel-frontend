@@ -20,6 +20,7 @@ interface AppointmentFormProps {
   salonName: string;
   salonCover?: string | null;
   services: Service[];
+  initialServiceId?: number;
 }
 
 function toDateInputValue(date: Date): string {
@@ -46,11 +47,13 @@ function parseDateInputValue(value: string): Date {
   return new Date(year, month - 1, day);
 }
 
-export default function AppointmentForm({ salonId, salonName, salonCover, services }: AppointmentFormProps) {
+export default function AppointmentForm({ salonId, salonName, salonCover, services, initialServiceId }: AppointmentFormProps) {
   const { createAppointment, loading, error } = useAppointments();
   const { getMonthAvailability, getDayAvailability } = useAvailability();
 
-  const [serviceId, setServiceId] = useState(services[0]?.id ?? 0);
+  const [serviceId, setServiceId] = useState(() =>
+    services.some((s) => s.id === initialServiceId) ? (initialServiceId as number) : (services[0]?.id ?? 0)
+  );
   const [displayMonth, setDisplayMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [heure, setHeure] = useState("");

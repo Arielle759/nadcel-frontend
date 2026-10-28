@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, LayoutDashboard, LogOut, Menu, Store, UserRound, X } from "lucide-react";
+import { CalendarDays, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/useAuthState";
 
@@ -34,8 +34,8 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-sage/20 bg-beige/90 shadow-[0_4px_24px_rgba(45,59,40,0.06)] backdrop-blur-xl">
-      <nav className="mx-auto flex min-h-18 max-w-[1600px] items-center justify-between gap-5 px-5 py-3 sm:px-8 lg:px-12">
+    <header className="sticky top-0 z-50 border-b border-sage/20 bg-beige/95 backdrop-blur">
+      <nav aria-label="Navigation principale" className="mx-auto flex min-h-18 max-w-6xl items-center justify-between gap-5 px-6 py-3 sm:px-10">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMenuOpen(false)}>
           <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-10 w-auto" priority />
           <span className="font-heading text-xl font-semibold tracking-tight text-forest">Nadcel</span>
@@ -48,8 +48,8 @@ export default function Navbar() {
 
         <div className="hidden items-center gap-2 text-sm font-medium lg:flex">
           {showPublicSalonLinks && (
-            <Link href="/salons" className="rounded-full px-4 py-2 text-anthracite/75 transition-colors hover:bg-sage/10 hover:text-forest">
-              Nos salons
+            <Link href="/salons" className="rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sage/10 hover:text-forest">
+              Trouver un salon
             </Link>
           )}
           {authed && (
@@ -59,8 +59,7 @@ export default function Navbar() {
             </Link>
           )}
           {showPartnerLink && (
-            <Link href="/devenir-partenaire" className="inline-flex items-center gap-2 rounded-full border border-dark-sage/35 px-4 py-2 text-link-sage transition-colors hover:bg-sage/10">
-              <Store size={16} />
+            <Link href="/devenir-partenaire" className="inline-flex items-center rounded-full border border-forest/25 px-4 py-2 text-forest transition-colors hover:border-forest/50 hover:bg-forest/5">
               Inscrire mon salon
             </Link>
           )}
@@ -89,8 +88,8 @@ export default function Navbar() {
 
       {menuOpen && (
         <div className="border-t border-sage/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
-          <div className="mx-auto flex max-w-[1600px] flex-col gap-2 text-sm font-medium">
-            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Nos salons</Link>}
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 text-sm font-medium">
+            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Trouver un salon</Link>}
             {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">{dashboardLabel}</Link>}
             {showPartnerLink && <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Inscrire mon salon</Link>}
             {authed ? (

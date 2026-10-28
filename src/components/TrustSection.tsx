@@ -1,39 +1,48 @@
 "use client";
 
-import { Building2, ShieldCheck, Star, Users } from "lucide-react";
 import { useSalons } from "@/hooks/useSalons";
 
+function formatRating(value: number): string {
+  return value.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
+// Chiffres réels uniquement : rien n'est affiché tant que les données ne sont
+// pas chargées, et aucune valeur par défaut ne remplace une donnée absente.
 export default function TrustSection() {
-  const { salons } = useSalons();
+  const { salons, total, loading } = useSalons({ per_page: 50 });
 
-  const salonsCount = salons.length > 0 ? salons.length : 9;
+  const reviewCount = salons.reduce((sum, salon) => sum + (salon.reviews_count || 0), 0);
+  const weightedSum = salons.reduce(
+    (sum, salon) => sum + Number(salon.reviews_avg_rating ?? 0) * (salon.reviews_count || 0),
+    0
+  );
+  const averageRating = reviewCount > 0 ? weightedSum / reviewCount : null;
 
-  const ratings = salons
-    .map((salon) => Number(salon.rating))
-    .filter((rating) => !Number.isNaN(rating) && rating > 0);
-  const averageRating =
-    ratings.length > 0
-      ? (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1)
-      : "4.5";
-
-  const STATS = [
-    { icon: Building2, value: `${salonsCount}`, label: "Salons partenaires" },
-    { icon: Star, value: `${averageRating}/5`, label: "Avis clients" },
-    { icon: Users, value: "40+", label: "Clientes satisfaites" },
-    { icon: ShieldCheck, value: null, label: "Paiement sécurisé" },
+  const items = [
+    {
+      value: loading || total === null ? "…" : String(total),
+      label: total === 1 ? "salon vérifié par notre équipe" : "salons vérifiés par notre équipe",
+    },
+    averageRating !== null
+      ? { value: `${formatRating(averageRating)} / 5`, label: `note moyenne sur ${reviewCount} avis` }
+      : { value: "Avis", label: "laissés uniquement après un rendez-vous terminé" },
+    { value: "0 F", label: "de frais de réservation, vous payez au salon" },
+    { value: "24 h", label: "avant le rendez-vous, un rappel par e-mail" },
   ];
 
   return (
-    <section className="relative z-10 mx-4 -mt-8 rounded-3xl border border-sage/20 bg-beige px-6 py-7 shadow-[0_18px_50px_rgba(45,59,40,0.12)] sm:mx-8 sm:px-10 lg:mx-auto lg:max-w-6xl">
-      <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:divide-x md:divide-sage/20">
-        {STATS.map(({ icon: Icon, value, label }) => (
-          <div key={label} className="flex flex-col items-center gap-2 px-3 text-center">
-            <Icon className="h-6 w-6 text-link-sage" />
-            {value && <span className="text-2xl font-bold text-forest">{value}</span>}
-            <span className="text-sm text-anthracite/75">{label}</span>
+    <section
+      aria-label="Nadcel en chiffres"
+      className="relative z-10 mx-4 -mt-10 rounded-3xl border border-sage/20 bg-beige px-6 py-8 shadow-[0_18px_50px_rgba(45,59,40,0.12)] sm:mx-8 sm:px-10 lg:mx-auto lg:w-full lg:max-w-6xl"
+    >
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:divide-x md:divide-sage/20">
+        {items.map(({ value, label }) => (
+          <div key={label} className="flex flex-col gap-1 px-2 md:px-6">
+            <dt className="order-2 text-sm leading-5 text-anthracite/75">{label}</dt>
+            <dd className="order-1 font-heading text-3xl font-semibold text-forest">{value}</dd>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   );
 }

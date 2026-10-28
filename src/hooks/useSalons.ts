@@ -24,6 +24,7 @@ export interface SalonSearchParams {
 
 interface UseSalonsResult {
   salons: Salon[];
+  total: number | null;
   loading: boolean;
   error: string | null;
   refetch: () => void;
@@ -32,11 +33,13 @@ interface UseSalonsResult {
 interface PaginatedResponse<T> {
   data: T[];
   current_page: number;
+  total?: number;
 }
 
 export function useSalons(params: SalonSearchParams = {}): UseSalonsResult {
   const { q, per_page } = params;
   const [salons, setSalons] = useState<Salon[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,6 +51,7 @@ export function useSalons(params: SalonSearchParams = {}): UseSalonsResult {
         params: { q, per_page },
       });
       setSalons(data.data);
+      setTotal(data.total ?? data.data.length);
     } catch (err) {
       setError(toErrorMessage(err, "Impossible de charger les salons."));
     } finally {
@@ -61,5 +65,5 @@ export function useSalons(params: SalonSearchParams = {}): UseSalonsResult {
     });
   }, [fetchSalons]);
 
-  return { salons, loading, error, refetch: fetchSalons };
+  return { salons, total, loading, error, refetch: fetchSalons };
 }

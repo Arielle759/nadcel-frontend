@@ -5,10 +5,14 @@ import AppointmentForm from "@/components/AppointmentForm";
 
 export default async function AppointmentsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { id } = await params;
+  const { service } = await searchParams;
+  const initialServiceId = typeof service === "string" ? Number(service) : undefined;
   const salon = await getSalon(id);
 
   if (!salon) {
@@ -33,7 +37,7 @@ export default async function AppointmentsPage({
         </p>
       </div>
 
-      <AppointmentForm salonId={salon.id} salonName={salon.name} salonCover={salon.cover} services={salon.services} />
+      <AppointmentForm salonId={salon.id} salonName={salon.name} salonCover={salon.cover} services={salon.services} initialServiceId={initialServiceId} />
     </main>
   );
 }

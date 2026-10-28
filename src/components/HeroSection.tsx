@@ -1,27 +1,45 @@
 "use client";
 
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { CalendarCheck2, MapPin, ShieldCheck } from "lucide-react";
+import { Search } from "lucide-react";
+import { ui } from "@/lib/ui";
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
+  visible: { transition: { staggerChildren: 0.12 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0 },
 };
 
+const SUGGESTIONS = ["Coiffure", "Manucure", "Massage", "Plateau", "Almadies"];
+
 export default function HeroSection() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  function search(term: string) {
+    const value = term.trim();
+    router.push(value ? `/salons?q=${encodeURIComponent(value)}` : "/salons");
+  }
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    search(query);
+  }
+
   return (
     <motion.section
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="relative flex min-h-[650px] overflow-hidden px-6 py-24 sm:px-10 lg:min-h-[720px] lg:px-16"
+      className="relative flex min-h-[620px] overflow-hidden px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
     >
       <Image
         src="/images/services/soin.jpg"
@@ -31,33 +49,75 @@ export default function HeroSection() {
         sizes="100vw"
         className="object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-forest/45 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/15" />
 
-      <div className="relative mx-auto flex w-full max-w-7xl items-center">
-        <div className="max-w-3xl">
-          <motion.span variants={itemVariants} transition={{ duration: 0.5 }} className="mb-6 inline-flex items-center gap-2 rounded-full border border-beige/20 bg-beige/10 px-4 py-2 text-sm font-medium text-beige backdrop-blur-sm">
-            La beauté à portée de clic
-          </motion.span>
-          <motion.h1 variants={itemVariants} transition={{ duration: 0.6, ease: "easeOut" }} className="max-w-3xl text-4xl font-semibold leading-[1.08] tracking-tight text-beige sm:text-6xl lg:text-7xl">
+      <div className="relative mx-auto flex w-full max-w-6xl items-center">
+        <div className="max-w-2xl">
+          <motion.p variants={itemVariants} className="mb-5 text-sm font-medium text-beige/75">
+            Dakar, Thiès, Saint-Louis et Mbour
+          </motion.p>
+          <motion.h1
+            variants={itemVariants}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-4xl font-semibold leading-[1.06] tracking-tight text-beige sm:text-6xl"
+          >
             Le bon salon, au bon moment, près de chez vous.
           </motion.h1>
-          <motion.p variants={itemVariants} transition={{ duration: 0.6, ease: "easeOut" }} className="mt-6 max-w-2xl text-lg leading-8 text-beige/80 sm:text-xl">
-            Découvrez des professionnels vérifiés et réservez votre prochain moment beauté simplement.
+          <motion.p
+            variants={itemVariants}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="mt-6 max-w-xl text-lg leading-8 text-beige/80"
+          >
+            Comparez les salons vérifiés, voyez les créneaux libres et réservez en ligne. Vous payez au salon.
           </motion.p>
-          <motion.div variants={itemVariants} transition={{ duration: 0.6, ease: "easeOut" }} className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/salons" className="inline-flex items-center justify-center gap-2 rounded-full bg-champagne px-7 py-3.5 font-semibold text-forest shadow-lg transition-all hover:-translate-y-0.5 hover:bg-beige">
-              Trouver un salon
-            </Link>
-            <Link href="/devenir-partenaire" className="inline-flex items-center justify-center rounded-full border border-beige/35 bg-beige/10 px-7 py-3.5 font-semibold text-beige backdrop-blur-sm transition-colors hover:bg-beige/20">
-              Je suis un professionnel
-            </Link>
+
+          <motion.form
+            variants={itemVariants}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            onSubmit={handleSubmit}
+            role="search"
+            className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(20,30,18,0.25)] sm:flex-row sm:items-center"
+          >
+            <label htmlFor="hero-search" className="sr-only">
+              Prestation, salon, quartier ou ville
+            </label>
+            <div className="flex flex-1 items-center gap-3 px-4">
+              <Search size={18} className="shrink-0 text-anthracite/50" aria-hidden="true" />
+              <input
+                id="hero-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Prestation, salon, quartier ou ville"
+                autoComplete="off"
+                className="h-12 w-full bg-transparent text-base text-anthracite outline-none placeholder:text-anthracite/50"
+              />
+            </div>
+            <button type="submit" className={`${ui.buttonPrimary} h-12 px-7`}>
+              Rechercher
+            </button>
+          </motion.form>
+
+          <motion.div variants={itemVariants} className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-beige/70">Par exemple :</span>
+            {SUGGESTIONS.map((term) => (
+              <button
+                key={term}
+                type="button"
+                onClick={() => search(term)}
+                className="rounded-full border border-beige/25 px-3 py-1 text-beige/90 transition-colors hover:border-beige/60 hover:text-beige"
+              >
+                {term}
+              </button>
+            ))}
           </motion.div>
-          <motion.div variants={itemVariants} transition={{ duration: 0.6 }} className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-beige/75">
-            <span className="inline-flex items-center gap-2"><ShieldCheck size={17} className="text-champagne" />Salons vérifiés</span>
-            <span className="inline-flex items-center gap-2"><CalendarCheck2 size={17} className="text-champagne" />Réservation simple</span>
-            <span className="inline-flex items-center gap-2"><MapPin size={17} className="text-champagne" />Partout au Sénégal</span>
-          </motion.div>
+
+          <motion.p variants={itemVariants} className="mt-10 text-sm text-beige/75">
+            Vous gérez un salon ?{" "}
+            <Link href="/devenir-partenaire" className="font-semibold text-beige underline decoration-beige/40 underline-offset-4 hover:decoration-beige">
+              Inscrivez-le gratuitement
+            </Link>
+          </motion.p>
         </div>
       </div>
     </motion.section>
