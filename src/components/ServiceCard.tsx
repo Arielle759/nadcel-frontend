@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Banknote, Clock3, Sparkles } from "lucide-react";
+import { Banknote, Clock3 } from "lucide-react";
 import type { Service } from "@/hooks/useServices";
 import { resolveServiceImage } from "@/lib/serviceImage";
 import { formatCurrency } from "@/lib/currency";
@@ -21,7 +21,7 @@ export default function ServiceCard({ service }: { service: Service }) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Sparkles size={40} className="text-beige/80" aria-hidden="true" />
+            <span className="font-heading text-5xl font-semibold text-beige/70" aria-hidden="true">{service.name.charAt(0)}</span>
           </div>
         )}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-forest/35 to-transparent" />

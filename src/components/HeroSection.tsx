@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, CalendarCheck2, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import { CalendarCheck2, MapPin, ShieldCheck } from "lucide-react";
 
 const containerVariants = {
   hidden: {},
@@ -37,7 +37,6 @@ export default function HeroSection() {
       <div className="relative mx-auto flex w-full max-w-7xl items-center">
         <div className="max-w-3xl">
           <motion.span variants={itemVariants} transition={{ duration: 0.5 }} className="mb-6 inline-flex items-center gap-2 rounded-full border border-beige/20 bg-beige/10 px-4 py-2 text-sm font-medium text-beige backdrop-blur-sm">
-            <Sparkles size={16} className="text-champagne" />
             La beauté à portée de clic
           </motion.span>
           <motion.h1 variants={itemVariants} transition={{ duration: 0.6, ease: "easeOut" }} className="max-w-3xl text-4xl font-semibold leading-[1.08] tracking-tight text-beige sm:text-6xl lg:text-7xl">
@@ -49,7 +48,6 @@ export default function HeroSection() {
           <motion.div variants={itemVariants} transition={{ duration: 0.6, ease: "easeOut" }} className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/salons" className="inline-flex items-center justify-center gap-2 rounded-full bg-champagne px-7 py-3.5 font-semibold text-forest shadow-lg transition-all hover:-translate-y-0.5 hover:bg-beige">
               Trouver un salon
-              <ArrowRight size={18} />
             </Link>
             <Link href="/devenir-partenaire" className="inline-flex items-center justify-center rounded-full border border-beige/35 bg-beige/10 px-7 py-3.5 font-semibold text-beige backdrop-blur-sm transition-colors hover:bg-beige/20">
               Je suis un professionnel

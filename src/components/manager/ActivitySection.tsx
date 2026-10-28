@@ -2,17 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  Activity,
-  CalendarClock,
-  Lightbulb,
-  Scissors,
-  TrendingDown,
-  TrendingUp,
-  UserRoundCheck,
-  Users,
-  Wallet,
-} from "lucide-react";
+
 import {
   useManagerActivity,
   type ActivityBusySlot,
@@ -21,7 +11,6 @@ import {
   type ManagerActivity,
 } from "@/hooks/useManagerActivity";
 import { formatCurrency } from "@/lib/currency";
-import SectionTitle from "@/components/SectionTitle";
 import ActivityMonthlyChart from "@/components/manager/ActivityMonthlyChart";
 import { DAY_LABELS, DAY_SHORT, PART_LABELS, formatMonthLong, formatTrend } from "@/components/manager/activityFormat";
 
@@ -54,7 +43,7 @@ export default function ActivitySection({
   return (
     <section className="flex flex-col gap-4" aria-busy={loading}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <SectionTitle icon={Activity}>Activité du salon</SectionTitle>
+        <h2 className="text-lg font-semibold text-forest">Activité du salon</h2>
         <div role="group" aria-label="Période analysée" className="flex rounded-full border border-sage/30 bg-beige p-1">
           {PERIODS.map(({ key, label }) => (
             <button
@@ -200,8 +189,7 @@ function PaymentMethods({ data }: { data: ManagerActivity }) {
   const used = data.payment_methods.filter((m) => m.count > 0);
   return (
     <div className={CARD}>
-      <p className="mb-2 flex items-center gap-2 font-semibold text-forest">
-        <Wallet size={17} aria-hidden="true" />
+      <p className="mb-2 font-semibold text-forest">
         Encaissements
       </p>
       {used.length === 0 ? (
@@ -212,7 +200,7 @@ function PaymentMethods({ data }: { data: ManagerActivity }) {
             <li key={m.method} className="flex items-center justify-between gap-2">
               <span className="text-anthracite">{METHOD_LABELS[m.method] ?? m.method}</span>
               <span className="text-anthracite/65">
-                {formatCurrency(m.amount)} · {m.share.toLocaleString("fr-FR")} %
+                {formatCurrency(m.amount)} ({m.share.toLocaleString("fr-FR")} %)
               </span>
             </li>
           ))}
@@ -228,13 +216,11 @@ function TrendBadge({ trend }: { trend: number | null }) {
     return <span className="text-xs text-anthracite/50">Nouveau</span>;
   }
   const up = trend! >= 0;
-  const Icon = up ? TrendingUp : TrendingDown;
   return (
     <span
       className={`inline-flex items-center gap-1 text-xs font-semibold ${up ? "text-link-sage" : "text-terracotta"}`}
       title="Par rapport à la période précédente de même durée"
     >
-      <Icon size={14} aria-hidden="true" />
       {label}
     </span>
   );
@@ -243,12 +229,11 @@ function TrendBadge({ trend }: { trend: number | null }) {
 function TopServices({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="flex items-center gap-2 font-semibold text-forest">
-        <Scissors size={17} aria-hidden="true" />
+      <p className="font-semibold text-forest">
         Prestations préférées des clients
       </p>
       <p className="mb-4 text-sm text-anthracite/60">
-        {data.totals.completed} prestation{data.totals.completed > 1 ? "s" : ""} réalisée{data.totals.completed > 1 ? "s" : ""} ·{" "}
+        {data.totals.completed} prestation{data.totals.completed > 1 ? "s" : ""} réalisée{data.totals.completed > 1 ? "s" : ""}, soit{" "}
         {formatCurrency(data.totals.revenue)}
       </p>
       {data.top_services.length === 0 ? (
@@ -268,7 +253,7 @@ function TopServices({ data }: { data: ManagerActivity }) {
                 <div className="h-full rounded-full bg-forest" style={{ width: `${service.share}%` }} />
               </div>
               <p className="text-xs text-anthracite/60">
-                {service.count} fois · {service.share.toLocaleString("fr-FR")} % des prestations ·{" "}
+                {service.count} fois, {service.share.toLocaleString("fr-FR")} % des prestations,{" "}
                 {formatCurrency(service.revenue)}
               </p>
             </li>
@@ -285,8 +270,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
 
   return (
     <div className={`${CARD} flex flex-col gap-3`}>
-      <p className="flex items-center gap-2 font-semibold text-forest">
-        <CalendarClock size={17} aria-hidden="true" />
+      <p className="font-semibold text-forest">
         Prévision pour {month}
       </p>
       {forecast.expected === null ? (
@@ -365,7 +349,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-2 text-xs text-anthracite/50">Matin : avant 12 h · Après-midi : 12 h – 17 h · Soir : après 17 h</p>
+      <p className="mt-2 text-xs text-anthracite/50">Matin : avant 12 h. Après-midi : de 12 h à 17 h. Soir : après 17 h.</p>
     </div>
   );
 }
@@ -373,8 +357,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
 function Employees({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="mb-3 flex items-center gap-2 font-semibold text-forest">
-        <Users size={17} aria-hidden="true" />
+      <p className="mb-3 font-semibold text-forest">
         Activité par employé
       </p>
       {data.employees.length === 0 ? (
@@ -385,7 +368,7 @@ function Employees({ data }: { data: ManagerActivity }) {
             <li key={employee.employee_id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <span className="font-medium text-anthracite">{employee.name}</span>
               <span className="text-anthracite/65">
-                {employee.count} prestation{employee.count > 1 ? "s" : ""} · {formatCurrency(employee.revenue)}
+                {employee.count} prestation{employee.count > 1 ? "s" : ""}, {formatCurrency(employee.revenue)}
               </span>
             </li>
           ))}
@@ -399,8 +382,7 @@ function Loyalty({ data }: { data: ManagerActivity }) {
   const { loyalty } = data;
   return (
     <div className={CARD}>
-      <p className="mb-2 flex items-center gap-2 font-semibold text-forest">
-        <UserRoundCheck size={17} aria-hidden="true" />
+      <p className="mb-2 font-semibold text-forest">
         Fidélité des clients
       </p>
       <p className="text-3xl font-semibold tracking-tight text-forest">{loyalty.rate.toLocaleString("fr-FR")} %</p>
@@ -444,8 +426,7 @@ function Insights({ data }: { data: ManagerActivity }) {
 
   return (
     <div className="rounded-2xl border border-champagne/30 bg-champagne/10 p-5">
-      <p className="mb-2 flex items-center gap-2 font-semibold text-forest">
-        <Lightbulb size={17} aria-hidden="true" />À retenir
+      <p className="mb-2 font-semibold text-forest">À retenir
       </p>
       <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-anthracite/80">
         {insights.map((insight) => (

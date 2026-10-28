@@ -113,7 +113,7 @@ export default function EditEmployeePage() {
         onClick={() => router.push(`/manager/salons/${id}/employees`)}
         className="self-start text-sm text-link-sage hover:underline"
       >
-        ← Retour aux employés
+        Retour aux employés
       </button>
 
       <h1 className="text-3xl font-semibold tracking-tight text-forest">Modifier l&apos;employé</h1>

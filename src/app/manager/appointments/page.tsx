@@ -13,6 +13,7 @@ import { PAYMENT_METHOD_LABELS } from "@/components/PaymentStatusBadge";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import { formatCurrency } from "@/lib/currency";
+import { formatDuration } from "@/components/manager/activityFormat";
 
 type Tab = "to_close" | "upcoming" | "completed" | "cancelled" | "all";
 
@@ -63,19 +64,13 @@ function dayLabel(iso: string, now: number): string {
   const diff = Math.round((startOf(date) - startOf(today)) / 86_400_000);
   const formatted = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
   const relative = diff === 0 ? "Aujourd'hui" : diff === 1 ? "Demain" : diff === -1 ? "Hier" : null;
-  return relative ? `${relative} · ${formatted}` : formatted;
+  return relative ? `${relative}, ${formatted}` : formatted;
 }
 
 function timeLabel(iso: string): string {
   return new Date(iso).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function endLabel(iso: string, minutes: number): string {
-  return new Date(new Date(iso).getTime() + minutes * 60_000).toLocaleTimeString("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default function ManagerAppointmentsPage() {
   const { getAppointments, updateAppointmentStatus, completeAppointment } = useManagerAppointments();
@@ -248,7 +243,7 @@ export default function ManagerAppointmentsPage() {
             <h2 className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-anthracite/55">
               <span className="first-letter:uppercase">{dayLabel(group[0].scheduled_at, now)}</span>
               <span className="font-normal normal-case tracking-normal text-anthracite/40">
-                · {group.length} rendez-vous
+                ({group.length})
               </span>
             </h2>
             <ul className="divide-y divide-sage/15 overflow-hidden rounded-2xl border border-sage/20 bg-white/70 shadow-[0_6px_20px_rgba(45,59,40,0.05)]">
@@ -321,8 +316,7 @@ function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now
   })();
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${className}`}>
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${className}`}>
       {label}
     </span>
   );
@@ -364,7 +358,7 @@ function AppointmentRow({
       <div className="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 gap-y-2 md:grid-cols-[4.5rem_minmax(0,1fr)_10rem_8rem_auto]">
         <div className="leading-tight">
           <p className={`text-base font-semibold text-forest ${cancelled ? "line-through" : ""}`}>{timeLabel(a.scheduled_at)}</p>
-          {a.duration > 0 && <p className="text-xs text-anthracite/50">→ {endLabel(a.scheduled_at, a.duration)}</p>}
+          {a.duration > 0 && <p className="text-xs text-anthracite/50">{formatDuration(a.duration)}</p>}
         </div>
 
         <div className="min-w-0">
@@ -385,7 +379,7 @@ function AppointmentRow({
           {a.status === "completed" && (
             <span className="text-sm font-medium text-anthracite/75">
               {formatCurrency(Number(a.amount_paid ?? a.price))}
-              {a.payment_method && <span className="text-anthracite/50"> · {PAYMENT_METHOD_LABELS[a.payment_method]}</span>}
+              {a.payment_method && <span className="text-anthracite/50"> par {PAYMENT_METHOD_LABELS[a.payment_method]}</span>}
             </span>
           )}
 

@@ -49,7 +49,7 @@ export default function ManagerEmployeesPage() {
         href={`/manager/salons/${id}`}
         className="self-start text-sm text-link-sage hover:underline"
       >
-        ← Retour au salon
+        Retour au salon
       </Link>
 
       <div className="flex items-center justify-between">

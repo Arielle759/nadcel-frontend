@@ -7,7 +7,7 @@ import Image from "next/image";
 import { homePathFor, login } from "@/lib/auth";
 import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
-import { ArrowRight, CalendarCheck2, CheckCircle2, Mail } from "lucide-react";
+import { CalendarCheck2, CheckCircle2, Mail } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,8 +75,7 @@ export default function LoginPage() {
             className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-forest px-5 py-3 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
           >
             {loading ? "Connexion..." : "Se connecter"}
-            {!loading && <ArrowRight size={17} aria-hidden="true" />}
-          </button>
+            </button>
 
           <p className="text-center text-sm text-anthracite/75">
             Pas encore de compte ?{" "}

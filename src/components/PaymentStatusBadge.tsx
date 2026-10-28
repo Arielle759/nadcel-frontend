@@ -38,7 +38,7 @@ export default function PaymentStatusBadge({
       className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${PAYMENT_STYLES[status]}`}
     >
       {PAYMENT_LABELS[status]}
-      {status === "paid" && details.length > 0 ? ` · ${details.join(" · ")}` : ""}
+      {status === "paid" && details.length > 0 ? ` : ${details.join(", ")}` : ""}
     </span>
   );
 }

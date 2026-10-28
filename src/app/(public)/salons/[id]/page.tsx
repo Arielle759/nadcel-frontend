@@ -23,7 +23,7 @@ export default async function SalonDetailPage({
   return (
     <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
       <Link href="/salons" className="text-sm text-link-sage hover:underline">
-        ← Retour aux salons
+        Retour aux salons
       </Link>
 
       <div className="relative aspect-[21/9] w-full overflow-hidden rounded-lg bg-gradient-to-br from-sage/40 to-dark-sage/40">

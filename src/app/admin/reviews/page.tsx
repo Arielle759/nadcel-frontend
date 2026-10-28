@@ -50,7 +50,7 @@ export default function AdminReviewsPage() {
   return (
     <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
       <Link href="/admin/dashboard" className="self-start text-sm text-link-sage hover:underline">
-        ← Retour au tableau de bord
+        Retour au tableau de bord
       </Link>
 
       <h1 className="text-3xl font-semibold tracking-tight text-forest">Avis</h1>

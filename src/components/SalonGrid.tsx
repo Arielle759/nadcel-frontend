@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { Salon } from "@/hooks/useSalons";
 import { assetUrl } from "@/lib/api";
 import SalonCategoryTags from "@/components/SalonCategoryTags";
@@ -86,7 +86,6 @@ export default function SalonGrid({
               <p className="line-clamp-3 flex-1 text-sm leading-6 text-anthracite/75">{salon.description}</p>
               <span className="mt-2 inline-flex w-fit items-center gap-2 text-sm font-semibold text-link-sage transition-colors group-hover:text-forest">
                 Découvrir le salon
-                <ArrowUpRight size={16} aria-hidden="true" />
               </span>
             </div>
           </Link>

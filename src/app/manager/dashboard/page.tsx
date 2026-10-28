@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Building2, Calendar } from "lucide-react";
+import { Building2, Calendar } from "lucide-react";
 import { useManager, ManagerStats } from "@/hooks/useManager";
 import ActivitySection from "@/components/manager/ActivitySection";
 
@@ -48,7 +48,6 @@ export default function ManagerDashboardPage() {
           >
             <Building2 size={16} aria-hidden="true" />
             Mes salons
-            <ArrowUpRight size={14} aria-hidden="true" />
           </Link>
         </div>
       </div>

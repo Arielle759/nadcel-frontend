@@ -21,7 +21,7 @@ export default async function AppointmentsPage({
         href={`/salons/${salon.id}`}
         className="text-sm text-link-sage hover:underline"
       >
-        ← Retour au salon
+        Retour au salon
       </Link>
 
       <div className="flex flex-col gap-2">

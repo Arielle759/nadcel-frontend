@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Banknote, Building2, Calendar, MessageSquare, PieChart as PieChartIcon, ShieldCheck, Users } from "lucide-react";
+import { Banknote, Building2, Calendar, PieChart as PieChartIcon, ShieldCheck, Users } from "lucide-react";
 import { AdminStats, useAdmin } from "@/hooks/useAdmin";
 import { formatCurrency } from "@/lib/currency";
 import StatCard from "@/components/StatCard";
@@ -49,8 +49,6 @@ export default function AdminDashboardPage() {
   return (
     <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige via-beige to-sage/20 px-6 py-10 sm:px-10 lg:px-14">
       <div className="relative overflow-hidden rounded-3xl bg-forest px-6 py-8 text-beige shadow-[0_18px_50px_rgba(45,59,40,0.18)] sm:px-8">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sage/20 blur-2xl" />
-        <div className="absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-champagne/15 blur-2xl" />
         <div className="relative max-w-2xl">
           <span className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-champagne">
             <ShieldCheck size={16} aria-hidden="true" />
@@ -151,20 +149,16 @@ export default function AdminDashboardPage() {
           className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
         >
           <span className="flex items-center gap-3 font-semibold text-forest">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-champagne/15 text-champagne"><Building2 size={19} /></span>
             Salons en attente
           </span>
-          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
         <Link
           href="/admin/reviews"
           className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
         >
           <span className="flex items-center gap-3 font-semibold text-forest">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage/15 text-link-sage"><MessageSquare size={19} /></span>
             Modérer les avis
           </span>
-          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
       </div>
     </main>

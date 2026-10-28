@@ -95,7 +95,7 @@ export default function EditServicePage() {
         onClick={() => router.push(`/manager/salons/${id}/services`)}
         className="self-start text-sm text-link-sage hover:underline"
       >
-        ← Retour aux services
+        Retour aux services
       </button>
 
       <h1 className="text-3xl font-semibold tracking-tight text-forest">Modifier le service</h1>

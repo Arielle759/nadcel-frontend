@@ -7,7 +7,7 @@ import Image from "next/image";
 import { register } from "@/lib/auth";
 import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
-import { ArrowRight, CheckCircle2, Mail, Sparkles, UserRound } from "lucide-react";
+import { CheckCircle2, Mail, UserRound } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -92,8 +92,7 @@ export default function RegisterPage() {
             className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-forest px-5 py-3 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
           >
             {loading ? "Création du compte..." : "Créer mon compte"}
-            {!loading && <ArrowRight size={17} aria-hidden="true" />}
-          </button>
+            </button>
 
           <p className="text-center text-sm text-anthracite/75">
             Déjà un compte ?{" "}
@@ -116,7 +115,7 @@ export default function RegisterPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-forest/95 via-forest/45 to-forest/10" />
         <div className="absolute inset-x-0 bottom-0 flex flex-col gap-5 p-10 xl:p-14">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-beige/20 bg-beige/10 px-4 py-2 text-sm text-beige backdrop-blur-sm"><Sparkles size={16} />Votre expérience commence ici</span>
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-beige/20 bg-beige/10 px-4 py-2 text-sm text-beige backdrop-blur-sm">Votre expérience commence ici</span>
           <h2 className="max-w-lg text-4xl font-semibold leading-tight text-beige">Prenez soin de vous, en toute simplicité.</h2>
           <div className="space-y-2 text-sm text-beige/80">
             <p className="flex items-center gap-2"><CheckCircle2 size={16} className="text-champagne" />Création de compte rapide</p>

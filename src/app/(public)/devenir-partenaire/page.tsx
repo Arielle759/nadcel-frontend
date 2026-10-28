@@ -7,7 +7,7 @@ import { isAuthenticated, register } from "@/lib/auth";
 import { useManager } from "@/hooks/useManager";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import PasswordField from "@/components/PasswordField";
-import { ArrowRight, CheckCircle2, Clock3, Mail, MapPin, Phone, Sparkles, Store, UserRound } from "lucide-react";
+import { CheckCircle2, Clock3, Mail, MapPin, Phone, Store, UserRound } from "lucide-react";
 
 export default function BecomePartnerPage() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function BecomePartnerPage() {
     <div className="flex flex-1 flex-col bg-gradient-to-br from-beige via-beige to-sage/20 lg:flex-row">
       <main className="flex flex-1 flex-col items-center px-5 py-8 sm:px-8 lg:px-10 lg:py-9">
         <div className="mb-5 w-full max-w-2xl text-center lg:text-left">
-          <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-terracotta"><Sparkles size={16} />Développez votre activité</span>
+          <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-terracotta">Développez votre activité</span>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
             Rejoignez les salons partenaires Nadcel
           </h1>
@@ -227,8 +227,7 @@ export default function BecomePartnerPage() {
             className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-2.5 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
           >
             {submitting ? "Envoi en cours..." : "Inscrire mon salon"}
-            {!submitting && <ArrowRight size={18} aria-hidden="true" />}
-          </button>
+            </button>
         </form>
       </main>
 

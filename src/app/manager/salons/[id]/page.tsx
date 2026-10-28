@@ -107,7 +107,7 @@ export default function ManagerSalonDetailPage() {
         onClick={() => router.push("/manager/salons")}
         className="self-start text-sm text-link-sage hover:underline"
       >
-        ← Retour à mes salons
+        Retour à mes salons
       </button>
 
       <div className="flex items-center justify-between">
