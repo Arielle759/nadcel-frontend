@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -23,15 +23,19 @@ const SUGGESTIONS = ["Coiffure", "Manucure", "Massage", "Plateau", "Almadies"];
 export default function HeroSection() {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  function search(term: string) {
-    const value = term.trim();
-    router.push(value ? `/salons?q=${encodeURIComponent(value)}` : "/salons");
+  // Une suggestion remplit seulement le champ : la redirection n'a lieu
+  // qu'au clic sur « Rechercher » (ou Entrée). Un second clic la retire.
+  function pickSuggestion(term: string) {
+    setQuery((current) => (current.trim().toLowerCase() === term.toLowerCase() ? "" : term));
+    inputRef.current?.focus();
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    search(query);
+    const value = query.trim();
+    router.push(value ? `/salons?q=${encodeURIComponent(value)}` : "/salons");
   }
 
   return (
@@ -84,6 +88,7 @@ export default function HeroSection() {
             <div className="flex flex-1 items-center gap-3 px-4">
               <Search size={18} className="shrink-0 text-anthracite/50" aria-hidden="true" />
               <input
+                ref={inputRef}
                 id="hero-search"
                 type="search"
                 value={query}
@@ -100,16 +105,24 @@ export default function HeroSection() {
 
           <motion.div variants={itemVariants} className="mt-5 flex flex-wrap items-center gap-2 text-sm">
             <span className="text-beige/70">Par exemple :</span>
-            {SUGGESTIONS.map((term) => (
-              <button
-                key={term}
-                type="button"
-                onClick={() => search(term)}
-                className="rounded-full border border-beige/25 px-3 py-1 text-beige/90 transition-colors hover:border-beige/60 hover:text-beige"
-              >
-                {term}
-              </button>
-            ))}
+            {SUGGESTIONS.map((term) => {
+              const selected = query.trim().toLowerCase() === term.toLowerCase();
+              return (
+                <button
+                  key={term}
+                  type="button"
+                  onClick={() => pickSuggestion(term)}
+                  aria-pressed={selected}
+                  className={`rounded-full border px-3 py-1 transition-colors ${
+                    selected
+                      ? "border-beige bg-beige font-semibold text-forest"
+                      : "border-beige/25 text-beige/90 hover:border-beige/60 hover:text-beige"
+                  }`}
+                >
+                  {term}
+                </button>
+              );
+            })}
           </motion.div>
 
           <motion.p variants={itemVariants} className="mt-10 text-sm text-beige/75">
