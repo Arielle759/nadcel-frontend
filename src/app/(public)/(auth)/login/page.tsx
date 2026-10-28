@@ -4,7 +4,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { login } from "@/lib/auth";
+import { homePathFor, login } from "@/lib/auth";
 import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
 import { ArrowRight, CalendarCheck2, CheckCircle2, Mail } from "lucide-react";
@@ -21,8 +21,11 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      await login({ email, password });
-      router.push(nextUrlForBookingDraft());
+      const { user } = await login({ email, password });
+      // Le gérant et l'administrateur arrivent directement dans leur espace ;
+      // le client reprend sa réservation en cours, ou revient à l'accueil.
+      const home = homePathFor(user);
+      router.replace(home === "/" ? nextUrlForBookingDraft(home) : home);
     } catch {
       setError("Identifiants invalides.");
     } finally {

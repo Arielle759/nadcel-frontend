@@ -36,7 +36,9 @@ export function clearBookingDraft(): void {
   }
 }
 
-export function nextUrlForBookingDraft(): string {
+// Une réservation commencée avant la connexion reprend là où elle s'était arrêtée ;
+// sinon, l'utilisateur arrive sur la page prévue pour son rôle (`fallback`).
+export function nextUrlForBookingDraft(fallback = "/"): string {
   const draft = readBookingDraft();
-  return draft ? `/salons/${draft.salonId}/appointments` : "/";
+  return draft ? `/salons/${draft.salonId}/appointments` : fallback;
 }
