@@ -9,6 +9,7 @@ import StatCard from "@/components/StatCard";
 import SectionTitle from "@/components/SectionTitle";
 import AppointmentsPieChart from "@/components/AppointmentsPieChart";
 import RevenueBarChart from "@/components/RevenueBarChart";
+import ActivitySection from "@/components/manager/ActivitySection";
 
 export default function ManagerDashboardPage() {
   const { getSalonStats } = useManager();
@@ -113,6 +114,8 @@ export default function ManagerDashboardPage() {
               <RevenueBarChart revenue={stats.revenue} />
             </div>
           </section>
+
+          <ActivitySection />
         </div>
       )}
 
