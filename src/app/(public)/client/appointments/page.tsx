@@ -10,11 +10,14 @@ import { formatDateTime } from "@/lib/date";
 import { formatCurrency } from "@/lib/currency";
 import AppointmentDateTime from "@/components/AppointmentDateTime";
 
-const CANCELLABLE_STATUSES = new Set(["pending", "confirmed"]);
+const CANCELLATION_HOURS = 24;
 
-function isMoreThan24hAway(scheduledAt: string): boolean {
-  const appointmentTime = new Date(scheduledAt).getTime();
-  return appointmentTime - Date.now() > 24 * 60 * 60 * 1000;
+// Même règle que le backend (Appointment::clientCanCancel) : une demande en attente
+// s'annule à tout moment, un rendez-vous confirmé jusqu'à 24 h avant.
+function clientCanCancel(status: string, scheduledAt: string): boolean {
+  if (status === "pending") return true;
+  if (status !== "confirmed") return false;
+  return new Date(scheduledAt).getTime() - Date.now() > CANCELLATION_HOURS * 60 * 60 * 1000;
 }
 
 export default function ClientAppointmentsPage() {
@@ -23,6 +26,7 @@ export default function ClientAppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [reviewingId, setReviewingId] = useState<number | null>(null);
   const [reviewNote, setReviewNote] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
@@ -53,9 +57,12 @@ export default function ClientAppointmentsPage() {
   async function handleCancel(id: number) {
     if (!window.confirm("Annuler cette réservation ?")) return;
     setCancellingId(id);
+    setCancelError(null);
     try {
       const updated = await cancelAppointment(id);
       setAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    } catch (err) {
+      setCancelError(err instanceof Error ? err.message : "Impossible d'annuler la réservation.");
     } finally {
       setCancellingId(null);
     }
@@ -107,6 +114,11 @@ export default function ClientAppointmentsPage() {
         </div>
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
+      {cancelError && (
+        <p role="alert" className="text-sm text-red-700">
+          {cancelError}
+        </p>
+      )}
 
       {!loading && !error && appointments.length === 0 && (
         <EmptyState
@@ -117,10 +129,8 @@ export default function ClientAppointmentsPage() {
 
       <div className="flex flex-col gap-5">
         {appointments.map((appointment) => {
-          const canCancel =
-            mounted &&
-            CANCELLABLE_STATUSES.has(appointment.status) &&
-            isMoreThan24hAway(appointment.scheduled_at);
+          const canCancel = mounted && clientCanCancel(appointment.status, appointment.scheduled_at);
+          const tooLateToCancel = mounted && appointment.status === "confirmed" && !canCancel;
 
           const canReview =
             appointment.status === "completed" &&
@@ -155,6 +165,11 @@ export default function ClientAppointmentsPage() {
                     <CircleCheckBig size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
                     <p>Votre rendez-vous est prévu le {formatDateTime(appointment.scheduled_at)}.</p>
                   </div>
+                )}
+                {tooLateToCancel && (
+                  <p className="text-sm text-anthracite/75">
+                    Moins de {CANCELLATION_HOURS} h avant le rendez-vous : pour annuler, contactez directement le salon.
+                  </p>
                 )}
               </div>
 

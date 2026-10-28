@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { DayPicker } from "react-day-picker";
 import { fr } from "date-fns/locale";
@@ -8,12 +8,11 @@ import "react-day-picker/style.css";
 import { useAppointments } from "@/hooks/useAppointments";
 import { MonthAvailability, useAvailability } from "@/hooks/useAvailability";
 import type { Service } from "@/hooks/useServices";
-import { assetUrl } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
-import { formatDateTime } from "@/lib/date";
 import { formatDuration } from "@/lib/duration";
 import { isAuthenticated } from "@/lib/auth";
 import { clearBookingDraft, readBookingDraft, saveBookingDraft } from "@/lib/bookingDraft";
+import { ui } from "@/lib/ui";
 
 interface AppointmentFormProps {
   salonId: number;
@@ -23,6 +22,9 @@ interface AppointmentFormProps {
   initialServiceId?: number;
 }
 
+const STRIP_DAYS = 14;
+const CANCELLATION_HOURS = 24;
+
 function toDateInputValue(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -31,9 +33,7 @@ function toDateInputValue(date: Date): string {
 }
 
 function toMonthValue(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function startOfToday(): Date {
@@ -42,79 +42,128 @@ function startOfToday(): Date {
   return today;
 }
 
+function addDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
 function parseDateInputValue(value: string): Date {
   const [year, month, day] = value.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
 
-export default function AppointmentForm({ salonId, salonName, salonCover, services, initialServiceId }: AppointmentFormProps) {
+function sameDay(a: Date | undefined, b: Date): boolean {
+  return !!a && toDateInputValue(a) === toDateInputValue(b);
+}
+
+// "09:30" -> "9 h 30", "14:00" -> "14 h"
+function formatSlot(slot: string): string {
+  const [hours, minutes] = slot.split(":");
+  return minutes === "00" ? `${Number(hours)} h` : `${Number(hours)} h ${minutes}`;
+}
+
+function formatLongDate(date: Date): string {
+  const label = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function groupSlots(slots: string[]): { label: string; slots: string[] }[] {
+  const groups = [
+    { label: "Matin", slots: [] as string[] },
+    { label: "Après-midi", slots: [] as string[] },
+    { label: "Soir", slots: [] as string[] },
+  ];
+  for (const slot of slots) {
+    const hour = Number(slot.split(":")[0]);
+    groups[hour < 12 ? 0 : hour < 17 ? 1 : 2].slots.push(slot);
+  }
+  return groups.filter((group) => group.slots.length > 0);
+}
+
+export default function AppointmentForm({ salonId, salonName, services, initialServiceId }: AppointmentFormProps) {
   const { createAppointment, loading, error } = useAppointments();
   const { getMonthAvailability, getDayAvailability } = useAvailability();
 
   const [serviceId, setServiceId] = useState(() =>
     services.some((s) => s.id === initialServiceId) ? (initialServiceId as number) : (services[0]?.id ?? 0)
   );
-  const [displayMonth, setDisplayMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [heure, setHeure] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
   const [success, setSuccess] = useState(false);
+  const [authRequired, setAuthRequired] = useState(false);
+  const [restoredNotice, setRestoredNotice] = useState(false);
 
-  const [monthAvailability, setMonthAvailability] = useState<MonthAvailability>({});
-  const [monthLoading, setMonthLoading] = useState(false);
-
+  const [availability, setAvailability] = useState<MonthAvailability>({});
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[] | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
 
-  const [authRequired, setAuthRequired] = useState(false);
-  const [restoredNotice, setRestoredNotice] = useState(false);
+  // Heure restaurée depuis un brouillon : appliquée une fois les créneaux du jour chargés.
+  const pendingHeure = useRef<string | null>(null);
+  const summaryRef = useRef<HTMLElement>(null);
 
-  // Restaure la sélection service/date/heure si le client vient d'être
-  // redirigé ici après une inscription/connexion déclenchée en plein milieu
-  // de sa réservation (voir handleSubmit ci-dessous).
+  const today = useMemo(() => startOfToday(), []);
+  const stripDays = useMemo(() => Array.from({ length: STRIP_DAYS }, (_, index) => addDays(today, index)), [today]);
+
+  // Mois à interroger : ceux couverts par la bande de jours, plus le mois affiché dans le calendrier.
+  const monthsToLoad = useMemo(() => {
+    const months = new Set(stripDays.map(toMonthValue));
+    if (showCalendar) months.add(toMonthValue(calendarMonth));
+    return Array.from(months).sort();
+  }, [stripDays, showCalendar, calendarMonth]);
+  const monthsKey = monthsToLoad.join(",");
+
+  // Reprise d'une réservation commencée avant la connexion ou l'inscription.
   useEffect(() => {
-    const draft = readBookingDraft();
-    if (!draft || draft.salonId !== salonId) return;
-    clearBookingDraft();
-
-    if (services.some((s) => s.id === draft.serviceId)) {
-      setServiceId(draft.serviceId);
-    }
-    setSelectedDate(parseDateInputValue(draft.date));
-    setHeure(draft.heure);
-    setRestoredNotice(true);
+    queueMicrotask(() => {
+      const draft = readBookingDraft();
+      if (!draft || draft.salonId !== salonId) return;
+      clearBookingDraft();
+      if (services.some((s) => s.id === draft.serviceId)) setServiceId(draft.serviceId);
+      const draftDate = parseDateInputValue(draft.date);
+      if (draftDate >= startOfToday()) {
+        pendingHeure.current = draft.heure;
+        setSelectedDate(draftDate);
+        if (!stripDays.some((day) => sameDay(draftDate, day))) {
+          setShowCalendar(true);
+          setCalendarMonth(draftDate);
+        }
+      }
+      setRestoredNotice(true);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!serviceId) return;
     let cancelled = false;
+    const months = monthsKey.split(",");
 
-    async function fetchMonthAvailability() {
-      setMonthLoading(true);
+    queueMicrotask(async () => {
+      setAvailabilityLoading(true);
       try {
-        const data = await getMonthAvailability(salonId, serviceId, toMonthValue(displayMonth));
-        if (!cancelled) setMonthAvailability(data);
+        const results = await Promise.all(months.map((month) => getMonthAvailability(salonId, serviceId, month)));
+        if (!cancelled) setAvailability(Object.assign({}, ...results));
       } catch {
-        if (!cancelled) setMonthAvailability({});
+        if (!cancelled) setAvailability({});
       } finally {
-        if (!cancelled) setMonthLoading(false);
+        if (!cancelled) setAvailabilityLoading(false);
       }
-    }
-
-    queueMicrotask(() => {
-      fetchMonthAvailability();
     });
 
     return () => {
       cancelled = true;
     };
-  }, [salonId, serviceId, displayMonth, getMonthAvailability]);
+  }, [salonId, serviceId, monthsKey, getMonthAvailability]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchDayAvailability() {
+    queueMicrotask(async () => {
       if (!selectedDate || !serviceId) {
         setAvailableSlots(null);
         return;
@@ -124,7 +173,10 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
       setHeure("");
       try {
         const slots = await getDayAvailability(salonId, toDateInputValue(selectedDate), serviceId);
-        if (!cancelled) setAvailableSlots(slots);
+        if (cancelled) return;
+        setAvailableSlots(slots);
+        if (pendingHeure.current && slots.includes(pendingHeure.current)) setHeure(pendingHeure.current);
+        pendingHeure.current = null;
       } catch (err) {
         if (!cancelled) {
           setAvailableSlots([]);
@@ -133,10 +185,6 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
       } finally {
         if (!cancelled) setSlotsLoading(false);
       }
-    }
-
-    queueMicrotask(() => {
-      fetchDayAvailability();
     });
 
     return () => {
@@ -144,228 +192,288 @@ export default function AppointmentForm({ salonId, salonName, salonCover, servic
     };
   }, [salonId, serviceId, selectedDate, getDayAvailability]);
 
-  function handleServiceChange(id: number) {
+  const selectedService = services.find((s) => s.id === serviceId);
+  const isDayUnavailable = (date: Date) => availability[toDateInputValue(date)] === false;
+  const ready = Boolean(selectedService && selectedDate && heure);
+
+  function chooseService(id: number) {
+    if (id === serviceId) return;
     setServiceId(id);
     setSelectedDate(undefined);
     setHeure("");
     setAvailableSlots(null);
+    setAuthRequired(false);
   }
 
-  function isDayUnavailable(date: Date): boolean {
-    return monthAvailability[toDateInputValue(date)] === false;
+  function chooseDate(date: Date | undefined) {
+    setSelectedDate(date);
+    setAuthRequired(false);
   }
 
-  const selectedService = services.find((s) => s.id === serviceId);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
     setSuccess(false);
     setAuthRequired(false);
     if (!selectedDate || !heure) return;
     if (!isAuthenticated()) {
-      saveBookingDraft({
-        salonId,
-        serviceId,
-        date: toDateInputValue(selectedDate),
-        heure,
-      });
+      saveBookingDraft({ salonId, serviceId, date: toDateInputValue(selectedDate), heure });
       setAuthRequired(true);
+      summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     try {
-      const scheduledAt = `${toDateInputValue(selectedDate)}T${heure}:00`;
       await createAppointment({
         salon_id: salonId,
         service_id: serviceId,
-        scheduled_at: scheduledAt,
+        scheduled_at: `${toDateInputValue(selectedDate)}T${heure}:00`,
       });
       setSuccess(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
-      // error state is exposed via the hook
+      // le message d'erreur est exposé par le hook
     }
   }
 
-  return (
-    <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
-      {/* Colonne gauche — formulaire (logique inchangée) */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6 lg:max-w-md"
-      >
-        {restoredNotice && (
-          <p className="rounded-md border border-dark-sage/30 bg-sage/10 px-3 py-2 text-sm text-forest">
-            Votre sélection a été restaurée : vérifiez le créneau ci-dessous et confirmez votre réservation.
+  if (success && selectedService && selectedDate) {
+    return (
+      <section aria-live="polite" className="mx-auto w-full max-w-xl rounded-3xl border border-sage/25 bg-white/60 p-8 text-center sm:p-10">
+        <p className="font-heading text-3xl font-semibold text-forest">Demande envoyée</p>
+        <p className="mt-4 leading-7 text-anthracite/85">
+          {selectedService.name} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
+        </p>
+        <p className="mt-2 text-sm leading-6 text-anthracite/75">
+          Le salon va confirmer votre rendez-vous. Vous recevrez un e-mail, et vous pouvez suivre son état dans votre espace.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link href="/client/appointments" className={ui.buttonPrimary}>
+            Voir mes réservations
+          </Link>
+          <Link href={`/salons/${salonId}`} className={ui.buttonSecondary}>
+            Retour au salon
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  const summary = (
+    <div className="rounded-3xl border border-sage/25 bg-white/60 p-6 shadow-[0_12px_32px_rgba(45,59,40,0.07)]">
+      <p className="font-heading text-2xl font-semibold text-forest">Récapitulatif</p>
+      <dl className="mt-5 flex flex-col gap-4 text-sm">
+        <div>
+          <dt className="text-anthracite/70">Salon</dt>
+          <dd className="font-medium text-anthracite">{salonName}</dd>
+        </div>
+        <div>
+          <dt className="text-anthracite/70">Prestation</dt>
+          <dd className="font-medium text-anthracite">
+            {selectedService ? `${selectedService.name}, ${formatDuration(selectedService.duration)}` : "À choisir"}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-anthracite/70">Date et heure</dt>
+          <dd className="font-medium text-anthracite">
+            {selectedDate ? formatLongDate(selectedDate) : "À choisir"}
+            {selectedDate && heure ? ` à ${formatSlot(heure)}` : ""}
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between border-t border-sage/25 pt-4">
+          <dt className="text-anthracite/70">À régler au salon</dt>
+          <dd className="text-lg font-semibold text-forest">
+            {selectedService ? formatCurrency(Number(selectedService.price)) : "-"}
+          </dd>
+        </div>
+      </dl>
+
+      {authRequired ? (
+        <div className="mt-6 rounded-2xl bg-sage/15 p-4">
+          <p className="text-sm leading-6 text-anthracite">
+            Connectez-vous pour confirmer. Votre sélection est gardée et vous reviendrez ici ensuite.
           </p>
-        )}
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="service" className="text-sm font-medium">
-            Service
-          </label>
-          <select
-            id="service"
-            required
-            value={serviceId}
-            onChange={(e) => handleServiceChange(Number(e.target.value))}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          >
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} ({formatCurrency(s.price)})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Date</span>
-          <DayPicker
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            month={displayMonth}
-            onMonthChange={setDisplayMonth}
-            disabled={[{ before: startOfToday() }, isDayUnavailable]}
-            locale={fr}
-            className="appointment-calendar self-start rounded-md border border-sage/40 bg-beige p-3"
-          />
-          {monthLoading && (
-            <p className="text-xs text-anthracite/75">Chargement des disponibilités...</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Heure</span>
-
-          {!selectedDate && (
-            <p className="text-sm text-anthracite/75">Choisissez d&apos;abord une date.</p>
-          )}
-
-          {selectedDate && slotsLoading && (
-            <p className="text-sm text-anthracite/75">Chargement des créneaux...</p>
-          )}
-
-          {selectedDate && !slotsLoading && availableSlots && availableSlots.length === 0 && (
-            <p className="text-sm text-anthracite/75">
-              Aucun créneau disponible ce jour, choisissez une autre date.
-            </p>
-          )}
-
-          {selectedDate && !slotsLoading && availableSlots && availableSlots.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {availableSlots.map((slot) => (
-                <button
-                  key={slot}
-                  type="button"
-                  onClick={() => setHeure(slot)}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    heure === slot
-                      ? "border-dark-sage bg-dark-sage text-beige"
-                      : "border-sage/40 text-anthracite hover:bg-sage/10"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {slotsError && <p className="text-xs text-red-600">{slotsError}</p>}
-        </div>
-
-        {authRequired && (
-          <p className="text-sm text-red-600">
-            Connectez-vous ou créez un compte pour finaliser votre réservation.{" "}
-            <Link href="/login" className="text-terracotta underline hover:brightness-90">
+          <div className="mt-3 flex flex-col gap-2">
+            <Link href="/login" className={ui.buttonPrimary}>
               Se connecter
-            </Link>{" "}
-            ou{" "}
-            <Link href="/register" className="text-terracotta underline hover:brightness-90">
+            </Link>
+            <Link href="/register" className={ui.buttonSecondary}>
               Créer un compte
             </Link>
-          </p>
-        )}
-        {!authRequired && error && <p className="text-sm text-red-600">{error}</p>}
-        {success && <p className="text-sm text-green-600">Réservation confirmée !</p>}
-
-        {selectedService && selectedDate && heure && (
-          <div className="flex flex-col gap-1 rounded-md border border-dark-sage/30 bg-sage/10 p-4">
-            <h3 className="text-sm font-semibold text-forest">Résumé de votre réservation</h3>
-            <p className="text-sm text-anthracite">Salon : {salonName}</p>
-            <p className="text-sm text-anthracite">Service : {selectedService.name}</p>
-            <p className="text-sm text-anthracite">Durée : {formatDuration(selectedService.duration)}</p>
-            <p className="text-sm text-anthracite">Prix : {formatCurrency(selectedService.price)}</p>
-            <p className="text-sm text-anthracite">
-              Date et heure : {formatDateTime(`${toDateInputValue(selectedDate)}T${heure}:00`)}
-            </p>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading || !selectedDate || !heure}
-          className="mt-2 rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-        >
-          {loading ? "Envoi en cours..." : "Confirmer réservation"}
-        </button>
-      </form>
-
-      {/* Colonne droite — fiche service sticky */}
-      <aside className="w-full lg:sticky lg:top-8 lg:max-w-sm lg:flex-none">
-        <div className="overflow-hidden rounded-lg border border-sage/30 bg-beige shadow-md">
-          {/* Photo de couverture du salon */}
-          {assetUrl(salonCover) && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={assetUrl(salonCover)}
-              alt={salonName}
-              className="aspect-video w-full object-cover"
-            />
-          )}
-
-          <div className="flex flex-col gap-4 p-5">
-            {/* Détails du service sélectionné */}
-            {selectedService ? (
-              <div className="flex flex-col gap-2">
-                <h3 className="font-fraunces text-lg font-semibold text-forest">
-                  {selectedService.name}
-                </h3>
-                {selectedService.description && (
-                  <p className="text-sm leading-relaxed text-anthracite/75">
-                    {selectedService.description}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-base font-semibold text-champagne">
-                    {formatCurrency(selectedService.price)}
-                  </span>
-                  <span className="text-sm text-anthracite/60">
-                    {formatDuration(selectedService.duration)}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-anthracite/50">
-                Sélectionnez un service pour voir les détails.
-              </p>
-            )}
-
-            {/* Date et heure sélectionnées */}
-            <div className="rounded-md border border-dark-sage/20 bg-sage/10 p-3">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-forest/60">
-                Date &amp; heure
-              </p>
-              {selectedDate && heure ? (
-                <p className="text-sm font-medium text-anthracite">
-                  {formatDateTime(`${toDateInputValue(selectedDate)}T${heure}:00`)}
-                </p>
-              ) : (
-                <p className="text-sm text-anthracite/50">Choisissez une date et une heure</p>
-              )}
-            </div>
           </div>
         </div>
+      ) : (
+        <button type="submit" form="booking-form" disabled={!ready || loading} className={`${ui.buttonPrimary} mt-6 h-12 w-full text-base`}>
+          {loading ? "Envoi en cours..." : "Confirmer la réservation"}
+        </button>
+      )}
+      {!authRequired && error && (
+        <p role="alert" className="mt-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      <p className="mt-4 text-xs leading-5 text-anthracite/70">
+        Paiement au salon en espèces, par Wave ou Orange Money. Annulation gratuite depuis votre espace jusqu&apos;à{" "}
+        {CANCELLATION_HOURS} h avant le rendez-vous.
+      </p>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 gap-10 pb-28 lg:grid-cols-[minmax(0,1fr)_340px] lg:pb-0">
+      <form id="booking-form" onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-12">
+        {restoredNotice && (
+          <p className="rounded-2xl bg-sage/15 px-4 py-3 text-sm text-forest">
+            Votre sélection a été reprise. Vérifiez le créneau puis confirmez.
+          </p>
+        )}
+
+        <fieldset className="min-w-0">
+          <legend className="font-heading text-2xl font-semibold text-forest">1. Prestation</legend>
+          <div className="mt-4 divide-y divide-sage/25 border-y border-sage/25">
+            {services.map((service) => {
+              const checked = service.id === serviceId;
+              return (
+                <label
+                  key={service.id}
+                  className={`flex cursor-pointer items-center gap-4 px-3 py-4 transition-colors ${checked ? "bg-sage/15" : "hover:bg-sage/5"}`}
+                >
+                  <input
+                    type="radio"
+                    name="service"
+                    value={service.id}
+                    checked={checked}
+                    onChange={() => chooseService(service.id)}
+                    className="h-4 w-4 shrink-0 accent-[var(--color-forest)]"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-semibold text-forest">{service.name}</span>
+                    <span className="block text-sm text-anthracite/75">{formatDuration(service.duration)}</span>
+                  </span>
+                  <span className="shrink-0 font-semibold text-anthracite">{formatCurrency(Number(service.price))}</span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <fieldset className="min-w-0">
+          <legend className="font-heading text-2xl font-semibold text-forest">2. Jour</legend>
+          <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Prochains jours">
+            {stripDays.map((day) => {
+              const unavailable = isDayUnavailable(day);
+              const selected = sameDay(selectedDate, day);
+              return (
+                <button
+                  key={toDateInputValue(day)}
+                  type="button"
+                  disabled={unavailable}
+                  aria-pressed={selected}
+                  aria-label={`${formatLongDate(day)}${unavailable ? ", complet ou fermé" : ""}`}
+                  onClick={() => chooseDate(day)}
+                  className={`flex w-16 shrink-0 flex-col items-center rounded-2xl border py-3 transition-colors ${
+                    selected
+                      ? "border-forest bg-forest text-beige"
+                      : unavailable
+                        ? "cursor-not-allowed border-sage/20 text-anthracite/35 line-through"
+                        : "border-sage/40 bg-white/50 text-anthracite hover:border-forest/50"
+                  }`}
+                >
+                  <span className="text-xs">{day.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
+                  <span className="text-lg font-semibold">{day.getDate()}</span>
+                  <span className="text-xs">{day.toLocaleDateString("fr-FR", { month: "short" })}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <button
+              type="button"
+              onClick={() => setShowCalendar((open) => !open)}
+              aria-expanded={showCalendar}
+              className="font-semibold text-forest underline-offset-4 hover:underline"
+            >
+              {showCalendar ? "Masquer le calendrier" : "Choisir une date plus lointaine"}
+            </button>
+            {availabilityLoading && <span className="text-anthracite/70">Mise à jour des disponibilités...</span>}
+          </div>
+          {showCalendar && (
+            <DayPicker
+              mode="single"
+              selected={selectedDate}
+              onSelect={chooseDate}
+              month={calendarMonth}
+              onMonthChange={setCalendarMonth}
+              disabled={[{ before: today }, isDayUnavailable]}
+              locale={fr}
+              className="appointment-calendar mt-4 w-fit rounded-2xl border border-sage/30 bg-white/60 p-4"
+            />
+          )}
+        </fieldset>
+
+        <fieldset className="min-w-0">
+          <legend className="font-heading text-2xl font-semibold text-forest">3. Heure</legend>
+          <div className="mt-4" aria-live="polite">
+            {!selectedDate && <p className="text-sm text-anthracite/75">Choisissez d&apos;abord un jour.</p>}
+            {selectedDate && slotsLoading && <p className="text-sm text-anthracite/75">Recherche des créneaux libres...</p>}
+            {selectedDate && !slotsLoading && availableSlots?.length === 0 && !slotsError && (
+              <p className="text-sm text-anthracite/75">Plus aucun créneau libre ce jour-là. Essayez un autre jour.</p>
+            )}
+            {slotsError && <p className="text-sm text-red-700">{slotsError}</p>}
+            {selectedDate && !slotsLoading && availableSlots && availableSlots.length > 0 && (
+              <div className="flex flex-col gap-5">
+                {groupSlots(availableSlots).map((group) => (
+                  <div key={group.label}>
+                    <p className="text-sm font-semibold text-anthracite/75">{group.label}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {group.slots.map((slot) => (
+                        <button
+                          key={slot}
+                          type="button"
+                          aria-pressed={heure === slot}
+                          onClick={() => {
+                            setHeure(slot);
+                            setAuthRequired(false);
+                          }}
+                          className={`min-h-11 min-w-20 rounded-full border px-4 text-sm font-medium transition-colors ${
+                            heure === slot
+                              ? "border-forest bg-forest text-beige"
+                              : "border-sage/40 bg-white/50 text-anthracite hover:border-forest/50"
+                          }`}
+                        >
+                          {formatSlot(slot)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </fieldset>
+      </form>
+
+      <aside ref={summaryRef} aria-label="Récapitulatif de la réservation" className="lg:sticky lg:top-28 lg:self-start">
+        {summary}
       </aside>
+
+      {/* Mobile : confirmation toujours accessible en bas de l'écran. */}
+      {!authRequired && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-sage/25 bg-beige/95 px-6 py-3 backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+            <p className="min-w-0 text-sm text-anthracite/80">
+              {ready && selectedDate ? (
+                <>
+                  <span className="block font-semibold text-forest">{formatSlot(heure)}</span>
+                  {formatLongDate(selectedDate)}
+                </>
+              ) : (
+                "Choisissez un jour et une heure"
+              )}
+            </p>
+            <button type="submit" form="booking-form" disabled={!ready || loading} className={`${ui.buttonPrimary} shrink-0`}>
+              {loading ? "Envoi..." : "Confirmer"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
