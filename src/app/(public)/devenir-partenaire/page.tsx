@@ -2,18 +2,64 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
-import { isAuthenticated, register } from "@/lib/auth";
+import { hasRole, isAuthenticated, logout, register } from "@/lib/auth";
 import { useManager } from "@/hooks/useManager";
 import { useHasMounted } from "@/hooks/useHasMounted";
+import { useMySalons, type MySalon } from "@/hooks/useMySalons";
 import PasswordField from "@/components/PasswordField";
-import { CheckCircle2, Clock3, Mail, MapPin, Phone, Store, UserRound } from "lucide-react";
+import { ui } from "@/lib/ui";
+
+const PASSWORD_MIN_LENGTH = 12;
+
+const STEPS = [
+  { title: "Vous envoyez votre demande", description: "Votre compte et les informations de votre salon, en quelques minutes." },
+  { title: "Notre équipe la vérifie", description: "Sous 48 heures ouvrées. Nous pouvons vous appeler pour confirmer." },
+  { title: "Vous ouvrez votre espace gérant", description: "Prestations, équipe, horaires : votre salon devient réservable." },
+];
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function StatusCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section aria-live="polite" className={`${ui.surface} rounded-3xl p-8 sm:p-10`}>
+      <h2 className="font-heading text-3xl font-semibold text-forest">{title}</h2>
+      <div className="mt-4 flex flex-col gap-4 leading-7 text-anthracite/80">{children}</div>
+    </section>
+  );
+}
+
+function Field({
+  id,
+  label,
+  children,
+  hint,
+}: {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className={ui.label}>
+        {label}
+      </label>
+      {children}
+      {hint && <p className="text-sm text-anthracite/70">{hint}</p>}
+    </div>
+  );
+}
 
 export default function BecomePartnerPage() {
   const router = useRouter();
   const mounted = useHasMounted();
-  const alreadyAuthenticated = mounted && isAuthenticated();
+  const authenticated = mounted && isAuthenticated();
   const { createSalon } = useManager();
+  const { salons, loading: salonsLoading } = useMySalons(authenticated);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,231 +73,249 @@ export default function BecomePartnerPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<string | null>(null);
+
+  const pending: MySalon | undefined = salons.find((s) => s.status === "pending");
+  const verified = salons.find((s) => s.status === "verified");
+  const rejected = salons.find((s) => s.status === "rejected");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmitError(null);
+
+    if (!authenticated && password.length < PASSWORD_MIN_LENGTH) {
+      setSubmitError(`Le mot de passe doit contenir au moins ${PASSWORD_MIN_LENGTH} caractères.`);
+      return;
+    }
+
     setSubmitting(true);
     try {
-      if (!alreadyAuthenticated) {
-        await register({ name, email, password, role: 'gerant' });
+      if (!authenticated) {
+        await register({ name, email, password });
       }
-      await createSalon({
-        name: salonName,
-        address,
-        city,
-        phone,
-        description,
-      });
-      setSubmitted(true);
+      await createSalon({ name: salonName, address, city, phone, description });
+      setSubmitted(salonName);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Impossible de créer le salon.");
+      setSubmitError(err instanceof Error ? err.message : "Impossible d'envoyer la demande.");
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (!mounted) {
-    return (
-      <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-beige to-sage/20 px-6 py-12">
-        <p className="text-anthracite/75">Chargement...</p>
-      </main>
-    );
+  function reconnect() {
+    logout();
+    router.push("/login");
   }
 
-  if (submitted) {
-    return (
-      <main className="flex flex-1 items-center justify-center bg-gradient-to-br from-beige to-sage/20 px-6 py-12">
-        <div className="flex max-w-md flex-col items-center gap-3 rounded-3xl border border-sage/20 bg-beige/90 p-8 text-center shadow-[0_20px_55px_rgba(45,59,40,0.1)]">
-          <Clock3 size={36} className="text-champagne" aria-hidden="true" />
-          <h1 className="text-2xl font-semibold tracking-tight text-forest">Votre salon a bien été soumis !</h1>
-          <p className="text-sm leading-6 text-anthracite/75">
-            Notre équipe va examiner votre demande. Dès qu&apos;elle sera validée, vous recevrez un accès
-            complet à votre espace gérant pour ajouter vos services, vos employés et gérer vos réservations.
-          </p>
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className="mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-2.5 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage"
-          >
+  let content: React.ReactNode;
+
+  if (!mounted || salonsLoading) {
+    content = <div className="h-96 animate-pulse rounded-3xl bg-sage/15" aria-busy="true" aria-label="Chargement" />;
+  } else if (submitted) {
+    content = (
+      <StatusCard title="Demande envoyée">
+        <p>
+          Merci ! La demande pour <strong className="text-forest">{submitted}</strong> est entre les mains de notre équipe.
+          Nous revenons vers vous sous 48 heures ouvrées.
+        </p>
+        <p className="text-sm text-anthracite/70">
+          Vous pouvez suivre son état sur cette page. Dès la validation, votre espace gérant s&apos;ouvre.
+        </p>
+        <div>
+          <Link href="/" className={ui.buttonPrimary}>
             Retour à l&apos;accueil
-          </button>
+          </Link>
         </div>
-      </main>
+      </StatusCard>
     );
-  }
-
-  return (
-    <div className="flex flex-1 flex-col bg-gradient-to-br from-beige via-beige to-sage/20 lg:flex-row">
-      <main className="flex flex-1 flex-col items-center px-5 py-8 sm:px-8 lg:px-10 lg:py-9">
-        <div className="mb-5 w-full max-w-2xl text-center lg:text-left">
-          <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-terracotta">Développez votre activité</span>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-forest sm:text-4xl">
-            Rejoignez les salons partenaires Nadcel
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-anthracite/70">
-            Créez la fiche de votre salon en quelques minutes. Une fois soumise, elle sera
-            examinée par notre équipe avant d&apos;être visible par les clients.
+  } else if (verified) {
+    content = (
+      <StatusCard title="Votre salon est partenaire">
+        <p>
+          <strong className="text-forest">{verified.name}</strong> est validé et visible par les clientes.
+        </p>
+        {hasRole("gerant") ? (
+          <div>
+            <Link href="/manager/dashboard" className={ui.buttonPrimary}>
+              Ouvrir mon espace gérant
+            </Link>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-anthracite/70">
+              Reconnectez-vous une fois pour activer votre accès gérant.
+            </p>
+            <div>
+              <button type="button" onClick={reconnect} className={ui.buttonPrimary}>
+                Me reconnecter
+              </button>
+            </div>
+          </>
+        )}
+      </StatusCard>
+    );
+  } else if (pending) {
+    content = (
+      <StatusCard title="Demande en cours d'examen">
+        <p>
+          La demande pour <strong className="text-forest">{pending.name}</strong> ({pending.city}) a été envoyée le{" "}
+          {formatDate(pending.created_at)}. Notre équipe la vérifie sous 48 heures ouvrées.
+        </p>
+        <p className="text-sm text-anthracite/70">
+          Une seule demande peut être examinée à la fois. Pour toute question : contact@nadcel.sn
+        </p>
+      </StatusCard>
+    );
+  } else {
+    content = (
+      <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-10 rounded-3xl p-6 sm:p-10`}>
+        {rejected && (
+          <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+            Votre précédente demande pour {rejected.name} n&apos;a pas été retenue. Vous pouvez en envoyer une nouvelle
+            avec des informations complètes, ou nous écrire à contact@nadcel.sn.
           </p>
-        </div>
+        )}
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full max-w-2xl flex-col gap-5 rounded-3xl border border-sage/20 bg-beige/90 p-5 shadow-[0_20px_55px_rgba(45,59,40,0.1)] sm:p-6"
-        >
-          {!alreadyAuthenticated && (
-            <section className="flex flex-col gap-3">
-              <div className="flex items-center gap-3 border-b border-sage/20 pb-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-forest text-xs font-bold text-beige">1</span>
-                <div><h2 className="font-semibold text-forest">Votre compte</h2><p className="text-xs text-anthracite/55">Vos informations de connexion</p></div>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-              <div className="flex flex-col gap-1">
-                <label htmlFor="name" className="text-sm font-semibold text-anthracite/80">
-                  Nom
-                </label>
-                <div className="relative"><UserRound size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-link-sage" /><input
-                  id="name"
-                  required
-                  autoComplete="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-                /></div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label htmlFor="email" className="text-sm font-semibold text-anthracite/80">
-                  Email
-                </label>
-                <div className="relative"><Mail size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-link-sage" /><input
+        {!authenticated && (
+          <fieldset className="flex flex-col gap-5">
+            <legend className="mb-5 font-heading text-2xl font-semibold text-forest">Votre compte</legend>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field id="name" label="Nom complet">
+                <input id="name" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
+              </Field>
+              <Field id="email" label="E-mail">
+                <input
                   id="email"
                   type="email"
                   required
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-                /></div>
-              </div>
-              <div className="sm:col-span-2">
-              <PasswordField
-                id="password"
-                label="Mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-              />
-              </div>
-              </div>
-            </section>
-          )}
+                  className={ui.input}
+                />
+              </Field>
+            </div>
+            <PasswordField
+              id="password"
+              label="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              minLength={PASSWORD_MIN_LENGTH}
+              hint={`${PASSWORD_MIN_LENGTH} caractères minimum.`}
+            />
+            <p className="text-sm text-anthracite/70">
+              Déjà un compte ?{" "}
+              <Link href="/login" className={ui.textLink}>
+                Connectez-vous
+              </Link>{" "}
+              puis revenez sur cette page.
+            </p>
+          </fieldset>
+        )}
 
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center gap-3 border-b border-sage/20 pb-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-champagne text-xs font-bold text-forest">{alreadyAuthenticated ? "1" : "2"}</span>
-              <div><h2 className="font-semibold text-forest">Votre salon</h2><p className="text-xs text-anthracite/55">Les informations visibles par vos futurs clients</p></div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="salonName" className="text-sm font-semibold text-anthracite/80">
-                Nom du salon
-              </label>
-              <div className="relative"><Store size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-link-sage" /><input
-                id="salonName"
-                required
-                value={salonName}
-                onChange={(e) => setSalonName(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-              /></div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="address" className="text-sm font-semibold text-anthracite/80">
-                Adresse
-              </label>
-              <div className="relative"><MapPin size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-link-sage" /><input
+        <fieldset className="flex flex-col gap-5">
+          <legend className="mb-5 font-heading text-2xl font-semibold text-forest">Votre salon</legend>
+          <Field id="salonName" label="Nom du salon">
+            <input id="salonName" required value={salonName} onChange={(e) => setSalonName(e.target.value)} className={ui.input} />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-[2fr_1fr]">
+            <Field id="address" label="Adresse" hint="Rue et quartier, par exemple : 12 rue Carnot, Plateau">
+              <input
                 id="address"
                 required
+                autoComplete="street-address"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-              /></div>
-            </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="city" className="text-sm font-semibold text-anthracite/80">
-                Ville
-              </label>
-              <input
-                id="city"
-                required
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 px-4 py-2.5 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+                className={ui.input}
               />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="phone" className="text-sm font-semibold text-anthracite/80">
-                Téléphone
-              </label>
-              <div className="relative"><Phone size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-link-sage" /><input
-                id="phone"
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl border border-sage/35 bg-white/70 py-2.5 pl-11 pr-4 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-              /></div>
-            </div>
-            <div className="flex flex-col gap-1 sm:col-span-2">
-              <label htmlFor="description" className="text-sm font-semibold text-anthracite/80">
-                Description
-              </label>
-              <textarea
-                id="description"
-                required
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                placeholder="Présentez votre univers, vos spécialités et ce qui rend votre salon unique."
-                className="resize-none rounded-xl border border-sage/35 bg-white/70 px-4 py-2.5 outline-none transition-all focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
-              />
-            </div>
-            </div>
-          </section>
-
-          {submitError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{submitError}</p>}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-2.5 font-semibold text-beige shadow-md transition-all hover:-translate-y-0.5 hover:bg-dark-sage disabled:translate-y-0 disabled:opacity-50"
-          >
-            {submitting ? "Envoi en cours..." : "Inscrire mon salon"}
-            </button>
-        </form>
-      </main>
-
-      <aside className="relative hidden min-h-[760px] w-full overflow-hidden bg-forest lg:sticky lg:top-[72px] lg:flex lg:h-[calc(100vh-72px)] lg:w-[40%] lg:flex-col lg:justify-end">
-        <Image
-          src="/images/services/coiffure.jpg"
-          alt="Professionnelle dans un salon de beauté"
-          fill
-          priority
-          sizes="40vw"
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-forest via-forest/55 to-forest/10" />
-        <div className="relative p-9 xl:p-12">
-          <Image src="/images/logo-icon.png" alt="" width={60} height={44} className="mb-6 h-11 w-auto brightness-0 invert" />
-          <h2 className="text-3xl font-semibold text-beige">Faites rayonner votre savoir-faire.</h2>
-          <p className="mt-3 leading-7 text-beige/65">Rejoignez une plateforme pensée pour simplifier votre quotidien et développer votre visibilité.</p>
-          <div className="mt-6 space-y-3 text-sm text-beige/80">
-            <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une vitrine professionnelle en ligne</p>
-            <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une gestion centralisée des rendez-vous</p>
-            <p className="flex items-center gap-3"><CheckCircle2 size={18} className="text-champagne" />Une présence auprès de nouveaux clients</p>
+            </Field>
+            <Field id="city" label="Ville">
+              <input id="city" required value={city} onChange={(e) => setCity(e.target.value)} placeholder="Dakar" className={ui.input} />
+            </Field>
           </div>
+          <Field id="phone" label="Téléphone du salon" hint="Utilisé par notre équipe pour vérifier votre demande.">
+            <input
+              id="phone"
+              type="tel"
+              required
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="77 123 45 67"
+              className={ui.input}
+            />
+          </Field>
+          <Field id="description" label="Présentation (facultatif)">
+            <textarea
+              id="description"
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Vos spécialités, l'ambiance du salon, ce que vos clientes apprécient."
+              className={`${ui.input} h-auto py-3`}
+            />
+          </Field>
+        </fieldset>
+
+        {submitError && (
+          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+            {submitError}
+          </p>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <button type="submit" disabled={submitting} className={`${ui.buttonPrimary} h-12 text-base sm:w-fit sm:px-8`}>
+            {submitting ? "Envoi en cours..." : "Envoyer ma demande"}
+          </button>
+          <p className="text-xs leading-5 text-anthracite/70">
+            Inscription gratuite. En envoyant cette demande, vous acceptez les{" "}
+            <Link href="/cgu" className={ui.textLink}>
+              conditions générales
+            </Link>
+            .
+          </p>
         </div>
-      </aside>
-    </div>
+      </form>
+    );
+  }
+
+  return (
+    <main className="flex flex-1 flex-col px-6 pb-24 pt-12 sm:px-10">
+      <div className="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="min-w-0">
+          <h1 className="text-4xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]">
+            Inscrire mon salon
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-anthracite/75">
+            Recevez des réservations en ligne et gérez votre agenda depuis un seul espace. L&apos;inscription est gratuite.
+          </p>
+          <div className="mt-10">{content}</div>
+        </div>
+
+        <aside className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
+          <div className="relative hidden aspect-[4/3] overflow-hidden rounded-3xl lg:block">
+            <Image src="/images/services/coiffure.jpg" alt="" fill sizes="380px" className="object-cover" />
+          </div>
+          <div className={`${ui.surface} rounded-3xl p-6`}>
+            <p className="font-heading text-xl font-semibold text-forest">Comment ça se passe</p>
+            <ol className="mt-5 flex flex-col gap-5">
+              {STEPS.map((step, index) => (
+                <li key={step.title} className="flex gap-4">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-forest">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="font-semibold text-anthracite">{step.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-anthracite/75">{step.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </aside>
+      </div>
+    </main>
   );
 }
