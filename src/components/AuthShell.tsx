@@ -4,14 +4,12 @@ import Image from "next/image";
 // droite (masquée sur mobile pour aller droit au formulaire).
 export default function AuthShell({
   title,
-  muted,
   intro,
   image,
   quote,
   children,
 }: {
   title: string;
-  muted: string;
   intro: string;
   image: string;
   quote: string;
@@ -23,7 +21,6 @@ export default function AuthShell({
         <div className="w-full max-w-md">
           <h1 className="text-4xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]">
             {title}
-            <span className="block text-[#7d8a76]">{muted}</span>
           </h1>
           <p className="mt-4 leading-7 text-anthracite/75">{intro}</p>
           <div className="mt-8">{children}</div>

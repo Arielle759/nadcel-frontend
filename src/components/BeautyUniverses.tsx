@@ -3,7 +3,7 @@ import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
 
-// Chaque univers ouvre la recherche de salons sur un terme que l'API sait
+// Chaque prestation ouvre la recherche de salons sur un terme que l'API sait
 // retrouver (catégorie ou nom de prestation).
 const UNIVERSES = [
   { label: "Coiffure", query: "Coiffure", image: "/images/services/coiffure.jpg" },
@@ -19,7 +19,7 @@ export default function BeautyUniverses() {
     <section aria-labelledby="universes-title" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading id="universes-title" title="Nos univers beauté" muted="Choisissez, on s'occupe du reste." />
+          <SectionHeading id="universes-title" title="Que souhaitez-vous faire ?" />
           <Link href="/salons" className={ui.buttonSecondary}>
             Tous les salons
           </Link>

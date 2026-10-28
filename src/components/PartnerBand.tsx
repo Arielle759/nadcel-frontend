@@ -21,12 +21,10 @@ export default function PartnerBand() {
   return (
     <section aria-labelledby="partner-title" className="mt-28 bg-forest px-6 py-24 sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <p className="mb-5 text-sm font-semibold text-champagne-light">Pour les professionnels</p>
         <SectionHeading
           id="partner-title"
-          title="Gérez vos rendez-vous."
-          muted="Remplissez vos créneaux."
-          description="L'inscription est gratuite. Votre fiche est vérifiée par notre équipe avant sa mise en ligne, sous 48 heures ouvrées."
+          title="Vous gérez un salon ?"
+          description="Recevez des réservations en ligne, suivez votre agenda et votre chiffre d'affaires au même endroit. L'inscription est gratuite et votre fiche est vérifiée par notre équipe avant sa mise en ligne."
           onDark
         />
         <div className="mt-9 flex flex-col gap-3 sm:flex-row">

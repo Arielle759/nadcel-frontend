@@ -59,7 +59,6 @@ export default function RegisterPage() {
   return (
     <AuthShell
       title="Créez votre compte"
-      muted="en une minute."
       intro="Gratuit, sans engagement. Réservez ensuite dans tous les salons Nadcel avec le même compte."
       image="/images/register.jpg"
       quote="Prenez soin de vous, en toute simplicité."

@@ -13,7 +13,11 @@ export default function PopularSalons() {
     <section aria-labelledby="salons-title" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading id="salons-title" title="Salons à découvrir" muted="Tous vérifiés par notre équipe." />
+          <SectionHeading
+            id="salons-title"
+            title="Salons à découvrir"
+            description="Chaque salon est vérifié par notre équipe avant d'apparaître ici."
+          />
           {total !== null && total > salons.length && (
             <Link href="/salons" className={ui.buttonSecondary}>
               Voir les {total} salons

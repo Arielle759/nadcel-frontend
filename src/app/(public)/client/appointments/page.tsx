@@ -146,7 +146,6 @@ export default function ClientAppointmentsPage() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <h1 className={`${ui.sectionTitleBase} text-forest`}>
             Mes réservations
-            <span className={ui.sectionTitleMuted}>Tous vos rendez-vous, au même endroit.</span>
           </h1>
           <Link href="/salons" className={ui.buttonPrimary}>
             Nouvelle réservation

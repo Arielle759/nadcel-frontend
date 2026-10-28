@@ -29,7 +29,5 @@ export const ui = {
   eyebrow: "text-sm font-medium text-anthracite/70",
   sectionTitleBase: "text-3xl font-semibold tracking-tight sm:text-[2.75rem] sm:leading-[1.1]",
   sectionTitle: "text-3xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]",
-  // Seconde ligne d'un titre, plus claire (contraste ≥ 3:1 en grand texte).
-  sectionTitleMuted: "block text-[#7d8a76]",
   container: "mx-auto w-full max-w-6xl px-6 sm:px-10",
 } as const;

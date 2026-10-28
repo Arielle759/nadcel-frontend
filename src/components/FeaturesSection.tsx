@@ -25,8 +25,7 @@ export default function FeaturesSection() {
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="how-it-works"
-          title="Votre rendez-vous,"
-          muted="sans passer un appel."
+          title="Votre rendez-vous, sans passer un appel"
           description="Trois étapes depuis votre téléphone. Le salon confirme ensuite votre rendez-vous, et vous le retrouvez dans votre espace."
         />
 

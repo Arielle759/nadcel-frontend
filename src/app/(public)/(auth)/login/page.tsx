@@ -35,8 +35,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Bon retour"
-      muted="parmi nous."
+      title="Bienvenue sur Nadcel"
       intro="Connectez-vous pour retrouver vos rendez-vous, ou l'espace de votre salon."
       image="/images/services/login.jpg"
       quote="La beauté, simplement organisée."
