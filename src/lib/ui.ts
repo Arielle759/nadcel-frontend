@@ -22,6 +22,10 @@ export const ui = {
   surfaceInteractive: `rounded-2xl bg-white ${shadow} transition-all duration-200 ${shadowHover}`,
   // Lien d'action sans soulignement : couleur et graisse suffisent.
   textLink: "font-semibold text-forest transition-colors hover:text-dark-sage",
+  // Champ de formulaire : fond blanc, ombre légère, anneau vert au focus.
+  input:
+    "h-12 w-full rounded-xl bg-white px-4 text-base text-anthracite outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06),0_0_0_1px_rgba(45,59,40,0.10)] transition-shadow placeholder:text-anthracite/45 focus:shadow-[0_0_0_2px_var(--color-forest)]",
+  label: "text-sm font-semibold text-anthracite",
   eyebrow: "text-sm font-medium text-anthracite/70",
   sectionTitleBase: "text-3xl font-semibold tracking-tight sm:text-[2.75rem] sm:leading-[1.1]",
   sectionTitle: "text-3xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]",

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CalendarDays, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
 import { logout } from "@/lib/auth";
@@ -15,7 +15,6 @@ const partnerButton =
 
 export default function Navbar() {
   const router = useRouter();
-  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const authed = useIsAuthenticated();
   const user = useCurrentUser();
@@ -27,7 +26,6 @@ export default function Navbar() {
     : isGerant
       ? "/manager/dashboard"
       : "/client/appointments";
-  const isDashboard = pathname.startsWith("/admin") || pathname.startsWith("/manager") || pathname.startsWith("/client");
   const showPublicSalonLinks = !isAdmin && !isGerant;
   const showPartnerLink = !authed || (!isAdmin && !isGerant);
 
@@ -44,11 +42,6 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMenuOpen(false)}>
           <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-10 w-auto" priority />
           <span className="font-heading text-xl font-semibold tracking-tight text-forest">Nadcel</span>
-          {isDashboard && (
-            <span className="hidden rounded-full bg-sage/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-link-sage sm:inline-flex">
-              Espace privé
-            </span>
-          )}
         </Link>
 
         {/* Hiérarchie : « Inscrire mon salon » est l'action mise en avant (doré),

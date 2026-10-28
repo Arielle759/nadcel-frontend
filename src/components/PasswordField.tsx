@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEventHandler } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { ui } from "@/lib/ui";
 
 interface PasswordFieldProps {
   id: string;
@@ -9,6 +10,8 @@ interface PasswordFieldProps {
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
   autoComplete?: "current-password" | "new-password";
+  hint?: string;
+  minLength?: number;
 }
 
 export default function PasswordField({
@@ -17,13 +20,15 @@ export default function PasswordField({
   value,
   onChange,
   autoComplete,
+  hint,
+  minLength,
 }: PasswordFieldProps) {
   const [isVisible, setIsVisible] = useState(false);
   const actionLabel = isVisible ? "Masquer le mot de passe" : "Afficher le mot de passe";
 
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-sm font-semibold text-anthracite/80">
+      <label htmlFor={id} className={ui.label}>
         {label}
       </label>
       <div className="relative">
@@ -34,7 +39,9 @@ export default function PasswordField({
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
-          className="w-full rounded-xl border border-sage/35 bg-white/70 px-4 py-3 pr-12 text-anthracite outline-none transition-all placeholder:text-anthracite/35 focus:border-dark-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
+          minLength={minLength}
+          aria-describedby={hint ? `${id}-hint` : undefined}
+          className={`${ui.input} pr-12`}
         />
         <button
           type="button"
@@ -46,6 +53,11 @@ export default function PasswordField({
           {isVisible ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
         </button>
       </div>
+      {hint && (
+        <p id={`${id}-hint`} className="text-sm text-anthracite/70">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }

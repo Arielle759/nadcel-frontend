@@ -63,7 +63,9 @@ export function useClientAppointments(): UseClientAppointmentsResult {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<PaginatedResponse<ClientAppointment>>("/appointments");
+      const { data } = await api.get<PaginatedResponse<ClientAppointment>>("/appointments", {
+        params: { per_page: 100 },
+      });
       return data.data;
     } catch (err) {
       const message = toErrorMessage(err, "Impossible de charger vos réservations.");
