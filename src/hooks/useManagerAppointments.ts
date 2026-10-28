@@ -10,7 +10,10 @@ export type AppointmentStatus =
   | "cancelled";
 
 export type PaymentStatus = "unpaid" | "paid";
-export type PaymentMethod = "cash" | "card";
+// Moyens de paiement sur place. "cash" et "card" ne sont conservés que pour l'affichage
+// d'éventuelles anciennes données.
+export type PaymentMethod = "especes" | "wave" | "orange_money" | "cash" | "card";
+export type OnSitePaymentMethod = "especes" | "wave" | "orange_money";
 
 export interface ManagerAppointmentClient {
   id: number;
@@ -24,8 +27,10 @@ export interface ManagerAppointment {
   service: Service;
   scheduled_at: string;
   status: AppointmentStatus;
+  price: string | number;
   payment_status: PaymentStatus;
   payment_method: PaymentMethod | null;
+  amount_paid: string | number | null;
 }
 
 interface PaginatedResponse<T> {
@@ -39,9 +44,10 @@ interface UseManagerAppointmentsResult {
     id: number | string,
     status: AppointmentStatus
   ) => Promise<ManagerAppointment>;
-  markAppointmentPaid: (
+  completeAppointment: (
     id: number | string,
-    method: PaymentMethod
+    amountPaid: number,
+    method: OnSitePaymentMethod
   ) => Promise<ManagerAppointment>;
   loading: boolean;
   error: string | null;
@@ -86,17 +92,23 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     []
   );
 
-  const markAppointmentPaid = useCallback(
-    async (id: number | string, method: PaymentMethod): Promise<ManagerAppointment> => {
+  // Clôture : le client est venu, le gérant note le montant encaissé sur place et le moyen utilisé.
+  const completeAppointment = useCallback(
+    async (
+      id: number | string,
+      amountPaid: number,
+      method: OnSitePaymentMethod
+    ): Promise<ManagerAppointment> => {
       setLoading(true);
       setError(null);
       try {
-        const { data } = await api.patch<ManagerAppointment>(`/appointments/${id}/pay`, {
+        const { data } = await api.patch<ManagerAppointment>(`/appointments/${id}/complete`, {
+          amount_paid: amountPaid,
           payment_method: method,
         });
         return data;
       } catch (err) {
-        const message = toErrorMessage(err, "Impossible de mettre à jour le paiement.");
+        const message = toErrorMessage(err, "Impossible de clôturer le rendez-vous.");
         setError(message);
         throw new Error(message);
       } finally {
@@ -109,7 +121,7 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
   return {
     getAppointments,
     updateAppointmentStatus,
-    markAppointmentPaid,
+    completeAppointment,
     loading,
     error,
   };

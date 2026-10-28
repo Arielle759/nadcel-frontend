@@ -35,6 +35,13 @@ export interface ActivityEmployee {
   revenue: number;
 }
 
+export interface ActivityPaymentMethod {
+  method: "especes" | "wave" | "orange_money";
+  count: number;
+  amount: number;
+  share: number;
+}
+
 export interface ActivityForecast {
   month: string;
   expected: number | null;
@@ -57,6 +64,7 @@ export interface ManagerActivity {
   busy_slots: ActivityBusySlot[];
   employees: ActivityEmployee[];
   loyalty: { clients: number; returning: number; rate: number };
+  payment_methods: ActivityPaymentMethod[];
   forecast: ActivityForecast;
 }
 

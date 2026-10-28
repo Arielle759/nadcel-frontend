@@ -2,19 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Banknote, Building2, Calendar, PieChart as PieChartIcon, Sparkles } from "lucide-react";
+import { ArrowUpRight, Building2, Calendar } from "lucide-react";
 import { useManager, ManagerStats } from "@/hooks/useManager";
-import { formatCurrency } from "@/lib/currency";
-import StatCard from "@/components/StatCard";
-import SectionTitle from "@/components/SectionTitle";
-import AppointmentsPieChart from "@/components/AppointmentsPieChart";
-import RevenueBarChart from "@/components/RevenueBarChart";
 import ActivitySection from "@/components/manager/ActivitySection";
 
 export default function ManagerDashboardPage() {
   const { getSalonStats } = useManager();
   const [stats, setStats] = useState<ManagerStats | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,10 +19,7 @@ export default function ManagerDashboardPage() {
         if (isMounted) setStats(data);
       })
       .catch(() => {
-        if (isMounted) setError("Impossible de charger les statistiques.");
-      })
-      .finally(() => {
-        if (isMounted) setLoading(false);
+        if (isMounted) setError("Impossible de charger les rendez-vous en cours.");
       });
 
     return () => {
@@ -37,110 +28,34 @@ export default function ManagerDashboardPage() {
   }, [getSalonStats]);
 
   return (
-    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige via-beige to-sage/20 px-6 py-10 sm:px-10 lg:px-14">
-      <div className="relative overflow-hidden rounded-3xl bg-forest px-6 py-8 text-beige shadow-[0_18px_50px_rgba(45,59,40,0.18)] sm:px-8">
-        <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-sage/20 blur-2xl" />
-        <div className="absolute -bottom-20 right-24 h-40 w-40 rounded-full bg-champagne/15 blur-2xl" />
-        <div className="relative max-w-2xl">
-          <span className="mb-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-champagne">
-            <Sparkles size={16} aria-hidden="true" />
-            Vue d&apos;ensemble
-          </span>
-          <h1 className="text-3xl font-semibold tracking-tight text-beige sm:text-4xl">
-            Tableau de bord
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-beige/75 sm:text-base">
-            Suivez l&apos;activité de vos salons et accédez rapidement à vos actions essentielles.
-          </p>
+    <main className="flex flex-1 flex-col gap-6 bg-gradient-to-br from-beige via-beige to-sage/20 px-5 py-6 sm:px-8 lg:px-10">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-forest sm:text-3xl">Tableau de bord</h1>
+          <p className="mt-1 text-sm text-anthracite/70">L&apos;activité de votre salon et ce qui demande votre attention.</p>
         </div>
-      </div>
-
-      {loading && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Chargement du tableau de bord" aria-busy="true">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="h-36 animate-pulse rounded-2xl border border-sage/20 bg-sage/10" />
-          ))}
-        </div>
-      )}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      {stats && (
-        <div className="flex flex-col gap-10">
-          <section className="flex flex-col gap-4">
-            <SectionTitle icon={Banknote}>Chiffre d&apos;affaires</SectionTitle>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <StatCard
-                label="Chiffre d'affaires généré"
-                value={formatCurrency(stats.revenue.generated)}
-                tone="forest"
-                prominent
-              />
-              <StatCard
-                label="Encaissé"
-                value={formatCurrency(stats.revenue.collected)}
-                tone="positive"
-                prominent
-              />
-              <StatCard
-                label="Reste à encaisser"
-                value={formatCurrency(stats.revenue.outstanding)}
-                tone="warning"
-                prominent
-              />
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-4">
-            <SectionTitle icon={Building2}>Salons</SectionTitle>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <StatCard label="Mes salons" value={stats.salons_count} />
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-4">
-            <SectionTitle icon={Calendar}>Rendez-vous</SectionTitle>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <StatCard label="Confirmés" value={stats.appointments.confirmed} tone="positive" />
-              <StatCard label="Terminés" value={stats.appointments.completed} tone="positive" />
-              <StatCard label="En attente" value={stats.appointments.pending} tone="warning" />
-              <StatCard label="Annulés" value={stats.appointments.cancelled} tone="negative" />
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-4">
-            <SectionTitle icon={PieChartIcon}>Visualisations</SectionTitle>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <AppointmentsPieChart appointments={stats.appointments} />
-              <RevenueBarChart revenue={stats.revenue} />
-            </div>
-          </section>
-
-          <ActivitySection />
-        </div>
-      )}
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link
-          href="/manager/salons"
-          className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
-        >
-          <span className="flex items-center gap-3 font-semibold text-forest">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sage/15 text-link-sage"><Building2 size={19} /></span>
-            Gérer mes salons
-          </span>
-          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
-        <Link
-          href="/manager/appointments"
-          className="group flex items-center justify-between rounded-2xl border border-sage/20 bg-beige p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage/40 hover:shadow-md"
-        >
-          <span className="flex items-center gap-3 font-semibold text-forest">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-champagne/15 text-champagne"><Calendar size={19} /></span>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/manager/appointments"
+            className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-dark-sage"
+          >
+            <Calendar size={16} aria-hidden="true" />
             Gérer les rendez-vous
-          </span>
-          <ArrowUpRight size={18} className="text-link-sage transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
+          </Link>
+          <Link
+            href="/manager/salons"
+            className="inline-flex items-center gap-2 rounded-full border border-dark-sage/40 px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10"
+          >
+            <Building2 size={16} aria-hidden="true" />
+            Mes salons
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </Link>
+        </div>
       </div>
+
+      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+
+      <ActivitySection upcoming={stats?.upcoming ?? null} toClose={stats?.to_close ?? null} />
     </main>
   );
 }

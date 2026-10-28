@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import {
   AppointmentStatus,
   ManagerAppointment,
-  PaymentMethod,
+  OnSitePaymentMethod,
   useManagerAppointments,
 } from "@/hooks/useManagerAppointments";
+import CloseAppointmentForm from "@/components/manager/CloseAppointmentForm";
 import { Calendar, Scissors, UserRound } from "lucide-react";
 import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
 import PaymentStatusBadge from "@/components/PaymentStatusBadge";
@@ -16,13 +17,15 @@ import { useToast } from "@/hooks/useToast";
 import AppointmentDateTime from "@/components/AppointmentDateTime";
 
 export default function ManagerAppointmentsPage() {
-  const { getAppointments, updateAppointmentStatus, markAppointmentPaid } =
+  const { getAppointments, updateAppointmentStatus, completeAppointment } =
     useManagerAppointments();
   const [appointments, setAppointments] = useState<ManagerAppointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
-  const [payingId, setPayingId] = useState<number | null>(null);
+  const [closingId, setClosingId] = useState<number | null>(null);
+  // Heure de référence prise au chargement : un rendez-vous ne se clôture qu'après son début.
+  const [loadedAt, setLoadedAt] = useState<number | null>(null);
   const { message: toastMessage, showToast } = useToast();
 
   useEffect(() => {
@@ -30,7 +33,10 @@ export default function ManagerAppointmentsPage() {
 
     getAppointments()
       .then((data) => {
-        if (isMounted) setAppointments(data);
+        if (isMounted) {
+          setAppointments(data);
+          setLoadedAt(Date.now());
+        }
       })
       .catch(() => {
         if (isMounted) setError("Impossible de charger les rendez-vous.");
@@ -59,13 +65,15 @@ export default function ManagerAppointmentsPage() {
     }
   }
 
-  async function handleMarkPaid(id: number, method: PaymentMethod) {
+  async function handleClose(id: number, amount: number, method: OnSitePaymentMethod) {
     setUpdatingId(id);
     try {
-      const updated = await markAppointmentPaid(id, method);
+      const updated = await completeAppointment(id, amount, method);
       setAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
-      setPayingId(null);
-      showToast("Paiement enregistré.");
+      setClosingId(null);
+      showToast("Rendez-vous clôturé et paiement enregistré.");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Impossible de clôturer le rendez-vous.");
     } finally {
       setUpdatingId(null);
     }
@@ -79,7 +87,7 @@ export default function ManagerAppointmentsPage() {
         </span>
         <h1 className="text-3xl font-semibold tracking-tight text-forest">Rendez-vous</h1>
         <p className="max-w-2xl text-anthracite/70">
-          Confirmez les demandes, suivez les prestations et enregistrez les paiements.
+          Confirmez les demandes et, une fois la prestation réalisée, clôturez le rendez-vous en notant le paiement reçu sur place.
         </p>
       </div>
 
@@ -116,10 +124,13 @@ export default function ManagerAppointmentsPage() {
               <AppointmentDateTime scheduledAt={appointment.scheduled_at} />
               <div className="flex flex-wrap items-center gap-2">
                 <AppointmentStatusBadge status={appointment.status} />
-                <PaymentStatusBadge
-                  status={appointment.payment_status}
-                  method={appointment.payment_method}
-                />
+                {appointment.status === "completed" && (
+                  <PaymentStatusBadge
+                    status={appointment.payment_status}
+                    method={appointment.payment_method}
+                    amount={appointment.amount_paid}
+                  />
+                )}
               </div>
             </div>
 
@@ -145,78 +156,39 @@ export default function ManagerAppointmentsPage() {
                 </>
               )}
 
-              {appointment.status === "confirmed" && (
-                <>
-                  <button
-                    type="button"
-                    disabled={updatingId === appointment.id}
-                    onClick={() => handleStatusChange(appointment.id, "in_progress")}
-                    className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
-                  >
-                    Démarrer
-                  </button>
-                  <button
-                    type="button"
-                    disabled={updatingId === appointment.id}
-                    onClick={() => handleStatusChange(appointment.id, "cancelled")}
-                    className="rounded-full border border-terracotta px-4 py-2 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white disabled:opacity-50"
-                  >
-                    Annuler
-                  </button>
-                </>
-              )}
-
-              {appointment.status === "in_progress" && (
-                <button
-                  type="button"
-                  disabled={updatingId === appointment.id}
-                  onClick={() => handleStatusChange(appointment.id, "completed")}
-                  className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
-                >
-                  Finaliser
-                </button>
-              )}
-
-              {appointment.payment_status === "unpaid" && appointment.status !== "cancelled" && (
-                <>
-                  {payingId === appointment.id ? (
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-anthracite/75">Payé par :</span>
+              {appointment.status === "confirmed" &&
+                (closingId === appointment.id ? (
+                  <CloseAppointmentForm
+                    appointmentId={appointment.id}
+                    defaultAmount={Number(appointment.price)}
+                    submitting={updatingId === appointment.id}
+                    onSubmit={(amount, method) => handleClose(appointment.id, amount, method)}
+                    onCancel={() => setClosingId(null)}
+                  />
+                ) : (
+                  <>
+                    {loadedAt !== null && new Date(appointment.scheduled_at).getTime() <= loadedAt ? (
                       <button
                         type="button"
                         disabled={updatingId === appointment.id}
-                        onClick={() => handleMarkPaid(appointment.id, "cash")}
-                        className="rounded-full border border-dark-sage px-3 py-1 text-xs font-medium text-link-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
+                        onClick={() => setClosingId(appointment.id)}
+                        className="rounded-full bg-forest px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-dark-sage disabled:opacity-50"
                       >
-                        Espèces
+                        Clôturer
                       </button>
-                      <button
-                        type="button"
-                        disabled={updatingId === appointment.id}
-                        onClick={() => handleMarkPaid(appointment.id, "card")}
-                        className="rounded-full border border-dark-sage px-3 py-1 text-xs font-medium text-link-sage transition-colors hover:bg-sage/10 disabled:opacity-50"
-                      >
-                        Carte
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPayingId(null)}
-                        className="text-xs text-anthracite/75 hover:underline"
-                      >
-                        Annuler
-                      </button>
-                    </div>
-                  ) : (
+                    ) : (
+                      <span className="text-xs text-anthracite/60">Clôture possible après l&apos;heure du rendez-vous</span>
+                    )}
                     <button
                       type="button"
-                      onClick={() => setPayingId(appointment.id)}
-                      className="rounded-full border border-green-600 px-4 py-2 text-sm font-medium text-green-600 transition-colors hover:bg-green-600 hover:text-white"
+                      disabled={updatingId === appointment.id}
+                      onClick={() => handleStatusChange(appointment.id, "cancelled")}
+                      className="rounded-full border border-terracotta px-4 py-2 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white disabled:opacity-50"
                     >
-                      Marquer payé
+                      Annuler
                     </button>
-                  )}
-                </>
-              )}
+                  </>
+                ))}
             </div>
           </div>
         ))}

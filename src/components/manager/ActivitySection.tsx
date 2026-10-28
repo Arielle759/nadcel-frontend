@@ -1,7 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Activity, CalendarClock, Lightbulb, Scissors, TrendingDown, TrendingUp, UserRoundCheck, Users } from "lucide-react";
+import {
+  Activity,
+  CalendarClock,
+  Lightbulb,
+  Scissors,
+  TrendingDown,
+  TrendingUp,
+  UserRoundCheck,
+  Users,
+  Wallet,
+} from "lucide-react";
 import {
   useManagerActivity,
   type ActivityBusySlot,
@@ -14,6 +25,12 @@ import SectionTitle from "@/components/SectionTitle";
 import ActivityMonthlyChart from "@/components/manager/ActivityMonthlyChart";
 import { DAY_LABELS, DAY_SHORT, PART_LABELS, formatMonthLong, formatTrend } from "@/components/manager/activityFormat";
 
+const METHOD_LABELS: Record<string, string> = {
+  especes: "Espèces",
+  wave: "Wave",
+  orange_money: "Orange Money",
+};
+
 const PERIODS: { key: ActivityPeriod; label: string }[] = [
   { key: "month", label: "30 derniers jours" },
   { key: "quarter", label: "3 derniers mois" },
@@ -24,7 +41,13 @@ const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
 const CARD = "rounded-2xl border border-sage/20 bg-beige p-5 shadow-[0_10px_30px_rgba(45,59,40,0.06)] sm:p-6";
 
-export default function ActivitySection() {
+export default function ActivitySection({
+  upcoming,
+  toClose,
+}: {
+  upcoming: number | null;
+  toClose: number | null;
+}) {
   const [period, setPeriod] = useState<ActivityPeriod>("month");
   const { data, loading, error } = useManagerActivity(period);
 
@@ -55,6 +78,8 @@ export default function ActivitySection() {
         </p>
       )}
 
+      <KpiRow data={data} upcoming={upcoming} toClose={toClose} />
+
       {!data && loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Chargement de l'activité">
           {[0, 1, 2, 3].map((item) => (
@@ -83,13 +108,117 @@ export default function ActivitySection() {
               <BusySlots slots={data.busy_slots} />
               <div className="flex flex-col gap-4">
                 <Employees data={data} />
-                <Loyalty data={data} />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                  <Loyalty data={data} />
+                  <PaymentMethods data={data} />
+                </div>
               </div>
             </div>
           </div>
         )
       )}
     </section>
+  );
+}
+
+// Quatre indicateurs compacts en tête : l'essentiel tient sur une seule ligne.
+function KpiRow({
+  data,
+  upcoming,
+  toClose,
+}: {
+  data: ManagerActivity | null;
+  upcoming: number | null;
+  toClose: number | null;
+}) {
+  const placeholder = "—";
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <Kpi
+        label="Prestations réalisées"
+        value={data ? data.totals.completed : placeholder}
+        trend={data ? <TrendBadge trend={data.totals.trend} /> : null}
+      />
+      <Kpi
+        label="Chiffre d'affaires encaissé"
+        value={data ? formatCurrency(data.totals.revenue) : placeholder}
+        hint="Payé sur place, noté à la clôture"
+      />
+      <Kpi label="Rendez-vous à venir" value={upcoming ?? placeholder} />
+      <Kpi
+        label="À clôturer"
+        value={toClose ?? placeholder}
+        tone={toClose ? "warning" : "neutral"}
+        hint={toClose ? "Rendez-vous passés sans paiement noté" : "Tout est à jour"}
+        href={toClose ? "/manager/appointments" : undefined}
+      />
+    </div>
+  );
+}
+
+function Kpi({
+  label,
+  value,
+  trend = null,
+  hint,
+  tone = "neutral",
+  href,
+}: {
+  label: string;
+  value: number | string;
+  trend?: React.ReactNode;
+  hint?: string;
+  tone?: "neutral" | "warning";
+  href?: string;
+}) {
+  const body = (
+    <>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-anthracite/60">{label}</p>
+      <p className={`mt-1 text-2xl font-semibold tracking-tight ${tone === "warning" ? "text-champagne" : "text-forest"}`}>
+        {value}
+      </p>
+      <div className="mt-1 flex min-h-4 items-center gap-2 text-xs text-anthracite/55">
+        {trend}
+        {hint && <span>{hint}</span>}
+      </div>
+    </>
+  );
+  const className = `rounded-2xl border bg-beige p-4 ${
+    tone === "warning" ? "border-champagne/40" : "border-sage/20"
+  } ${href ? "transition-colors hover:border-champagne" : ""}`;
+
+  return href ? (
+    <Link href={href} className={className}>
+      {body}
+    </Link>
+  ) : (
+    <div className={className}>{body}</div>
+  );
+}
+
+function PaymentMethods({ data }: { data: ManagerActivity }) {
+  const used = data.payment_methods.filter((m) => m.count > 0);
+  return (
+    <div className={CARD}>
+      <p className="mb-2 flex items-center gap-2 font-semibold text-forest">
+        <Wallet size={17} aria-hidden="true" />
+        Encaissements
+      </p>
+      {used.length === 0 ? (
+        <p className="text-sm text-anthracite/60">Aucun paiement noté à la clôture sur cette période.</p>
+      ) : (
+        <ul className="flex flex-col gap-1.5 text-sm">
+          {used.map((m) => (
+            <li key={m.method} className="flex items-center justify-between gap-2">
+              <span className="text-anthracite">{METHOD_LABELS[m.method] ?? m.method}</span>
+              <span className="text-anthracite/65">
+                {formatCurrency(m.amount)} · {m.share.toLocaleString("fr-FR")} %
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

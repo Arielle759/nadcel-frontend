@@ -1,13 +1,16 @@
 import { useCallback, useState } from "react";
 import { api, toErrorMessage } from "@/lib/api";
 import type { SalonDetail } from "@/lib/salons";
-import type { AdminStatsAppointments, AdminStatsRevenue } from "@/hooks/useAdmin";
+import type { AdminStatsAppointments } from "@/hooks/useAdmin";
 import type { OpeningHours } from "@/lib/openingHours";
 
 export interface ManagerStats {
   salons_count: number;
   appointments: AdminStatsAppointments;
-  revenue: AdminStatsRevenue;
+  // Paiement sur place : uniquement ce qui a réellement été encaissé à la clôture.
+  revenue: { collected: number };
+  to_close: number; // rendez-vous passés pas encore clôturés
+  upcoming: number;
 }
 
 export interface UpdateSalonData {
