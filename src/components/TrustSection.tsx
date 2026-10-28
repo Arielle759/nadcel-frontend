@@ -33,7 +33,7 @@ export default function TrustSection() {
   return (
     <section
       aria-label="Nadcel en chiffres"
-      className="relative z-10 mx-4 -mt-10 rounded-3xl border border-sage/20 bg-beige px-6 py-8 shadow-[0_18px_50px_rgba(45,59,40,0.12)] sm:mx-8 sm:px-10 lg:mx-auto lg:w-full lg:max-w-6xl"
+      className="relative z-10 mx-4 -mt-10 rounded-3xl bg-white px-6 py-8 shadow-[0_2px_6px_rgba(45,59,40,0.06),0_24px_56px_rgba(45,59,40,0.14)] sm:mx-8 sm:px-10 lg:mx-auto lg:w-full lg:max-w-6xl"
     >
       <dl className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:divide-x md:divide-sage/20">
         {items.map(({ value, label }) => (

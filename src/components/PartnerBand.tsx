@@ -1,22 +1,51 @@
 import Link from "next/link";
+import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
+
+const BENEFITS = [
+  {
+    title: "Un agenda qui se remplit seul",
+    description: "Vos clientes réservent jour et nuit sur les créneaux que vous ouvrez, sans appel manqué.",
+  },
+  {
+    title: "Moins de rendez-vous oubliés",
+    description: "Un rappel part automatiquement la veille. Vous confirmez ou refusez chaque demande.",
+  },
+  {
+    title: "Votre activité en clair",
+    description: "Chiffre d'affaires encaissé, prestations les plus demandées et prévisions du mois prochain.",
+  },
+];
 
 export default function PartnerBand() {
   return (
-    <section aria-labelledby="partner-title" className="px-6 pb-20 sm:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8 rounded-3xl bg-forest px-8 py-12 text-beige sm:px-12 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-2xl">
-          <h2 id="partner-title" className="text-3xl font-semibold tracking-tight text-beige sm:text-4xl">
-            Vous gérez un salon ?
-          </h2>
-          <p className="mt-3 leading-7 text-beige/80">
-            Recevez des réservations en ligne, suivez votre agenda et votre chiffre d&apos;affaires au même endroit.
-            L&apos;inscription est gratuite et votre fiche est vérifiée par notre équipe avant sa mise en ligne.
-          </p>
+    <section aria-labelledby="partner-title" className="mt-28 bg-forest px-6 py-24 sm:px-10">
+      <div className="mx-auto max-w-6xl">
+        <p className="mb-5 text-sm font-semibold text-champagne-light">Pour les professionnels</p>
+        <SectionHeading
+          id="partner-title"
+          title="Gérez vos rendez-vous."
+          muted="Remplissez vos créneaux."
+          description="L'inscription est gratuite. Votre fiche est vérifiée par notre équipe avant sa mise en ligne, sous 48 heures ouvrées."
+          onDark
+        />
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+          <Link href="/devenir-partenaire" className={`${ui.buttonOnDark} h-12 px-7`}>
+            Inscrire mon salon
+          </Link>
+          <Link href="/login" className={`${ui.buttonGhostOnDark} h-12 px-7`}>
+            Déjà partenaire ? Se connecter
+          </Link>
         </div>
-        <Link href="/devenir-partenaire" className={`${ui.buttonOnDark} shrink-0 px-7`}>
-          Inscrire mon salon
-        </Link>
+
+        <ul className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-3">
+          {BENEFITS.map(({ title, description }) => (
+            <li key={title} className="rounded-2xl bg-beige/[0.06] p-7 ring-1 ring-inset ring-beige/10">
+              <h3 className="text-lg font-semibold text-beige">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-beige/75">{description}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

@@ -96,7 +96,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-anthracite/75">
             Déjà un compte ?{" "}
-            <Link href="/login" className="font-semibold text-link-sage hover:underline">
+            <Link href="/login" className="font-semibold text-forest transition-colors hover:text-dark-sage">
               Se connecter
             </Link>
           </p>

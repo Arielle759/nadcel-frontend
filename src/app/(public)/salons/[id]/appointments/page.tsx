@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSalon } from "@/lib/salons";
 import { salonArea } from "@/lib/salonArea";
 import AppointmentForm from "@/components/AppointmentForm";
+import { ui } from "@/lib/ui";
 
 export default async function AppointmentsPage({
   params,
@@ -26,13 +27,13 @@ export default async function AppointmentsPage({
         <nav aria-label="Fil d'Ariane" className="text-sm text-anthracite/75">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/salons" className="text-forest underline-offset-4 hover:underline">
+              <Link href="/salons" className={ui.textLink}>
                 Salons
               </Link>
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <Link href={`/salons/${salon.id}`} className="text-forest underline-offset-4 hover:underline">
+              <Link href={`/salons/${salon.id}`} className={ui.textLink}>
                 {salon.name}
               </Link>
             </li>

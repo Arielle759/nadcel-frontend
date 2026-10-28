@@ -68,7 +68,7 @@ export default async function SalonDetailPage({
         <nav aria-label="Fil d'Ariane" className="text-sm text-anthracite/75">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
-              <Link href="/salons" className="text-forest underline-offset-4 hover:underline">
+              <Link href="/salons" className={ui.textLink}>
                 Salons
               </Link>
             </li>
@@ -118,11 +118,11 @@ export default async function SalonDetailPage({
                     <h3 className="text-sm font-semibold text-anthracite/75" style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
                       {category} ({services.length})
                     </h3>
-                    <ul className="mt-2 divide-y divide-sage/25 border-y border-sage/25">
+                    <ul className="mt-3 flex flex-col gap-3">
                       {services.map((service) => {
                         const imageSrc = resolveServiceImage(service);
                         return (
-                          <li key={service.id} className="flex items-center gap-4 py-4">
+                          <li key={service.id} className={`${ui.surface} flex items-center gap-4 p-3 pr-4 sm:p-4`}>
                             <div className="relative hidden h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sage/20 sm:block">
                               {imageSrc && <Image src={imageSrc} alt="" fill sizes="56px" className="object-cover" />}
                             </div>
@@ -143,7 +143,7 @@ export default async function SalonDetailPage({
                             </span>
                             <Link
                               href={`${bookingHref}?service=${service.id}`}
-                              className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-forest/25 px-4 text-sm font-semibold text-forest transition-colors hover:border-forest hover:bg-forest hover:text-beige"
+                              className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-forest/[0.07] px-5 text-sm font-semibold text-forest transition-colors hover:bg-forest hover:text-beige"
                               aria-label={`Réserver : ${service.name}`}
                             >
                               Réserver
@@ -189,7 +189,7 @@ export default async function SalonDetailPage({
                   href={mapsHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-block text-sm font-semibold text-forest underline-offset-4 hover:underline"
+                  className={`${ui.buttonSecondary} mt-4`}
                 >
                   Voir l&apos;itinéraire (Google Maps)
                 </a>
@@ -198,7 +198,7 @@ export default async function SalonDetailPage({
           </div>
 
           <aside aria-label="Réservation" className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
-            <div className="rounded-3xl border border-sage/25 bg-white/60 p-6 shadow-[0_12px_32px_rgba(45,59,40,0.07)]">
+            <div className={`${ui.surface} rounded-3xl p-6`}>
               <p className="font-heading text-2xl font-semibold text-forest">Réserver</p>
               {minPrice !== null && maxPrice !== null && (
                 <p className="mt-2 text-sm text-anthracite/80">
@@ -221,7 +221,7 @@ export default async function SalonDetailPage({
       </div>
 
       {/* Mobile : l'action de réservation reste toujours accessible en bas de l'écran. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-sage/25 bg-beige/95 px-6 py-3 backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(45,59,40,0.10)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <p className="min-w-0 text-sm text-anthracite/80">
             {minPrice !== null ? <>À partir de <span className="font-semibold text-forest">{formatCurrency(minPrice)}</span></> : salon.name}

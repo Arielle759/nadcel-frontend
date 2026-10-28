@@ -79,7 +79,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-anthracite/75">
             Pas encore de compte ?{" "}
-            <Link href="/register" className="font-semibold text-link-sage hover:underline">
+            <Link href="/register" className="font-semibold text-forest transition-colors hover:text-dark-sage">
               Créer un compte
             </Link>
           </p>

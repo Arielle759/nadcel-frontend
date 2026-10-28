@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           <p className="text-anthracite/75">
             Vous pouvez à tout moment demander l&apos;accès, la correction ou la suppression
             de vos données personnelles en nous contactant à{" "}
-            <a href="mailto:contact@nadcel.sn" className="text-link-sage hover:underline">
+            <a href="mailto:contact@nadcel.sn" className="font-semibold text-forest transition-colors hover:text-dark-sage">
               contact@nadcel.sn
             </a>
             .

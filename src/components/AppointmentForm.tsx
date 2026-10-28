@@ -236,7 +236,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
   if (success && selectedService && selectedDate) {
     return (
-      <section aria-live="polite" className="mx-auto w-full max-w-xl rounded-3xl border border-sage/25 bg-white/60 p-8 text-center sm:p-10">
+      <section aria-live="polite" className={`${ui.surface} mx-auto w-full max-w-xl rounded-3xl p-8 text-center sm:p-10`}>
         <p className="font-heading text-3xl font-semibold text-forest">Demande envoyée</p>
         <p className="mt-4 leading-7 text-anthracite/85">
           {selectedService.name} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
@@ -257,7 +257,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
   }
 
   const summary = (
-    <div className="rounded-3xl border border-sage/25 bg-white/60 p-6 shadow-[0_12px_32px_rgba(45,59,40,0.07)]">
+    <div className={`${ui.surface} rounded-3xl p-6`}>
       <p className="font-heading text-2xl font-semibold text-forest">Récapitulatif</p>
       <dl className="mt-5 flex flex-col gap-4 text-sm">
         <div>
@@ -277,7 +277,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
             {selectedDate && heure ? ` à ${formatSlot(heure)}` : ""}
           </dd>
         </div>
-        <div className="flex items-baseline justify-between border-t border-sage/25 pt-4">
+        <div className="flex items-baseline justify-between rounded-2xl bg-beige px-4 py-3">
           <dt className="text-anthracite/70">À régler au salon</dt>
           <dd className="text-lg font-semibold text-forest">
             {selectedService ? formatCurrency(Number(selectedService.price)) : "-"}
@@ -327,13 +327,13 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
         <fieldset className="min-w-0">
           <legend className="font-heading text-2xl font-semibold text-forest">1. Prestation</legend>
-          <div className="mt-4 divide-y divide-sage/25 border-y border-sage/25">
+          <div className="mt-4 flex flex-col gap-3">
             {services.map((service) => {
               const checked = service.id === serviceId;
               return (
                 <label
                   key={service.id}
-                  className={`flex cursor-pointer items-center gap-4 px-3 py-4 transition-colors ${checked ? "bg-sage/15" : "hover:bg-sage/5"}`}
+                  className={`flex cursor-pointer items-center gap-4 rounded-2xl bg-white p-4 transition-all duration-200 ${checked ? "shadow-[0_0_0_2px_var(--color-forest),0_10px_26px_rgba(45,59,40,0.12)]" : "shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_14px_32px_rgba(45,59,40,0.11)]"}`}
                 >
                   <input
                     type="radio"
@@ -372,8 +372,8 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                     selected
                       ? "border-forest bg-forest text-beige"
                       : unavailable
-                        ? "cursor-not-allowed border-sage/20 text-anthracite/35 line-through"
-                        : "border-sage/40 bg-white/50 text-anthracite hover:border-forest/50"
+                        ? "cursor-not-allowed border-transparent bg-sage/10 text-anthracite/40"
+                        : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(45,59,40,0.05),0_6px_16px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.07),0_10px_22px_rgba(45,59,40,0.12)]"
                   }`}
                 >
                   <span className="text-xs">{day.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
@@ -388,7 +388,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
               type="button"
               onClick={() => setShowCalendar((open) => !open)}
               aria-expanded={showCalendar}
-              className="font-semibold text-forest underline-offset-4 hover:underline"
+              className={`${ui.buttonSecondary} min-h-10 px-5`}
             >
               {showCalendar ? "Masquer le calendrier" : "Choisir une date plus lointaine"}
             </button>
@@ -403,7 +403,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
               onMonthChange={setCalendarMonth}
               disabled={[{ before: today }, isDayUnavailable]}
               locale={fr}
-              className="appointment-calendar mt-4 w-fit rounded-2xl border border-sage/30 bg-white/60 p-4"
+              className={`appointment-calendar ${ui.surface} mt-4 w-fit p-4`}
             />
           )}
         </fieldset>
@@ -435,7 +435,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                           className={`min-h-11 min-w-20 rounded-full border px-4 text-sm font-medium transition-colors ${
                             heure === slot
                               ? "border-forest bg-forest text-beige"
-                              : "border-sage/40 bg-white/50 text-anthracite hover:border-forest/50"
+                              : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(45,59,40,0.05),0_6px_16px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.07),0_10px_22px_rgba(45,59,40,0.12)]"
                           }`}
                         >
                           {formatSlot(slot)}
@@ -456,7 +456,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
       {/* Mobile : confirmation toujours accessible en bas de l'écran. */}
       {!authRequired && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-sage/25 bg-beige/95 px-6 py-3 backdrop-blur lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(45,59,40,0.10)] backdrop-blur lg:hidden">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
             <p className="min-w-0 text-sm text-anthracite/80">
               {ready && selectedDate ? (

@@ -39,7 +39,7 @@ export default function PrivateSpaceMessage({ message, title, icon: Icon, showLo
           <h1 className="text-xl font-semibold text-forest">{title}</h1>
           <p className="text-sm text-anthracite/75">{message}</p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/" className="text-sm font-medium text-link-sage hover:underline">
+            <Link href="/" className="text-sm font-semibold text-forest transition-colors hover:text-dark-sage">
               Retour à l&apos;accueil
             </Link>
             {showLogout && (
