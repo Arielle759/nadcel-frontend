@@ -1,71 +1,76 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Building2 } from "lucide-react";
 import { useManagerSalons } from "@/hooks/useManagerSalons";
-import { useManager } from "@/hooks/useManager";
-import EmptyState from "@/components/EmptyState";
+import ManagerPage from "@/components/manager/ManagerPage";
+import { assetUrl } from "@/lib/api";
+import { salonArea } from "@/lib/salonArea";
+import { ui } from "@/lib/ui";
+import type { Salon } from "@/hooks/useSalons";
+
+function statusOf(salon: Salon): { label: string; className: string } {
+  if (salon.is_verified && salon.is_active) return { label: "En ligne", className: "bg-emerald-100 text-emerald-900" };
+  if (salon.is_verified) return { label: "Suspendu", className: "bg-red-100 text-red-900" };
+  if (salon.is_active) return { label: "En attente de validation", className: "bg-amber-100 text-amber-900" };
+  return { label: "Non retenu", className: "bg-red-100 text-red-900" };
+}
 
 export default function ManagerSalonsPage() {
-  const { salons, loading, error, refetch } = useManagerSalons();
-  const { deleteSalon } = useManager();
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  async function handleDelete(id: number) {
-    if (!window.confirm("Supprimer ce salon ?")) return;
-    setDeletingId(id);
-    try {
-      await deleteSalon(id);
-      refetch();
-    } finally {
-      setDeletingId(null);
-    }
-  }
+  const { salons, loading, error } = useManagerSalons();
 
   return (
-    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Mes salons</h1>
-
-      {loading && <p className="text-anthracite/75">Chargement des salons...</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+    <ManagerPage
+      title="Mes salons"
+      description="La fiche, les prestations et l'équipe de chaque salon."
+      actions={
+        <Link href="/devenir-partenaire" className={ui.buttonSecondary}>
+          Ajouter un salon
+        </Link>
+      }
+    >
+      {loading && <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />}
+      {error && <p className="text-sm text-red-700">{error}</p>}
 
       {!loading && !error && salons.length === 0 && (
-        <EmptyState
-          message="Vous n'avez pas encore de salon associé à votre compte."
-          icon={Building2}
-        />
+        <div className={`${ui.surface} px-6 py-12 text-center`}>
+          <p className="font-heading text-2xl font-semibold text-forest">Aucun salon pour le moment</p>
+          <p className="mt-2 text-sm text-anthracite/75">Envoyez une demande de partenariat pour inscrire votre salon.</p>
+        </div>
       )}
 
-      <ul className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
-        {salons.map((salon) => (
-          <li
-            key={salon.id}
-            className="flex items-center justify-between gap-4 rounded-lg border border-sage/30 bg-beige p-4"
-          >
-            <div>
-              <p className="font-semibold text-anthracite">{salon.name}</p>
-              <p className="text-sm text-anthracite/75">{salon.description}</p>
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href={`/manager/salons/${salon.id}`}
-                className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10"
-              >
-                Modifier
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleDelete(salon.id)}
-                disabled={deletingId === salon.id}
-                className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-90 disabled:opacity-50"
-              >
-                {deletingId === salon.id ? "Suppression..." : "Supprimer"}
-              </button>
-            </div>
-          </li>
-        ))}
+      <ul className="flex flex-col gap-4">
+        {salons.map((salon) => {
+          const cover = assetUrl(salon.cover ?? salon.logo);
+          const status = statusOf(salon);
+          return (
+            <li key={salon.id} className={`${ui.surface} flex flex-col gap-5 p-4 sm:flex-row sm:items-center sm:p-5`}>
+              <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl bg-sage/20 sm:h-24 sm:w-36">
+                {cover && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={cover} alt="" className="h-full w-full object-cover" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h2 className="text-xl font-semibold text-forest">{salon.name}</h2>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span>
+                </div>
+                <p className="mt-1 text-sm text-anthracite/75">{salonArea(salon.address, salon.city)}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link href={`/manager/salons/${salon.id}`} className={ui.buttonPrimary}>
+                  Gérer
+                </Link>
+                {salon.is_verified && salon.is_active && (
+                  <Link href={`/salons/${salon.id}`} className={ui.buttonSecondary}>
+                    Page publique
+                  </Link>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
-    </main>
+    </ManagerPage>
   );
 }

@@ -93,7 +93,7 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <DashboardShell initials="GE" title="Espace gérant" subtitle="Pilotage du salon" navItems={NAV_ITEMS}>
+    <DashboardShell title="Espace gérant" navItems={NAV_ITEMS}>
       {children}
     </DashboardShell>
   );

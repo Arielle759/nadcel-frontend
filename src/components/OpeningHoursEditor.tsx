@@ -1,9 +1,13 @@
 import { DAYS, DEFAULT_DAY_HOURS, DayKey, OpeningHours } from "@/lib/openingHours";
+import { ui } from "@/lib/ui";
 
 interface OpeningHoursEditorProps {
   value: OpeningHours | null;
   onChange: (value: OpeningHours | null) => void;
 }
+
+const timeInput =
+  "h-10 rounded-lg bg-white px-2 text-sm text-anthracite outline-none shadow-[0_0_0_1px_rgba(45,59,40,0.12)] focus:shadow-[0_0_0_2px_var(--color-forest)]";
 
 export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEditorProps) {
   const isCustom = value !== null;
@@ -17,38 +21,25 @@ export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEdit
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">Horaires d&apos;ouverture</span>
-        <button
-          type="button"
-          onClick={toggleCustom}
-          className="text-xs font-medium text-link-sage hover:underline"
-        >
-          {isCustom ? "Revenir aux horaires par défaut (9h-19h)" : "Personnaliser les horaires"}
-        </button>
-      </div>
-
-      {!isCustom && (
-        <p className="text-sm text-anthracite/75">
-          Par défaut, votre salon est ouvert de 9h à 19h tous les jours.
+    <div className="flex flex-col gap-5">
+      {!isCustom ? (
+        <p className="text-sm leading-6 text-anthracite/80">
+          Horaires standard : ouvert tous les jours de 9 h à 19 h. Les créneaux proposés aux clientes suivent ces horaires.
         </p>
-      )}
-
-      {isCustom && (
-        <div className="flex flex-col gap-2">
+      ) : (
+        <ul className="flex flex-col gap-1">
           {DAYS.map(({ key, label }) => {
             const dayHours = value?.[key] ?? null;
             const isOpen = dayHours !== null;
 
             return (
-              <div key={key} className="flex flex-wrap items-center gap-3">
-                <label className="flex w-32 items-center gap-2 text-sm text-anthracite">
+              <li key={key} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2.5">
+                <label className="flex w-36 items-center gap-3 text-sm font-medium text-anthracite">
                   <input
                     type="checkbox"
                     checked={isOpen}
                     onChange={(e) => setDay(key, e.target.checked ? DEFAULT_DAY_HOURS : null)}
-                    className="h-4 w-4 rounded border-sage/40"
+                    className="h-4 w-4 accent-[var(--color-forest)]"
                   />
                   {label}
                 </label>
@@ -56,26 +47,34 @@ export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEdit
                   <div className="flex items-center gap-2">
                     <input
                       type="time"
+                      aria-label={`${label}, ouverture`}
                       value={dayHours.open}
                       onChange={(e) => setDay(key, { ...dayHours, open: e.target.value })}
-                      className="rounded-md border border-sage/40 px-2 py-1 text-sm"
+                      className={timeInput}
                     />
-                    <span className="text-sm text-anthracite/60">à</span>
+                    <span className="text-sm text-anthracite/70">à</span>
                     <input
                       type="time"
+                      aria-label={`${label}, fermeture`}
                       value={dayHours.close}
                       onChange={(e) => setDay(key, { ...dayHours, close: e.target.value })}
-                      className="rounded-md border border-sage/40 px-2 py-1 text-sm"
+                      className={timeInput}
                     />
                   </div>
                 ) : (
-                  <span className="text-sm text-anthracite/50">Fermé</span>
+                  <span className="text-sm text-anthracite/60">Fermé</span>
                 )}
-              </div>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
+
+      <div>
+        <button type="button" onClick={toggleCustom} className={ui.buttonSecondary}>
+          {isCustom ? "Revenir aux horaires standard" : "Personnaliser les jours et les heures"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -25,7 +25,14 @@ export const ui = {
   // Champ de formulaire : fond blanc, ombre légère, anneau vert au focus.
   input:
     "h-12 w-full rounded-xl bg-white px-4 text-base text-anthracite outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06),0_0_0_1px_rgba(45,59,40,0.10)] transition-shadow placeholder:text-anthracite/45 focus:shadow-[0_0_0_2px_var(--color-forest)]",
+  textarea:
+    "min-h-28 w-full rounded-xl bg-white px-4 py-3 text-base text-anthracite outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06),0_0_0_1px_rgba(45,59,40,0.10)] transition-shadow placeholder:text-anthracite/45 focus:shadow-[0_0_0_2px_var(--color-forest)]",
   label: "text-sm font-semibold text-anthracite",
+  // Action destructive discrète (le vrai bouton rouge n'apparaît qu'à la confirmation).
+  buttonDangerGhost:
+    "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-sm font-semibold text-red-800 transition-colors hover:bg-red-50",
+  buttonDanger:
+    "inline-flex min-h-11 items-center justify-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-900 disabled:opacity-60",
   eyebrow: "text-sm font-medium text-anthracite/70",
   sectionTitleBase: "text-3xl font-semibold tracking-tight sm:text-[2.75rem] sm:leading-[1.1]",
   sectionTitle: "text-3xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]",

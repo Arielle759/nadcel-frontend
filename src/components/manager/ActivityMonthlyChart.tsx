@@ -24,7 +24,7 @@ export default function ActivityMonthlyChart({
   });
 
   return (
-    <div className="rounded-2xl border border-sage/20 bg-beige p-5 shadow-[0_10px_30px_rgba(45,59,40,0.06)] sm:p-6">
+    <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] sm:p-6">
       <p className="font-semibold text-forest">Évolution sur 12 mois</p>
       <p className="mb-4 text-sm text-anthracite/60">
         Prestations réalisées chaque mois. Le dernier mois est en cours.

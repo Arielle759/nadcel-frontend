@@ -28,7 +28,7 @@ const PERIODS: { key: ActivityPeriod; label: string }[] = [
 
 const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
-const CARD = "rounded-2xl border border-sage/20 bg-beige p-5 shadow-[0_10px_30px_rgba(45,59,40,0.06)] sm:p-6";
+const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] sm:p-6";
 
 export default function ActivitySection({
   upcoming,
@@ -44,7 +44,7 @@ export default function ActivitySection({
     <section className="flex flex-col gap-4" aria-busy={loading}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-forest">Activité du salon</h2>
-        <div role="group" aria-label="Période analysée" className="flex rounded-full border border-sage/30 bg-beige p-1">
+        <div role="group" aria-label="Période analysée" className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
@@ -72,7 +72,7 @@ export default function ActivitySection({
       {!data && loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Chargement de l'activité">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className="h-56 animate-pulse rounded-2xl border border-sage/20 bg-sage/10" />
+            <div key={item} className="h-56 animate-pulse rounded-2xl bg-sage/15" />
           ))}
         </div>
       )}
@@ -162,8 +162,8 @@ function Kpi({
 }) {
   const body = (
     <>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-anthracite/60">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold tracking-tight ${tone === "warning" ? "text-champagne" : "text-forest"}`}>
+      <p className="text-sm font-medium text-anthracite/75">{label}</p>
+      <p className={`mt-1 font-heading text-3xl font-semibold tracking-tight ${tone === "warning" ? "text-champagne" : "text-forest"}`}>
         {value}
       </p>
       <div className="mt-1 flex min-h-4 items-center gap-2 text-xs text-anthracite/55">
@@ -172,9 +172,9 @@ function Kpi({
       </div>
     </>
   );
-  const className = `rounded-2xl border bg-beige p-4 ${
-    tone === "warning" ? "border-champagne/40" : "border-sage/20"
-  } ${href ? "transition-colors hover:border-champagne" : ""}`;
+  const className = `rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] ${
+    tone === "warning" ? "ring-1 ring-inset ring-champagne/50" : ""
+  } ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_16px_36px_rgba(45,59,40,0.12)]" : ""}`;
 
   return href ? (
     <Link href={href} className={className}>
@@ -425,7 +425,7 @@ function Insights({ data }: { data: ManagerActivity }) {
   if (insights.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-champagne/30 bg-champagne/10 p-5">
+    <div className="rounded-2xl bg-champagne-light/25 p-5">
       <p className="mb-2 font-semibold text-forest">À retenir
       </p>
       <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-anthracite/80">

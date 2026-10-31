@@ -53,7 +53,7 @@ export default function CloseAppointmentForm({
     >
       <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
         <div className="flex flex-col gap-1">
-          <label htmlFor={amountId} className="text-[11px] font-semibold uppercase tracking-wide text-anthracite/60">
+          <label htmlFor={amountId} className="text-xs font-semibold text-anthracite/75">
             Montant encaissé
           </label>
           <div className="flex items-center rounded-lg border border-sage/35 bg-white focus-within:border-dark-sage focus-within:ring-4 focus-within:ring-sage/10">
@@ -73,7 +73,7 @@ export default function CloseAppointmentForm({
         </div>
 
         <fieldset className="flex flex-col gap-1">
-          <legend className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-anthracite/60">
+          <legend className="mb-1 text-xs font-semibold text-anthracite/75">
             Payé par
           </legend>
           <div className="flex flex-wrap gap-1.5">

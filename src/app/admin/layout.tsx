@@ -41,7 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <DashboardShell initials="AD" title="Administration" subtitle="Centre de contrôle" navItems={NAV_ITEMS}>
+    <DashboardShell title="Administration" navItems={NAV_ITEMS}>
       {children}
     </DashboardShell>
   );

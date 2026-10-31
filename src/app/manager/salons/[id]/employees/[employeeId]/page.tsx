@@ -1,46 +1,49 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Service, useServices } from "@/hooks/useServices";
+import ManagerPage from "@/components/manager/ManagerPage";
+import { formatDuration } from "@/lib/duration";
+import { ui } from "@/lib/ui";
 
-export default function EditEmployeePage() {
+function EditEmployeeContent() {
   const { id, employeeId } = useParams<{ id: string; employeeId: string }>();
-  const router = useRouter();
-  const { getEmployees, updateEmployee, loading: saving, error: saveError } = useEmployees();
+  const justCreated = useSearchParams().get("nouveau") === "1";
+  const { getEmployees, updateEmployee } = useEmployees();
   const { getServices } = useServices();
 
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-
   const [services, setServices] = useState<Service[]>([]);
-  const [servicesLoading, setServicesLoading] = useState(true);
 
-  const [nom, setNom] = useState("");
-  const [telephone, setTelephone] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [serviceIds, setServiceIds] = useState<number[]>([]);
-  const [success, setSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
-    getEmployees(id)
-      .then((employees) => {
+    Promise.all([getEmployees(id), getServices(id)])
+      .then(([employees, salonServices]) => {
         if (!isMounted) return;
+        setServices(salonServices);
         const employee = employees.find((e) => String(e.id) === employeeId);
         if (!employee) {
-          setFetchError("Employé introuvable.");
+          setFetchError("Membre de l'équipe introuvable.");
           return;
         }
-        setNom(employee.name);
-        setTelephone(employee.phone);
+        setName(employee.name);
+        setPhone(employee.phone);
         setEmail(employee.user.email);
         setServiceIds(employee.services.map((service) => service.id));
       })
       .catch(() => {
-        if (isMounted) setFetchError("Impossible de charger l'employé.");
+        if (isMounted) setFetchError("Impossible de charger ce membre de l'équipe.");
       })
       .finally(() => {
         if (isMounted) setFetching(false);
@@ -49,151 +52,126 @@ export default function EditEmployeePage() {
     return () => {
       isMounted = false;
     };
-  }, [getEmployees, id, employeeId]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    getServices(id)
-      .then((data) => {
-        if (isMounted) setServices(data);
-      })
-      .finally(() => {
-        if (isMounted) setServicesLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [getServices, id]);
+  }, [getEmployees, getServices, id, employeeId]);
 
   function toggleService(serviceId: number) {
     setServiceIds((current) =>
-      current.includes(serviceId)
-        ? current.filter((sid) => sid !== serviceId)
-        : [...current, serviceId]
+      current.includes(serviceId) ? current.filter((sid) => sid !== serviceId) : [...current, serviceId]
     );
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSuccess(false);
+    setSaving(true);
+    setMessage(null);
     try {
-      await updateEmployee(employeeId, {
-        name: nom,
-        phone: telephone,
-        service_ids: serviceIds,
-      });
-      setSuccess(true);
-    } catch {
-      // error state is exposed via useEmployees
+      await updateEmployee(employeeId, { name, phone, service_ids: serviceIds });
+      setMessage({ ok: true, text: "Modifications enregistrées." });
+    } catch (err) {
+      setMessage({ ok: false, text: err instanceof Error ? err.message : "Enregistrement impossible." });
+    } finally {
+      setSaving(false);
     }
   }
 
-  if (fetching) {
-    return (
-      <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-anthracite/75">Chargement de l&apos;employé...</p>
-      </main>
-    );
-  }
+  const back = { href: `/manager/salons/${id}/employees`, label: "Équipe" };
 
-  if (fetchError) {
+  if (fetching || fetchError) {
     return (
-      <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-sm text-red-600">{fetchError}</p>
-      </main>
+      <ManagerPage title={fetching ? "Chargement..." : "Introuvable"} back={back} width="narrow">
+        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sage/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
+      </ManagerPage>
     );
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
-      <button
-        type="button"
-        onClick={() => router.push(`/manager/salons/${id}/employees`)}
-        className="self-start text-sm text-link-sage hover:underline"
-      >
-        Retour aux employés
-      </button>
+    <ManagerPage title={name || "Membre de l'équipe"} back={back} width="narrow">
+      {justCreated && (
+        <p className="mb-6 rounded-2xl bg-sage/20 px-5 py-4 text-sm leading-6 text-forest">
+          {name} fait maintenant partie de l&apos;équipe. Cochez les prestations qu&apos;il ou elle réalise, puis enregistrez.
+        </p>
+      )}
 
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Modifier l&apos;employé</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <section className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
+          <h2 className="font-heading text-2xl font-semibold text-forest">Coordonnées</h2>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="name" className={ui.label}>
+              Nom complet
+            </label>
+            <input id="name" required value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="phone" className={ui.label}>
+                Téléphone
+              </label>
+              <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className={ui.input} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className={ui.label}>E-mail</span>
+              <p className="flex h-12 items-center px-1 text-anthracite/75">{email}</p>
+            </div>
+          </div>
+        </section>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6"
-      >
-        <div className="flex flex-col gap-1">
-          <label htmlFor="nom" className="text-sm font-medium">
-            Nom
-          </label>
-          <input
-            id="nom"
-            required
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
+        <fieldset className={`${ui.surface} flex flex-col gap-4 p-6 sm:p-8`}>
+          <legend className="sr-only">Prestations réalisées</legend>
+          <div>
+            <p className="font-heading text-2xl font-semibold text-forest">Prestations réalisées</p>
+            <p className="mt-1 text-sm text-anthracite/75">
+              Les clientes ne peuvent réserver avec ce membre que les prestations cochées.
+            </p>
+          </div>
+          {services.length === 0 ? (
+            <p className="text-sm text-anthracite/75">Ce salon n&apos;a pas encore de prestation.</p>
+          ) : (
+            <div className="grid gap-2 sm:grid-cols-2">
+              {services.map((service) => {
+                const checked = serviceIds.includes(service.id);
+                return (
+                  <label
+                    key={service.id}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition-colors ${
+                      checked ? "bg-forest/10 shadow-[0_0_0_2px_var(--color-forest)]" : "bg-beige hover:bg-sage/20"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleService(service.id)}
+                      className="h-4 w-4 shrink-0 accent-[var(--color-forest)]"
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-anthracite">{service.name}</span>
+                      <span className="block text-xs text-anthracite/70">{formatDuration(service.duration)}</span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </fieldset>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="telephone" className="text-sm font-medium">
-            Téléphone
-          </label>
-          <input
-            id="telephone"
-            type="tel"
-            required
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Email</span>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            disabled
-            className="rounded-md border border-sage/40 bg-sage/10 px-3 py-2 text-anthracite/75"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">Services réalisables</span>
-          {servicesLoading && <p className="text-sm text-anthracite/75">Chargement des services...</p>}
-          {!servicesLoading && services.length === 0 && (
-            <p className="text-sm text-anthracite/75">
-              Aucun service disponible. Ajoutez d&apos;abord des services au salon.
+        <div className="flex flex-wrap items-center gap-4">
+          <button type="submit" disabled={saving} className={ui.buttonPrimary}>
+            {saving ? "Enregistrement..." : "Enregistrer"}
+          </button>
+          {message && (
+            <p role="status" className={`text-sm font-medium ${message.ok ? "text-forest" : "text-red-700"}`}>
+              {message.text}
             </p>
           )}
-          <div className="flex flex-col gap-2">
-            {services.map((service) => (
-              <label key={service.id} className="flex items-center gap-2 text-sm text-anthracite">
-                <input
-                  type="checkbox"
-                  checked={serviceIds.includes(service.id)}
-                  onChange={() => toggleService(service.id)}
-                  className="h-4 w-4 rounded border-sage/40"
-                />
-                {service.name}
-              </label>
-            ))}
-          </div>
         </div>
-
-        {saveError && <p className="text-sm text-red-600">{saveError}</p>}
-        {success && <p className="text-sm text-green-600">Employé mis à jour !</p>}
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="mt-2 rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-        >
-          {saving ? "Enregistrement..." : "Enregistrer"}
-        </button>
       </form>
-    </main>
+    </ManagerPage>
+  );
+}
+
+export default function EditEmployeePage() {
+  return (
+    <Suspense fallback={null}>
+      <EditEmployeeContent />
+    </Suspense>
   );
 }

@@ -9,7 +9,7 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { resolveServiceImage } from "@/lib/serviceImage";
 import { salonArea } from "@/lib/salonArea";
-import { DAYS, type DayKey, type OpeningHours } from "@/lib/openingHours";
+import { DAYS, DEFAULT_DAY_HOURS, type DayKey, type OpeningHours } from "@/lib/openingHours";
 import { ui } from "@/lib/ui";
 
 // getDay() : 0 = dimanche … 6 = samedi
@@ -54,7 +54,9 @@ export default async function SalonDetailPage({
   const coverSrc = assetUrl(salon.cover);
   const bookingHref = `/salons/${salon.id}/appointments`;
   const todayKey = DAY_KEYS_BY_INDEX[new Date().getDay()];
-  const today = todayLabel(salon.opening_hours, todayKey);
+  // Sans horaires personnalisés, le backend applique 9 h - 19 h tous les jours.
+  const hours: OpeningHours = salon.opening_hours ?? Object.fromEntries(DAYS.map((d) => [d.key, DEFAULT_DAY_HOURS]));
+  const today = todayLabel(hours, todayKey);
   const groups = groupByCategory(salon.services);
   const prices = salon.services.map((service) => service.price);
   const minPrice = prices.length > 0 ? Math.min(...prices) : null;
@@ -162,22 +164,18 @@ export default async function SalonDetailPage({
                 <h2 id="hours-title" className="text-2xl font-semibold tracking-tight text-forest">
                   Horaires
                 </h2>
-                {salon.opening_hours ? (
-                  <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 text-sm">
+                <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 text-sm">
                     {DAYS.map(({ key, label }) => {
-                      const hours = salon.opening_hours?.[key];
+                      const dayHours = hours[key];
                       const isToday = key === todayKey;
                       return (
                         <div key={key} className={`contents ${isToday ? "font-semibold text-forest" : "text-anthracite/85"}`}>
                           <dt>{label}</dt>
-                          <dd>{hours ? `${formatHour(hours.open)} à ${formatHour(hours.close)}` : "Fermé"}</dd>
+                          <dd>{dayHours ? `${formatHour(dayHours.open)} à ${formatHour(dayHours.close)}` : "Fermé"}</dd>
                         </div>
                       );
                     })}
                   </dl>
-                ) : (
-                  <p className="mt-4 text-sm text-anthracite/75">Le salon n&apos;a pas encore renseigné ses horaires.</p>
-                )}
               </section>
 
               <section aria-labelledby="address-title">

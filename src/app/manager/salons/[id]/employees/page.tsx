@@ -4,6 +4,19 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Employee, useEmployees } from "@/hooks/useEmployees";
+import ManagerPage from "@/components/manager/ManagerPage";
+import SalonNav from "@/components/manager/SalonNav";
+import ConfirmDelete from "@/components/ConfirmDelete";
+import { ui } from "@/lib/ui";
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
 
 export default function ManagerEmployeesPage() {
   const { id } = useParams<{ id: string }>();
@@ -11,16 +24,13 @@ export default function ManagerEmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchEmployees = useCallback(async () => {
-    setLoading(true);
     setError(null);
     try {
-      const data = await getEmployees(id);
-      setEmployees(data);
+      setEmployees(await getEmployees(id));
     } catch {
-      setError("Impossible de charger les employés.");
+      setError("Impossible de charger l'équipe.");
     } finally {
       setLoading(false);
     }
@@ -32,78 +42,71 @@ export default function ManagerEmployeesPage() {
     });
   }, [fetchEmployees]);
 
-  async function handleDelete(employeeId: number) {
-    if (!window.confirm("Supprimer cet employé ?")) return;
-    setDeletingId(employeeId);
-    try {
-      await deleteEmployee(employeeId);
-      await fetchEmployees();
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
   return (
-    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <Link
-        href={`/manager/salons/${id}`}
-        className="self-start text-sm text-link-sage hover:underline"
-      >
-        Retour au salon
-      </Link>
-
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight text-forest">Employés</h1>
-        <Link
-          href={`/manager/salons/${id}/employees/new`}
-          className="rounded-full bg-dark-sage px-5 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage"
-        >
-          Ajouter un employé
+    <ManagerPage
+      title="Équipe"
+      description="Chaque rendez-vous est attribué à un membre de l'équipe qui réalise la prestation et qui est libre à ce moment-là."
+      back={{ href: "/manager/salons", label: "Mes salons" }}
+      actions={
+        <Link href={`/manager/salons/${id}/employees/new`} className={ui.buttonPrimary}>
+          Ajouter un membre
         </Link>
-      </div>
+      }
+    >
+      <SalonNav salonId={id} current="employees" />
 
-      {loading && <p className="text-anthracite/75">Chargement des employés...</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <div className="mt-8">
+        {loading && <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />}
+        {error && <p className="text-sm text-red-700">{error}</p>}
 
-      {!loading && !error && employees.length === 0 && (
-        <p className="text-anthracite/75">Aucun employé pour ce salon.</p>
-      )}
+        {!loading && !error && employees.length === 0 && (
+          <div className={`${ui.surface} px-6 py-12 text-center`}>
+            <p className="font-heading text-2xl font-semibold text-forest">Personne dans l&apos;équipe</p>
+            <p className="mt-2 text-sm text-anthracite/75">
+              Sans membre de l&apos;équipe, aucun créneau ne peut être proposé aux clientes.
+            </p>
+          </div>
+        )}
 
-      <ul className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
-        {employees.map((employee) => (
-          <li
-            key={employee.id}
-            className="flex items-center justify-between gap-4 rounded-lg border border-sage/30 bg-beige p-4"
-          >
-            <div>
-              <p className="font-semibold text-anthracite">{employee.name}</p>
-              <p className="text-sm text-anthracite/75">{employee.phone}</p>
-              <p className="text-sm text-anthracite/75">{employee.user.email}</p>
-              {employee.services.length > 0 && (
-                <p className="text-sm text-anthracite/75">
+        <ul className="grid gap-4 md:grid-cols-2">
+          {employees.map((employee) => (
+            <li key={employee.id} className={`${ui.surface} flex flex-col gap-4 p-5`}>
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-forest" aria-hidden="true">
+                  {initials(employee.name)}
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-forest">{employee.name}</p>
+                  <p className="truncate text-sm text-anthracite/75">{employee.phone}</p>
+                </div>
+              </div>
+              {employee.services.length > 0 ? (
+                <p className="text-sm text-anthracite/80">
+                  <span className="font-medium text-anthracite">Réalise : </span>
                   {employee.services.map((service) => service.name).join(", ")}
                 </p>
+              ) : (
+                <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  Aucune prestation associée : ce membre ne reçoit pas encore de rendez-vous.
+                </p>
               )}
-            </div>
-            <div className="flex gap-2">
-              <Link
-                href={`/manager/salons/${id}/employees/${employee.id}`}
-                className="rounded-full border border-dark-sage px-4 py-2 text-sm font-medium text-link-sage transition-colors hover:bg-sage/10"
-              >
-                Modifier
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleDelete(employee.id)}
-                disabled={deletingId === employee.id}
-                className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-90 disabled:opacity-50"
-              >
-                {deletingId === employee.id ? "Suppression..." : "Supprimer"}
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </main>
+              <div className="flex flex-wrap items-center gap-1">
+                <Link href={`/manager/salons/${id}/employees/${employee.id}`} className={ui.buttonSecondary}>
+                  Modifier
+                </Link>
+                <ConfirmDelete
+                  label="Retirer"
+                  question="Retirer ce membre de l'équipe ?"
+                  onConfirm={async () => {
+                    await deleteEmployee(employee.id);
+                    await fetchEmployees();
+                  }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </ManagerPage>
   );
 }

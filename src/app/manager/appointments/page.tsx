@@ -170,16 +170,16 @@ export default function ManagerAppointmentsPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-5 bg-gradient-to-br from-beige via-beige to-sage/15 px-5 py-6 sm:px-8 lg:px-10">
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-5 py-8 sm:px-10 sm:py-10">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-forest sm:text-3xl">Rendez-vous</h1>
+        <h1 className="text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Rendez-vous</h1>
         <p className="mt-1 text-sm text-anthracite/70">
           Après chaque prestation, clôturez le rendez-vous en notant le paiement reçu sur place.
         </p>
       </div>
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="group" aria-label="Filtrer les rendez-vous" className="flex gap-1 overflow-x-auto rounded-xl border border-sage/25 bg-white/60 p-1">
+        <div role="group" aria-label="Filtrer les rendez-vous" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
           {TABS.map(({ key, label }) => {
             const active = activeTab === key;
             const alert = key === "to_close" && counts.to_close > 0;
@@ -189,7 +189,7 @@ export default function ManagerAppointmentsPage() {
                 type="button"
                 aria-pressed={active}
                 onClick={() => setTab(key)}
-                className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`flex min-h-9 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors ${
                   active ? "bg-forest text-beige shadow-sm" : "text-anthracite/70 hover:bg-sage/10"
                 }`}
               >
@@ -214,7 +214,7 @@ export default function ManagerAppointmentsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Client ou prestation"
-            className="w-full rounded-xl border border-sage/30 bg-white/70 py-2 pl-9 pr-3 text-sm outline-none focus:border-dark-sage focus:ring-4 focus:ring-sage/10"
+            className="h-11 w-full rounded-full bg-white pl-9 pr-4 text-sm outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06),0_0_0_1px_rgba(45,59,40,0.10)] focus:shadow-[0_0_0_2px_var(--color-forest)]"
           />
         </label>
       </div>
@@ -222,14 +222,14 @@ export default function ManagerAppointmentsPage() {
       {loading && (
         <div className="flex flex-col gap-2" aria-label="Chargement des rendez-vous" aria-busy="true">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className="h-16 animate-pulse rounded-xl border border-sage/20 bg-sage/10" />
+            <div key={item} className="h-16 animate-pulse rounded-2xl bg-sage/15" />
           ))}
         </div>
       )}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && groups.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-sage/30 py-12 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-white py-12 text-center shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
           <CalendarX2 size={28} className="text-anthracite/30" aria-hidden="true" />
           <p className="font-medium text-anthracite/75">
             {query ? "Aucun rendez-vous ne correspond à votre recherche." : emptyMessage(activeTab)}
@@ -240,13 +240,13 @@ export default function ManagerAppointmentsPage() {
       <div className="flex flex-col gap-5">
         {groups.map((group) => (
           <section key={dayKey(group[0].scheduled_at)} aria-label={dayLabel(group[0].scheduled_at, now)}>
-            <h2 className="mb-2 flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-anthracite/55">
+            <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold text-anthracite/80">
               <span className="first-letter:uppercase">{dayLabel(group[0].scheduled_at, now)}</span>
-              <span className="font-normal normal-case tracking-normal text-anthracite/40">
+              <span className="font-normal text-anthracite/55">
                 ({group.length})
               </span>
             </h2>
-            <ul className="divide-y divide-sage/15 overflow-hidden rounded-2xl border border-sage/20 bg-white/70 shadow-[0_6px_20px_rgba(45,59,40,0.05)]">
+            <ul className="divide-y divide-sage/15 overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
               {group.map((a) => (
                 <AppointmentRow
                   key={a.id}

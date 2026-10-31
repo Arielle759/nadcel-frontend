@@ -1,196 +1,66 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Service, useServices } from "@/hooks/useServices";
 import { resolveServiceImage } from "@/lib/serviceImage";
-import ImageUploadInput from "@/components/ImageUploadInput";
+import ManagerPage from "@/components/manager/ManagerPage";
+import ServiceForm from "@/components/manager/ServiceForm";
 
 export default function EditServicePage() {
   const { id, serviceId } = useParams<{ id: string; serviceId: string }>();
-  const router = useRouter();
-  const { getServices, updateService, loading: saving, error: saveError } = useServices();
-
+  const { getServices, updateService } = useServices();
+  const [service, setService] = useState<Service | null>(null);
   const [fetching, setFetching] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [service, setService] = useState<Service | null>(null);
-
-  const [nom, setNom] = useState("");
-  const [description, setDescription] = useState("");
-  const [prix, setPrix] = useState("");
-  const [duree, setDuree] = useState("");
-  const [categorie, setCategorie] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-
     getServices(id)
       .then((services) => {
         if (!isMounted) return;
         const found = services.find((s) => String(s.id) === serviceId);
-        if (!found) {
-          setFetchError("Service introuvable.");
-          return;
-        }
-        setService(found);
-        setNom(found.name);
-        setDescription(found.description);
-        setPrix(String(found.price));
-        setDuree(String(found.duration));
-        setCategorie(found.category);
+        if (found) setService(found);
+        else setFetchError("Prestation introuvable.");
       })
       .catch(() => {
-        if (isMounted) setFetchError("Impossible de charger le service.");
+        if (isMounted) setFetchError("Impossible de charger la prestation.");
       })
       .finally(() => {
         if (isMounted) setFetching(false);
       });
-
     return () => {
       isMounted = false;
     };
   }, [getServices, id, serviceId]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setSuccess(false);
-    try {
-      const updated = await updateService(serviceId, {
-        name: nom,
-        description,
-        price: Math.round(Number(prix)),
-        duration: Number(duree),
-        category: categorie,
-        image,
-      });
-      setService(updated);
-      setSuccess(true);
-    } catch {
-      // error state is exposed via useServices
-    }
-  }
+  const back = { href: `/manager/salons/${id}/services`, label: "Prestations" };
 
-  if (fetching) {
+  if (fetching || !service) {
     return (
-      <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-anthracite/75">Chargement du service...</p>
-      </main>
-    );
-  }
-
-  if (fetchError) {
-    return (
-      <main className="flex flex-1 flex-col gap-6 px-6 py-12 sm:px-16">
-        <p className="text-sm text-red-600">{fetchError}</p>
-      </main>
+      <ManagerPage title={fetching ? "Chargement..." : "Prestation introuvable"} back={back} width="narrow">
+        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sage/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
+      </ManagerPage>
     );
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
-      <button
-        type="button"
-        onClick={() => router.push(`/manager/salons/${id}/services`)}
-        className="self-start text-sm text-link-sage hover:underline"
-      >
-        Retour aux services
-      </button>
-
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Modifier le service</h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6"
-      >
-        <div className="flex flex-col gap-1">
-          <label htmlFor="nom" className="text-sm font-medium">
-            Nom
-          </label>
-          <input
-            id="nom"
-            required
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="description" className="text-sm font-medium">
-            Description
-          </label>
-          <textarea
-            id="description"
-            required
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="prix" className="text-sm font-medium">
-            Prix (FCFA)
-          </label>
-          <input
-            id="prix"
-            type="number"
-            min="0"
-            step="100"
-            required
-            value={prix}
-            onChange={(e) => setPrix(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="duree" className="text-sm font-medium">
-            Durée (min)
-          </label>
-          <input
-            id="duree"
-            type="number"
-            min="0"
-            step="1"
-            required
-            value={duree}
-            onChange={(e) => setDuree(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="categorie" className="text-sm font-medium">
-            Catégorie
-          </label>
-          <input
-            id="categorie"
-            required
-            value={categorie}
-            onChange={(e) => setCategorie(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <ImageUploadInput
-          currentImageUrl={service ? resolveServiceImage(service) : undefined}
-          onChange={setImage}
-        />
-
-        {saveError && <p className="text-sm text-red-600">{saveError}</p>}
-        {success && <p className="text-sm text-green-600">Service mis à jour !</p>}
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="mt-2 rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-        >
-          {saving ? "Enregistrement..." : "Enregistrer"}
-        </button>
-      </form>
-    </main>
+    <ManagerPage title={service.name} back={back} width="narrow">
+      <ServiceForm
+        initial={{
+          name: service.name,
+          description: service.description,
+          price: Number(service.price),
+          duration: service.duration,
+          category: service.category,
+        }}
+        currentImageUrl={resolveServiceImage(service)}
+        submitLabel="Enregistrer les modifications"
+        onSubmit={async (values) => {
+          const updated = await updateService(serviceId, values);
+          setService(updated);
+        }}
+      />
+    </ManagerPage>
   );
 }

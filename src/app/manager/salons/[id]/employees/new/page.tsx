@@ -3,95 +3,70 @@
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { useEmployees } from "@/hooks/useEmployees";
+import ManagerPage from "@/components/manager/ManagerPage";
+import { ui } from "@/lib/ui";
 
 export default function NewEmployeePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { createEmployee, loading, error } = useEmployees();
 
-  const [nom, setNom] = useState("");
-  const [telephone, setTelephone] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     try {
-      await createEmployee({
-        salon_id: Number(id),
-        name: nom,
-        phone: telephone,
-        email,
-      });
-      router.push(`/manager/salons/${id}/employees`);
+      const employee = await createEmployee({ salon_id: Number(id), name, phone, email });
+      // Étape suivante immédiate : choisir les prestations qu'il réalise.
+      router.push(`/manager/salons/${id}/employees/${employee.id}?nouveau=1`);
     } catch {
-      // error state is exposed via useEmployees
+      // message exposé par useEmployees
     }
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 px-6 py-12 sm:px-16">
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Ajouter un employé</h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-sage/30 bg-beige p-6"
-      >
-        <div className="flex flex-col gap-1">
-          <label htmlFor="nom" className="text-sm font-medium">
-            Nom
+    <ManagerPage
+      title="Nouveau membre de l'équipe"
+      description="Vous choisirez ensuite les prestations qu'il ou elle réalise."
+      back={{ href: `/manager/salons/${id}/employees`, label: "Équipe" }}
+      width="narrow"
+    >
+      <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="name" className={ui.label}>
+            Nom complet
           </label>
-          <input
-            id="nom"
-            required
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
+          <input id="name" required value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
+        </div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="phone" className={ui.label}>
+              Téléphone
+            </label>
+            <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="77 123 45 67" className={ui.input} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email" className={ui.label}>
+              E-mail
+            </label>
+            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={ui.input} />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="telephone" className="text-sm font-medium">
-            Téléphone
-          </label>
-          <input
-            id="telephone"
-            type="tel"
-            required
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
+        {error && (
+          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+            {error}
+          </p>
+        )}
+
+        <div className="pt-2">
+          <button type="submit" disabled={loading} className={ui.buttonPrimary}>
+            {loading ? "Ajout..." : "Continuer"}
+          </button>
         </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="rounded-md border border-sage/40 px-3 py-2"
-          />
-        </div>
-
-        <p className="text-sm text-anthracite/75">
-          Les services réalisables par cet employé pourront être associés séparément après sa
-          création.
-        </p>
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 rounded-full bg-dark-sage px-5 py-2 font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-        >
-          {loading ? "Création..." : "Ajouter"}
-        </button>
       </form>
-    </main>
+    </ManagerPage>
   );
 }
