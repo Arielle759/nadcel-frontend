@@ -64,6 +64,9 @@ export default function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
         />
+        <Link href="/mot-de-passe-oublie" className={`${ui.textLink} -mt-2 self-end text-sm`}>
+          Mot de passe oublié ?
+        </Link>
 
         {error && (
           <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
