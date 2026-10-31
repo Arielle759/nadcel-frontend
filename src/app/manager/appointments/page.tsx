@@ -9,6 +9,9 @@ import {
   useManagerAppointments,
 } from "@/hooks/useManagerAppointments";
 import CloseAppointmentForm from "@/components/manager/CloseAppointmentForm";
+import OfflineAppointmentForm from "@/components/manager/OfflineAppointmentForm";
+import { BOOKING_SOURCE_LABELS, appointmentClientName } from "@/lib/bookingSources";
+import { ui } from "@/lib/ui";
 import { PAYMENT_METHOD_LABELS } from "@/components/PaymentStatusBadge";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
@@ -82,6 +85,7 @@ export default function ManagerAppointmentsPage() {
   const [cancelingId, setCancelingId] = useState<number | null>(null);
   const [tab, setTab] = useState<Tab | null>(null); // null : onglet choisi automatiquement
   const [query, setQuery] = useState("");
+  const [creating, setCreating] = useState(false);
   // Heure de référence prise au chargement : un rendez-vous ne se clôture qu'après son début.
   const [loadedAt, setLoadedAt] = useState<number | null>(null);
   const { message: toastMessage, showToast } = useToast();
@@ -125,7 +129,11 @@ export default function ManagerAppointmentsPage() {
     const needle = normalize(query.trim());
     const filtered = appointments
       .filter((a) => belongsTo(activeTab, a, now))
-      .filter((a) => !needle || normalize(`${a.client?.name ?? ""} ${a.service?.name ?? ""}`).includes(needle))
+      .filter(
+        (a) =>
+          !needle ||
+          normalize(`${appointmentClientName(a)} ${a.client_phone ?? ""} ${a.service?.name ?? ""}`).includes(needle)
+      )
       .sort((a, b) => {
         const diff = new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime();
         return activeTab === "upcoming" ? diff : -diff;
@@ -146,9 +154,11 @@ export default function ManagerAppointmentsPage() {
   async function handleStatusChange(id: number, status: AppointmentStatus) {
     setUpdatingId(id);
     try {
-      replace(await updateAppointmentStatus(id, status));
+      const updated = await updateAppointmentStatus(id, status);
+      replace(updated);
       setCancelingId(null);
-      showToast(status === "confirmed" ? "Rendez-vous confirmé." : "Rendez-vous annulé. Le client a été prévenu.");
+      const cancelledMessage = updated.client ? "Rendez-vous annulé. La cliente a été prévenue par e-mail." : "Rendez-vous annulé.";
+      showToast(status === "confirmed" ? "Rendez-vous confirmé." : cancelledMessage);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Action impossible.");
     } finally {
@@ -171,12 +181,32 @@ export default function ManagerAppointmentsPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-5 py-8 sm:px-10 sm:py-10">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Rendez-vous</h1>
-        <p className="mt-1 text-sm text-anthracite/70">
-          Après chaque prestation, clôturez le rendez-vous en notant le paiement reçu sur place.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Rendez-vous</h1>
+          <p className="mt-1 text-sm text-anthracite/70">
+            Après chaque prestation, clôturez le rendez-vous en notant le paiement reçu sur place.
+          </p>
+        </div>
+        {!creating && (
+          <button type="button" onClick={() => setCreating(true)} className={ui.buttonPrimary}>
+            Nouveau rendez-vous
+          </button>
+        )}
       </div>
+
+      {creating && (
+        <OfflineAppointmentForm
+          onCancel={() => setCreating(false)}
+          onCreated={(created) => {
+            setAppointments((prev) => [created, ...prev]);
+            setCreating(false);
+            setTab("upcoming");
+            setLoadedAt(Date.now());
+            showToast(`Rendez-vous de ${appointmentClientName(created)} enregistré.`);
+          }}
+        />
+      )}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div role="group" aria-label="Filtrer les rendez-vous" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
@@ -362,8 +392,25 @@ function AppointmentRow({
         </div>
 
         <div className="min-w-0">
-          <p className="truncate font-semibold text-anthracite">{a.client?.name ?? "Client"}</p>
-          <p className="truncate text-sm text-anthracite/65">{a.service?.name ?? "Prestation"}</p>
+          <p className="flex min-w-0 items-center gap-2">
+            <span className="truncate font-semibold text-anthracite">{appointmentClientName(a)}</span>
+            {a.source && a.source !== "online" && (
+              <span className="shrink-0 rounded-full bg-beige px-2 py-0.5 text-[11px] font-semibold text-anthracite/75">
+                {BOOKING_SOURCE_LABELS[a.source]}
+              </span>
+            )}
+          </p>
+          <p className="truncate text-sm text-anthracite/65">
+            {a.service?.name ?? "Prestation"}
+            {!a.client && a.client_phone && (
+              <>
+                {", "}
+                <a href={`tel:${a.client_phone.replace(/\s+/g, "")}`} className="font-medium text-forest hover:text-dark-sage">
+                  {a.client_phone}
+                </a>
+              </>
+            )}
+          </p>
         </div>
 
         <p className="col-start-2 truncate text-sm text-anthracite/65 md:col-start-auto">

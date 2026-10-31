@@ -21,9 +21,27 @@ export interface ManagerAppointmentClient {
   email: string;
 }
 
+// online : réservé par la cliente sur Nadcel ; les autres sont saisis par le salon.
+export type BookingSource = "online" | "whatsapp" | "phone" | "walk_in";
+export type OfflineBookingSource = Exclude<BookingSource, "online">;
+
+export interface OfflineAppointmentData {
+  salon_id: number;
+  service_id: number;
+  scheduled_at: string; // YYYY-MM-DDTHH:mm:00
+  client_name: string;
+  client_phone: string;
+  source: OfflineBookingSource;
+  notes?: string;
+}
+
 export interface ManagerAppointment {
   id: number;
-  client: ManagerAppointmentClient;
+  // null pour un rendez-vous saisi par le salon sans compte client.
+  client: ManagerAppointmentClient | null;
+  client_name: string | null;
+  client_phone: string | null;
+  source: BookingSource;
   service: Service;
   scheduled_at: string;
   duration: number; // minutes
@@ -51,6 +69,7 @@ interface UseManagerAppointmentsResult {
     amountPaid: number,
     method: OnSitePaymentMethod
   ) => Promise<ManagerAppointment>;
+  createOfflineAppointment: (data: OfflineAppointmentData) => Promise<ManagerAppointment>;
   loading: boolean;
   error: string | null;
 }
@@ -123,10 +142,26 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     []
   );
 
+  const createOfflineAppointment = useCallback(async (payload: OfflineAppointmentData): Promise<ManagerAppointment> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data } = await api.post<ManagerAppointment>("/manager/appointments", payload);
+      return data;
+    } catch (err) {
+      const message = toErrorMessage(err, "Impossible d'enregistrer le rendez-vous.");
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     getAppointments,
     updateAppointmentStatus,
     completeAppointment,
+    createOfflineAppointment,
     loading,
     error,
   };

@@ -65,6 +65,8 @@ export interface ManagerActivity {
   employees: ActivityEmployee[];
   loyalty: { clients: number; returning: number; rate: number };
   payment_methods: ActivityPaymentMethod[];
+  // Prestations réalisées par canal de réservation (absent des anciennes réponses de l'API).
+  sources?: { source: "online" | "whatsapp" | "phone" | "walk_in"; count: number; share: number }[];
   forecast: ActivityForecast;
 }
 

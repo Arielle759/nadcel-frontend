@@ -10,6 +10,7 @@ import {
   type DayPart,
   type ManagerActivity,
 } from "@/hooks/useManagerActivity";
+import { BOOKING_SOURCE_LABELS } from "@/lib/bookingSources";
 import { formatCurrency } from "@/lib/currency";
 import ActivityMonthlyChart from "@/components/manager/ActivityMonthlyChart";
 import { DAY_LABELS, DAY_SHORT, PART_LABELS, formatMonthLong, formatTrend } from "@/components/manager/activityFormat";
@@ -100,6 +101,7 @@ export default function ActivitySection({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                   <Loyalty data={data} />
                   <PaymentMethods data={data} />
+                  <BookingSources data={data} />
                 </div>
               </div>
             </div>
@@ -206,6 +208,26 @@ function PaymentMethods({ data }: { data: ManagerActivity }) {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function BookingSources({ data }: { data: ManagerActivity }) {
+  const sources = data.sources ?? [];
+  if (sources.length === 0) return null;
+  return (
+    <div className={CARD}>
+      <p className="mb-2 font-semibold text-forest">Canaux de réservation</p>
+      <ul className="flex flex-col gap-1.5 text-sm">
+        {sources.map((s) => (
+          <li key={s.source} className="flex items-center justify-between gap-2">
+            <span className="text-anthracite">{BOOKING_SOURCE_LABELS[s.source]}</span>
+            <span className="text-anthracite/65">
+              {s.count} ({s.share.toLocaleString("fr-FR")} %)
+            </span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
