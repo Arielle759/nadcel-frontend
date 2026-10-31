@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useManagerAppointments";
 import CloseAppointmentForm from "@/components/manager/CloseAppointmentForm";
 import OfflineAppointmentForm from "@/components/manager/OfflineAppointmentForm";
+import WhatsAppReminderButton from "@/components/manager/WhatsAppReminderButton";
 import { BOOKING_SOURCE_LABELS, appointmentClientName } from "@/lib/bookingSources";
 import { ui } from "@/lib/ui";
 import { PAYMENT_METHOD_LABELS } from "@/components/PaymentStatusBadge";
@@ -298,6 +299,7 @@ export default function ManagerAppointmentsPage() {
                   }}
                   onCancel={() => handleStatusChange(a.id, "cancelled")}
                   onKeep={() => setCancelingId(null)}
+                  onReminderSent={(updated) => replace({ ...a, reminder_sent_at: updated.reminder_sent_at })}
                 />
               ))}
             </ul>
@@ -365,6 +367,7 @@ function AppointmentRow({
   onAskCancel,
   onCancel,
   onKeep,
+  onReminderSent,
 }: {
   appointment: ManagerAppointment;
   now: number;
@@ -378,6 +381,7 @@ function AppointmentRow({
   onAskCancel: () => void;
   onCancel: () => void;
   onKeep: () => void;
+  onReminderSent: (updated: ManagerAppointment) => void;
 }) {
   const started = new Date(a.scheduled_at).getTime() <= now;
   const open = isOpen(a);
@@ -428,6 +432,10 @@ function AppointmentRow({
               {formatCurrency(Number(a.amount_paid ?? a.price))}
               {a.payment_method && <span className="text-anthracite/50"> par {PAYMENT_METHOD_LABELS[a.payment_method]}</span>}
             </span>
+          )}
+
+          {open && !started && !a.client && a.client_phone && !closing && !canceling && (
+            <WhatsAppReminderButton appointment={a} compact onSent={(updated) => onReminderSent(updated)} />
           )}
 
           {open && !closing && !canceling && (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useManager, ManagerStats } from "@/hooks/useManager";
 import ActivitySection from "@/components/manager/ActivitySection";
+import RemindersCard from "@/components/manager/RemindersCard";
 import ManagerPage from "@/components/manager/ManagerPage";
 import { ui } from "@/lib/ui";
 
@@ -48,6 +49,7 @@ export default function ManagerDashboardPage() {
           {error}
         </p>
       )}
+      <RemindersCard />
       <ActivitySection upcoming={stats?.upcoming ?? null} toClose={stats?.to_close ?? null} />
     </ManagerPage>
   );

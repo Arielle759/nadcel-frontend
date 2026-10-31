@@ -42,6 +42,8 @@ export interface ManagerAppointment {
   client_name: string | null;
   client_phone: string | null;
   source: BookingSource;
+  reminder_sent_at: string | null;
+  salon?: { id: number; name: string };
   service: Service;
   scheduled_at: string;
   duration: number; // minutes
@@ -70,6 +72,7 @@ interface UseManagerAppointmentsResult {
     method: OnSitePaymentMethod
   ) => Promise<ManagerAppointment>;
   createOfflineAppointment: (data: OfflineAppointmentData) => Promise<ManagerAppointment>;
+  markReminderSent: (id: number | string) => Promise<ManagerAppointment>;
   loading: boolean;
   error: string | null;
 }
@@ -157,7 +160,17 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
     }
   }, []);
 
+  const markReminderSent = useCallback(async (id: number | string): Promise<ManagerAppointment> => {
+    try {
+      const { data } = await api.patch<ManagerAppointment>(`/manager/appointments/${id}/reminder`);
+      return data;
+    } catch (err) {
+      throw new Error(toErrorMessage(err, "Impossible de noter le rappel."));
+    }
+  }, []);
+
   return {
+    markReminderSent,
     getAppointments,
     updateAppointmentStatus,
     completeAppointment,
