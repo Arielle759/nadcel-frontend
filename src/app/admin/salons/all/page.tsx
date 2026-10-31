@@ -1,134 +1,235 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { Building2 } from "lucide-react";
-import { AdminSalon, useAdmin } from "@/hooks/useAdmin";
-import SalonStatusBadge from "@/components/SalonStatusBadge";
-import EmptyState from "@/components/EmptyState";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminSalon, SALON_STATE_LABELS, SalonState, salonState, useAdmin } from "@/hooks/useAdmin";
+import ManagerPage from "@/components/manager/ManagerPage";
+import ConfirmDelete from "@/components/ConfirmDelete";
+import SalonRating from "@/components/SalonRating";
+import { ui } from "@/lib/ui";
+
+const FILTERS: { key: SalonState | "all"; label: string }[] = [
+  { key: "all", label: "Tous" },
+  { key: "online", label: "En ligne" },
+  { key: "suspended", label: "Suspendus" },
+  { key: "pending", label: "En attente" },
+  { key: "rejected", label: "Refusés" },
+];
+
+const STATE_STYLES: Record<SalonState, string> = {
+  online: "bg-sage/25 text-forest",
+  pending: "bg-champagne-light/30 text-champagne",
+  suspended: "bg-terracotta/10 text-terracotta",
+  rejected: "bg-anthracite/10 text-anthracite/75",
+};
+
+function normalize(value: string): string {
+  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
 
 export default function AdminAllSalonsPage() {
-  const { getAllSalons, suspendSalon, reactivateSalon, deleteSalon } = useAdmin();
-  const [salons, setSalons] = useState<AdminSalon[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { getSalons, changeSalonState, deleteSalon } = useAdmin();
+  const [salons, setSalons] = useState<AdminSalon[] | null>(null);
+  const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [filter, setFilter] = useState<SalonState | "all">("all");
+  const [query, setQuery] = useState("");
 
-  const fetchSalons = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async () => {
     try {
-      const data = await getAllSalons();
-      setSalons(data);
-    } catch {
-      setError("Impossible de charger les salons.");
-    } finally {
-      setLoading(false);
+      const page = await getSalons();
+      setSalons(page.data);
+      setTotal(page.total);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de charger les salons.");
     }
-  }, [getAllSalons]);
+  }, [getSalons]);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      fetchSalons();
-    });
-  }, [fetchSalons]);
+    queueMicrotask(load);
+  }, [load]);
 
-  async function handleSuspend(id: number) {
-    setUpdatingId(id);
-    try {
-      const updated = await suspendSalon(id);
-      setSalons((prev) => prev.map((s) => (s.id === id ? updated : s)));
-    } finally {
-      setUpdatingId(null);
+  const counts = useMemo(() => {
+    const result: Record<SalonState | "all", number> = { all: 0, online: 0, pending: 0, suspended: 0, rejected: 0 };
+    for (const salon of salons ?? []) {
+      result.all += 1;
+      result[salonState(salon)] += 1;
     }
+    return result;
+  }, [salons]);
+
+  const visible = useMemo(() => {
+    const q = normalize(query.trim());
+    return (salons ?? []).filter(
+      (salon) =>
+        (filter === "all" || salonState(salon) === filter) &&
+        (q === "" || normalize(`${salon.name} ${salon.city} ${salon.manager?.name ?? ""}`).includes(q))
+    );
+  }, [salons, filter, query]);
+
+  function replace(updated: AdminSalon) {
+    // La réponse ne contient pas le gérant ni les avis : on garde ceux déjà chargés.
+    setSalons((current) => current?.map((s) => (s.id === updated.id ? { ...s, ...updated, manager: s.manager } : s)) ?? null);
   }
 
-  async function handleReactivate(id: number) {
-    setUpdatingId(id);
-    try {
-      const updated = await reactivateSalon(id);
-      setSalons((prev) => prev.map((s) => (s.id === id ? updated : s)));
-    } finally {
-      setUpdatingId(null);
-    }
-  }
+  return (
+    <ManagerPage title="Salons" description="Tous les salons de la plateforme. Un salon suspendu n'apparaît plus dans les recherches.">
+      {error && (
+        <p role="alert" className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+          {error}
+        </p>
+      )}
 
-  async function handleDelete(id: number) {
-    if (!window.confirm("Supprimer définitivement ce salon ?")) return;
-    setUpdatingId(id);
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div role="tablist" aria-label="Filtrer par état" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+          {FILTERS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={filter === key}
+              onClick={() => setFilter(key)}
+              className={`min-h-10 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-semibold transition-colors ${
+                filter === key ? "bg-forest text-beige" : "text-anthracite/75 hover:text-forest"
+              }`}
+            >
+              {label}
+              {salons && <span className={`ml-1.5 font-normal ${filter === key ? "text-beige/75" : "text-anthracite/50"}`}>{counts[key]}</span>}
+            </button>
+          ))}
+        </div>
+        <label className="lg:w-72">
+          <span className="sr-only">Rechercher un salon</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Nom, ville ou gérant"
+            className={ui.input}
+          />
+        </label>
+      </div>
+
+      {salons === null ? (
+        !error && <div className="h-96 animate-pulse rounded-2xl bg-sage/15" aria-busy="true" aria-label="Chargement" />
+      ) : visible.length === 0 ? (
+        <div className={`${ui.surface} p-8 text-center`}>
+          <p className="font-semibold text-forest">Aucun salon</p>
+          <p className="mt-1 text-sm text-anthracite/70">
+            {query ? "Aucun salon ne correspond à cette recherche." : "Aucun salon dans cet état pour le moment."}
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {visible.map((salon) => (
+            <SalonRow
+              key={salon.id}
+              salon={salon}
+              onChange={async (action) => replace(await changeSalonState(salon.id, action))}
+              onDelete={async () => {
+                await deleteSalon(salon.id);
+                setSalons((current) => current?.filter((s) => s.id !== salon.id) ?? null);
+              }}
+            />
+          ))}
+        </ul>
+      )}
+
+      {salons && total > salons.length && (
+        <p className="mt-4 text-sm text-anthracite/65">
+          {salons.length} salons affichés sur {total}, les plus récents d&apos;abord.
+        </p>
+      )}
+    </ManagerPage>
+  );
+}
+
+function SalonRow({
+  salon,
+  onChange,
+  onDelete,
+}: {
+  salon: AdminSalon;
+  onChange: (action: "verify" | "reactivate" | "suspend") => Promise<void>;
+  onDelete: () => Promise<void>;
+}) {
+  const state = salonState(salon);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(action: "verify" | "reactivate") {
+    setBusy(true);
+    setError(null);
     try {
-      await deleteSalon(id);
-      setSalons((prev) => prev.filter((s) => s.id !== id));
+      await onChange(action);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "L'action a échoué.");
     } finally {
-      setUpdatingId(null);
+      setBusy(false);
     }
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <Link href="/admin/dashboard" className="self-start text-sm text-link-sage hover:underline">
-        Retour au tableau de bord
-      </Link>
+    <li className={`${ui.surface} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {state === "online" ? (
+            <Link href={`/salons/${salon.id}`} className="font-semibold text-forest hover:text-dark-sage" title="Voir la fiche publique">
+              {salon.name}
+            </Link>
+          ) : (
+            <p className="font-semibold text-forest">{salon.name}</p>
+          )}
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATE_STYLES[state]}`}>{SALON_STATE_LABELS[state]}</span>
+        </div>
+        <p className="mt-1 text-sm text-anthracite/75">
+          {salon.city}
+          {salon.manager ? `, géré par ${salon.manager.name}` : ""}
+        </p>
+        {/* Une demande n'a jamais été visible : pas de note à afficher. */}
+        {(state === "online" || state === "suspended") && (
+          <div className="mt-1">
+            <SalonRating average={salon.reviews_avg_rating ?? null} count={salon.reviews_count ?? 0} />
+          </div>
+        )}
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-red-700">
+            {error}
+          </p>
+        )}
+      </div>
 
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Tous les salons</h1>
-
-      {loading && <p className="text-anthracite/75">Chargement des salons...</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      {!loading && !error && salons.length === 0 && (
-        <EmptyState message="Aucun salon à afficher." icon={Building2} />
-      )}
-
-      <ul className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
-        {salons.map((salon) => {
-          const isBusy = updatingId === salon.id;
-          return (
-            <li
-              key={salon.id}
-              className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold text-anthracite">{salon.name}</p>
-                  <SalonStatusBadge isVerified={salon.is_verified} isActive={salon.is_active} />
-                </div>
-                <p className="text-sm text-anthracite/75">{salon.city}</p>
-                <p className="text-sm text-anthracite/75">Gérant : {salon.manager?.name ?? "—"}</p>
-              </div>
-              <div className="flex gap-2">
-                {salon.is_verified && salon.is_active && (
-                  <button
-                    type="button"
-                    onClick={() => handleSuspend(salon.id)}
-                    disabled={isBusy}
-                    className="rounded-full border border-terracotta px-4 py-2 text-sm font-medium text-terracotta transition-colors hover:bg-terracotta hover:text-white disabled:opacity-50"
-                  >
-                    {isBusy ? "..." : "Suspendre"}
-                  </button>
-                )}
-                {salon.is_verified && !salon.is_active && (
-                  <button
-                    type="button"
-                    onClick={() => handleReactivate(salon.id)}
-                    disabled={isBusy}
-                    className="rounded-full bg-dark-sage px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-                  >
-                    {isBusy ? "..." : "Réactiver"}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => handleDelete(salon.id)}
-                  disabled={isBusy}
-                  className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-90 disabled:opacity-50"
-                >
-                  {isBusy ? "..." : "Supprimer"}
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </main>
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+        {state === "online" && (
+          <ConfirmDelete
+            label="Suspendre"
+            question={`Suspendre ${salon.name} ? Il disparaîtra des recherches.`}
+            confirmLabel="Oui, suspendre"
+            busyLabel="Suspension..."
+            onConfirm={() => onChange("suspend")}
+          />
+        )}
+        {state === "suspended" && (
+          <button type="button" disabled={busy} onClick={() => run("reactivate")} className={ui.buttonSecondary}>
+            {busy ? "Remise en ligne..." : "Remettre en ligne"}
+          </button>
+        )}
+        {state === "pending" && (
+          <Link href="/admin/salons" className={ui.buttonSecondary}>
+            Examiner la demande
+          </Link>
+        )}
+        {state === "rejected" && (
+          <button type="button" disabled={busy} onClick={() => run("verify")} className={ui.buttonSecondary}>
+            {busy ? "Validation..." : "Valider finalement"}
+          </button>
+        )}
+        {/* Un salon en ligne doit d'abord être suspendu : pas de suppression en un geste. */}
+        {(state === "suspended" || state === "rejected") && (
+          <ConfirmDelete question={`Supprimer ${salon.name} ? Ses rendez-vous passés restent conservés.`} onConfirm={onDelete} />
+        )}
+      </div>
+    </li>
   );
 }

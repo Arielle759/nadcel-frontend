@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, List, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Inbox, Store, MessageSquare } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
@@ -20,9 +20,9 @@ function useIsAdmin(): boolean {
 
 const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
-  { href: "/admin/salons", label: "Salons en attente", icon: Building2 },
-  { href: "/admin/salons/all", label: "Tous les salons", icon: List },
-  { href: "/admin/reviews", label: "Modérer les avis", icon: MessageSquare },
+  { href: "/admin/salons", label: "Demandes", icon: Inbox },
+  { href: "/admin/salons/all", label: "Salons", icon: Store },
+  { href: "/admin/reviews", label: "Avis", icon: MessageSquare },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -1,107 +1,75 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Building2 } from "lucide-react";
 import { AdminSalon, useAdmin } from "@/hooks/useAdmin";
-import EmptyState from "@/components/EmptyState";
+import ManagerPage from "@/components/manager/ManagerPage";
+import PartnerRequestCard from "@/components/admin/PartnerRequestCard";
+import { ui } from "@/lib/ui";
 
-export default function AdminSalonsPage() {
-  const { getPendingSalons, validateSalon, rejectSalon } = useAdmin();
-  const [salons, setSalons] = useState<AdminSalon[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function AdminPartnerRequestsPage() {
+  const { getPendingSalons, changeSalonState } = useAdmin();
+  const [requests, setRequests] = useState<AdminSalon[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const fetchSalons = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const load = useCallback(async () => {
     try {
-      const data = await getPendingSalons();
-      setSalons(data.filter((s) => s.is_verified === false && s.is_active === true));
-    } catch {
-      setError("Impossible de charger les salons en attente.");
-    } finally {
-      setLoading(false);
+      setRequests(await getPendingSalons());
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Impossible de charger les demandes.");
     }
   }, [getPendingSalons]);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      fetchSalons();
-    });
-  }, [fetchSalons]);
+    queueMicrotask(load);
+  }, [load]);
 
-  async function handleValidate(id: number) {
-    setUpdatingId(id);
-    try {
-      await validateSalon(id);
-      setSalons((prev) => prev.filter((s) => s.id !== id));
-    } finally {
-      setUpdatingId(null);
-    }
-  }
-
-  async function handleReject(id: number) {
-    if (!window.confirm("Rejeter ce salon ?")) return;
-    setUpdatingId(id);
-    try {
-      await rejectSalon(id);
-      setSalons((prev) => prev.filter((s) => s.id !== id));
-    } finally {
-      setUpdatingId(null);
-    }
+  async function decide(salon: AdminSalon, action: "verify" | "reject") {
+    await changeSalonState(salon.id, action);
+    setRequests((current) => current?.filter((s) => s.id !== salon.id) ?? null);
+    setNotice(
+      action === "verify"
+        ? `${salon.name} est en ligne. Son gérant accède à son espace dès sa prochaine connexion.`
+        : `La demande de ${salon.name} a été refusée.`
+    );
   }
 
   return (
-    <main className="flex flex-1 flex-col gap-8 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <Link href="/admin/dashboard" className="self-start text-sm text-link-sage hover:underline">
-        Retour au tableau de bord
-      </Link>
-
-      <h1 className="text-3xl font-semibold tracking-tight text-forest">Salons en attente</h1>
-
-      {loading && <p className="text-anthracite/75">Chargement des salons...</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      {!loading && !error && salons.length === 0 && (
-        <EmptyState message="Aucun salon en attente de validation." icon={Building2} />
+    <ManagerPage
+      title="Demandes de partenariat"
+      description="Vérifiez chaque salon avant de le mettre en ligne. En cas de doute, appelez le numéro indiqué."
+    >
+      {notice && (
+        <p role="status" className="mb-6 rounded-2xl bg-sage/20 px-5 py-4 text-sm text-forest">
+          {notice}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+          {error}
+        </p>
       )}
 
-      <ul className="flex flex-col gap-4 border-t-4 border-t-champagne pt-4">
-        {salons.map((salon) => (
-          <li
-            key={salon.id}
-            className="flex flex-col gap-3 rounded-lg border border-sage/30 bg-beige p-4 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div>
-              <p className="font-semibold text-anthracite">{salon.name}</p>
-              <p className="text-sm text-anthracite/75">{salon.description}</p>
-              <p className="text-sm text-anthracite/75">
-                {salon.address}, {salon.city}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => handleValidate(salon.id)}
-                disabled={updatingId === salon.id}
-                className="rounded-full bg-dark-sage px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-sage disabled:opacity-50"
-              >
-                {updatingId === salon.id ? "..." : "Valider"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleReject(salon.id)}
-                disabled={updatingId === salon.id}
-                className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition-colors hover:brightness-90 disabled:opacity-50"
-              >
-                {updatingId === salon.id ? "..." : "Rejeter"}
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </main>
+      {requests === null ? (
+        !error && <div className="h-64 animate-pulse rounded-2xl bg-sage/15" aria-busy="true" aria-label="Chargement" />
+      ) : requests.length === 0 ? (
+        <div className={`${ui.surface} p-8 text-center`}>
+          <p className="font-semibold text-forest">Aucune demande en attente</p>
+          <p className="mt-1 text-sm text-anthracite/70">Les nouvelles demandes envoyées depuis « Inscrire mon salon » apparaîtront ici.</p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-4">
+          {requests.map((salon) => (
+            <PartnerRequestCard
+              key={salon.id}
+              salon={salon}
+              onValidate={() => decide(salon, "verify")}
+              onReject={() => decide(salon, "reject")}
+            />
+          ))}
+        </ul>
+      )}
+    </ManagerPage>
   );
 }

@@ -3,16 +3,21 @@
 import { useState } from "react";
 import { ui } from "@/lib/ui";
 
-// Suppression en deux temps, sans fenêtre du navigateur : un lien discret,
-// puis une vraie confirmation au même endroit.
+// Action sensible en deux temps, sans fenêtre du navigateur : un bouton
+// discret, puis une vraie confirmation au même endroit. Sert aussi pour
+// « Refuser » ou « Suspendre » côté administration.
 export default function ConfirmDelete({
   label = "Supprimer",
   question,
   onConfirm,
+  confirmLabel = "Oui, supprimer",
+  busyLabel = "Suppression...",
 }: {
   label?: string;
   question: string;
   onConfirm: () => Promise<void>;
+  confirmLabel?: string;
+  busyLabel?: string;
 }) {
   const [asking, setAsking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -25,7 +30,7 @@ export default function ConfirmDelete({
       await onConfirm();
       setAsking(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "La suppression a échoué.");
+      setError(err instanceof Error ? err.message : "L'action a échoué.");
     } finally {
       setBusy(false);
     }
@@ -43,7 +48,7 @@ export default function ConfirmDelete({
     <div role="alertdialog" aria-label={question} className="flex flex-wrap items-center gap-2 rounded-2xl bg-red-50 px-3 py-2">
       <span className="text-sm font-medium text-red-900">{question}</span>
       <button type="button" onClick={confirm} disabled={busy} className={ui.buttonDanger}>
-        {busy ? "Suppression..." : "Oui, supprimer"}
+        {busy ? busyLabel : confirmLabel}
       </button>
       <button type="button" onClick={() => setAsking(false)} className="min-h-11 rounded-full px-3 text-sm font-semibold text-anthracite/80 hover:text-forest">
         Annuler

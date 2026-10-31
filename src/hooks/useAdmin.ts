@@ -1,268 +1,137 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { api, toErrorMessage } from "@/lib/api";
 
-export interface AdminStatsSalons {
-  total: number;
-  verified: number;
-  pending: number;
-  rejected: number;
-}
-
-export interface AdminStatsAppointments {
-  confirmed: number;
-  completed: number;
-  pending: number;
-  cancelled: number;
-}
-
-export interface AdminStatsUsersByRole {
-  role: string;
-  count: number;
-}
-
-export interface AdminStatsUsers {
-  by_role: AdminStatsUsersByRole[];
-  without_role: number;
-}
-
-export interface AdminStatsRevenue {
-  generated: number;
-  collected: number;
-  outstanding: number;
-}
-
+// La plateforme ne voit aucun montant : chaque salon encaisse lui-même, sur place.
 export interface AdminStats {
-  salons: AdminStatsSalons;
-  appointments: AdminStatsAppointments;
-  revenue: AdminStatsRevenue;
-  users: AdminStatsUsers;
+  salons: { online: number; pending: number; suspended: number; rejected: number };
+  users: { clients: number; new_clients: number; managers: number };
+  appointments: {
+    this_month: number;
+    last_month_same_period: number;
+    trend: number | null; // en %, null sans période de comparaison
+    cancellation_rate: number | null; // en %, sur les 30 derniers jours
+    online_share: number | null; // en %, sur les 30 derniers jours
+  };
+  to_review: { pending_salons: number; low_reviews: number };
+  monthly: AdminMonth[];
 }
 
-export interface AdminSalonManager {
-  id: number;
-  name: string;
-  email: string;
+export interface AdminMonth {
+  month: string; // "2026-03"
+  appointments: number;
+  new_clients: number;
+  is_partial: boolean;
 }
+
+export type SalonState = "online" | "pending" | "suspended" | "rejected";
 
 export interface AdminSalon {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   address: string;
   city: string;
+  phone: string | null;
   is_verified: boolean;
   is_active: boolean;
-  manager?: AdminSalonManager;
-}
-
-export interface AdminReviewClient {
-  id: number;
-  name: string;
-}
-
-export interface AdminReviewSalon {
-  id: number;
-  name: string;
+  created_at: string;
+  reviews_count?: number;
+  reviews_avg_rating?: number | string | null;
+  manager?: { id: number; name: string; email: string } | null;
 }
 
 export interface AdminReview {
   id: number;
-  client_id: number;
-  appointment_id: number;
-  salon_id: number;
   rating: number;
-  comment: string;
+  comment: string | null;
   manager_response: string | null;
-  manager_responded_at: string | null;
   created_at: string;
-  client: AdminReviewClient;
-  salon: AdminReviewSalon;
+  client: { id: number; name: string } | null;
+  salon: { id: number; name: string } | null;
 }
 
-interface PaginatedResponse<T> {
+export interface Page<T> {
   data: T[];
   current_page: number;
+  last_page: number;
+  total: number;
 }
 
-interface UseAdminResult {
-  getStats: () => Promise<AdminStats>;
-  getPendingSalons: () => Promise<AdminSalon[]>;
-  getAllSalons: () => Promise<AdminSalon[]>;
-  validateSalon: (id: number | string) => Promise<AdminSalon>;
-  rejectSalon: (id: number | string) => Promise<AdminSalon>;
-  suspendSalon: (id: number | string) => Promise<AdminSalon>;
-  reactivateSalon: (id: number | string) => Promise<AdminSalon>;
-  deleteSalon: (id: number | string) => Promise<void>;
-  getReviews: () => Promise<AdminReview[]>;
-  deleteReview: (id: number | string) => Promise<void>;
-  loading: boolean;
-  error: string | null;
+export function salonState(salon: Pick<AdminSalon, "is_verified" | "is_active">): SalonState {
+  if (salon.is_verified) return salon.is_active ? "online" : "suspended";
+  return salon.is_active ? "pending" : "rejected";
 }
 
-export function useAdmin(): UseAdminResult {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const SALON_STATE_LABELS: Record<SalonState, string> = {
+  online: "En ligne",
+  pending: "En attente",
+  suspended: "Suspendu",
+  rejected: "Refusé",
+};
 
-  const getStats = useCallback(async (): Promise<AdminStats> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.get<AdminStats>("/admin/stats");
-      return data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de charger les statistiques.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+// Le message d'erreur de l'API (ex. « Seul un salon en ligne peut être suspendu. »)
+// est affiché tel quel ; sinon un message par défaut en français.
+async function call<T>(request: () => Promise<{ data: T }>, fallback: string): Promise<T> {
+  try {
+    const { data } = await request();
+    return data;
+  } catch (err) {
+    throw new Error(toErrorMessage(err, fallback));
+  }
+}
 
-  const getPendingSalons = useCallback(async (): Promise<AdminSalon[]> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.get<PaginatedResponse<AdminSalon>>("/admin/salons/pending");
-      return data.data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de charger les salons en attente.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+export function useAdmin() {
+  const getStats = useCallback(
+    () => call(() => api.get<AdminStats>("/admin/stats"), "Impossible de charger le tableau de bord."),
+    []
+  );
 
-  const getAllSalons = useCallback(async (): Promise<AdminSalon[]> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.get<PaginatedResponse<AdminSalon>>("/admin/salons");
-      return data.data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de charger les salons.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getPendingSalons = useCallback(
+    async () =>
+      (await call(() => api.get<Page<AdminSalon>>("/admin/salons/pending"), "Impossible de charger les demandes.")).data,
+    []
+  );
 
-  const validateSalon = useCallback(async (id: number | string): Promise<AdminSalon> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.patch<AdminSalon>(`/admin/salons/${id}/verify`);
-      return data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de valider le salon.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getSalons = useCallback(
+    (status?: SalonState) =>
+      call(
+        () => api.get<Page<AdminSalon>>("/admin/salons", { params: { per_page: 100, ...(status ? { status } : {}) } }),
+        "Impossible de charger les salons."
+      ),
+    []
+  );
 
-  const rejectSalon = useCallback(async (id: number | string): Promise<AdminSalon> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.patch<AdminSalon>(`/admin/salons/${id}/reject`);
-      return data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de rejeter le salon.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const changeSalonState = useCallback(
+    (id: number, action: "verify" | "reject" | "suspend" | "reactivate") =>
+      call(() => api.patch<AdminSalon>(`/admin/salons/${id}/${action}`), "L'action n'a pas pu être enregistrée."),
+    []
+  );
 
-  const suspendSalon = useCallback(async (id: number | string): Promise<AdminSalon> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.patch<AdminSalon>(`/admin/salons/${id}/suspend`);
-      return data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de suspendre le salon.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const deleteSalon = useCallback(
+    async (id: number) => {
+      await call(() => api.delete(`/admin/salons/${id}`), "Impossible de supprimer le salon.");
+    },
+    []
+  );
 
-  const reactivateSalon = useCallback(async (id: number | string): Promise<AdminSalon> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.patch<AdminSalon>(`/admin/salons/${id}/reactivate`);
-      return data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de réactiver le salon.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getReviews = useCallback(
+    (page = 1, maxRating?: number) =>
+      call(
+        () =>
+          api.get<Page<AdminReview>>("/reviews", {
+            params: { page, per_page: 30, ...(maxRating ? { max_rating: maxRating } : {}) },
+          }),
+        "Impossible de charger les avis."
+      ),
+    []
+  );
 
-  const deleteSalon = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/admin/salons/${id}`);
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de supprimer le salon.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const deleteReview = useCallback(
+    async (id: number) => {
+      await call(() => api.delete(`/admin/reviews/${id}`), "Impossible de supprimer l'avis.");
+    },
+    []
+  );
 
-  const getReviews = useCallback(async (): Promise<AdminReview[]> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.get<PaginatedResponse<AdminReview>>("/reviews");
-      return data.data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de charger les avis.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const deleteReview = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/admin/reviews/${id}`);
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de supprimer l'avis.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    getStats,
-    getPendingSalons,
-    getAllSalons,
-    validateSalon,
-    rejectSalon,
-    suspendSalon,
-    reactivateSalon,
-    deleteSalon,
-    getReviews,
-    deleteReview,
-    loading,
-    error,
-  };
+  return { getStats, getPendingSalons, getSalons, changeSalonState, deleteSalon, getReviews, deleteReview };
 }
