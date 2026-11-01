@@ -61,7 +61,7 @@ interface PaginatedResponse<T> {
 }
 
 interface UseManagerAppointmentsResult {
-  getAppointments: () => Promise<ManagerAppointment[]>;
+  getAppointments: (window?: { from: Date; to: Date }) => Promise<ManagerAppointment[]>;
   updateAppointmentStatus: (
     id: number | string,
     status: AppointmentStatus
@@ -81,13 +81,15 @@ export function useManagerAppointments(): UseManagerAppointmentsResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAppointments = useCallback(async (): Promise<ManagerAppointment[]> => {
+  const getAppointments = useCallback(async (window?: { from: Date; to: Date }): Promise<ManagerAppointment[]> => {
     setLoading(true);
     setError(null);
     try {
       // Agenda du salon uniquement (sans les réservations personnelles du gérant).
       const { data } = await api.get<PaginatedResponse<ManagerAppointment>>("/appointments", {
-        params: { scope: "salon", per_page: 100 },
+        params: window
+          ? { scope: "salon", per_page: 500, from: window.from.toISOString(), to: window.to.toISOString() }
+          : { scope: "salon", per_page: 100 },
       });
       return data.data;
     } catch (err) {

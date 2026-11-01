@@ -43,7 +43,7 @@ export default async function AppointmentsPage({
         </nav>
 
         <div className="mb-10 mt-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Réserver chez {salon.name}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Réserver chez {salon.name}</h1>
           <p className="mt-2 text-anthracite/75">{salonArea(salon.address, salon.city)}</p>
         </div>
 

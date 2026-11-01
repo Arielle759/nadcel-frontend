@@ -79,7 +79,7 @@ function EditEmployeeContent() {
   if (fetching || fetchError) {
     return (
       <ManagerPage title={fetching ? "Chargement..." : "Introuvable"} back={back} width="narrow">
-        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sage/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
+        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sable/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
       </ManagerPage>
     );
   }
@@ -87,14 +87,14 @@ function EditEmployeeContent() {
   return (
     <ManagerPage title={name || "Membre de l'équipe"} back={back} width="narrow">
       {justCreated && (
-        <p className="mb-6 rounded-2xl bg-sage/20 px-5 py-4 text-sm leading-6 text-forest">
+        <p className="mb-6 rounded-2xl bg-sable/20 px-5 py-4 text-sm leading-6 text-brand">
           {name} fait maintenant partie de l&apos;équipe. Cochez les prestations qu&apos;il ou elle réalise, puis enregistrez.
         </p>
       )}
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <section className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
-          <h2 className="font-heading text-2xl font-semibold text-forest">Coordonnées</h2>
+          <h2 className="font-heading text-2xl font-semibold text-brand">Coordonnées</h2>
           <div className="flex flex-col gap-2">
             <label htmlFor="name" className={ui.label}>
               Nom complet
@@ -118,7 +118,7 @@ function EditEmployeeContent() {
         <fieldset className={`${ui.surface} flex flex-col gap-4 p-6 sm:p-8`}>
           <legend className="sr-only">Prestations réalisées</legend>
           <div>
-            <p className="font-heading text-2xl font-semibold text-forest">Prestations réalisées</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Prestations réalisées</p>
             <p className="mt-1 text-sm text-anthracite/75">
               Les clientes ne peuvent réserver avec ce membre que les prestations cochées.
             </p>
@@ -133,14 +133,14 @@ function EditEmployeeContent() {
                   <label
                     key={service.id}
                     className={`flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition-colors ${
-                      checked ? "bg-forest/10 shadow-[0_0_0_2px_var(--color-forest)]" : "bg-beige hover:bg-sage/20"
+                      checked ? "bg-brand/10 shadow-[0_0_0_2px_var(--color-brand)]" : "bg-beige hover:bg-sable/20"
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleService(service.id)}
-                      className="h-4 w-4 shrink-0 accent-[var(--color-forest)]"
+                      className="h-4 w-4 shrink-0 accent-[var(--color-brand)]"
                     />
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-semibold text-anthracite">{service.name}</span>
@@ -158,7 +158,7 @@ function EditEmployeeContent() {
             {saving ? "Enregistrement..." : "Enregistrer"}
           </button>
           {message && (
-            <p role="status" className={`text-sm font-medium ${message.ok ? "text-forest" : "text-red-700"}`}>
+            <p role="status" className={`text-sm font-medium ${message.ok ? "text-brand" : "text-red-700"}`}>
               {message.text}
             </p>
           )}

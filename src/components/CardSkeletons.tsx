@@ -7,10 +7,10 @@ export default function CardSkeletons({ count = 3 }: { count?: number }) {
     >
       {Array.from({ length: count }, (_, index) => (
         <div key={index}>
-          <div className="aspect-[4/3] animate-pulse rounded-2xl bg-sage/20" />
+          <div className="aspect-[4/3] animate-pulse rounded-2xl bg-sable/20" />
           <div className="mt-4 space-y-2 px-1">
-            <div className="h-5 w-2/3 animate-pulse rounded-full bg-sage/25" />
-            <div className="h-4 w-1/2 animate-pulse rounded-full bg-sage/15" />
+            <div className="h-5 w-2/3 animate-pulse rounded-full bg-sable/25" />
+            <div className="h-4 w-1/2 animate-pulse rounded-full bg-sable/15" />
           </div>
         </div>
       ))}

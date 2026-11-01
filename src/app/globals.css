@@ -8,22 +8,34 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-sage: #a3b18a;
-  --color-dark-sage: #588157;
-  /* Darkened dark-sage for use as text/link color — dark-sage itself is only
-     3.97:1 on beige (fails WCAG AA 4.5:1); this variant clears 4.73:1 while
-     staying in the same hue. Buttons/borders keep using dark-sage as-is. */
-  --color-link-sage: #4f744e;
+  /* Identité Nadcel : chocolat et beige, touche de terracotta, doré pour les avis.
+     Contrastes mesurés sur l'ivoire (#f5f1e8), seuil WCAG AA = 4,5:1. */
+  /* Chocolat : titres, barre latérale, bandeaux et graphiques (10,4:1). */
+  --color-brand: #4a3328;
+  /* Chocolat au lait : survols et éléments secondaires (6,8:1). */
+  --color-brand-soft: #6e4c3a;
+  /* Liens et petits textes (8,2:1). */
+  --color-brand-link: #5c3d2e;
+  /* Chocolat noir : boutons principaux et pied de page (12:1). */
+  --color-cacao: #3b2a24;
+  --color-cacao-soft: #54403a;
+  /* Terracotta : touche d'accent seulement (liens, « Inscrire mon salon »,
+     numéros d'étapes, barres de progression). 5,8:1 sur l'ivoire. */
+  --color-accent: #8f4a32;
+  --color-accent-soft: #a65a3f;
+  /* Sable : uniquement en fond léger (bg-sable/15, /20...). */
+  --color-sable: #dcc6b4;
   --color-beige: #f5f1e8;
   --color-anthracite: #374151;
-  --color-forest: #2d3b28;
+  /* Doré : étoiles des avis, éléments « en attente ». */
   --color-champagne: #9c7635;
-  /* Doré clair : boutons sur fond vert foncé (texte forest, contraste 6:1). */
   --color-champagne-light: #d8b26a;
-  --color-terracotta: #9c5236;
+  /* Couleurs de sens, distinctes de la marque : baisse / alerte, hausse. */
+  --color-alert: #b3261e;
+  --color-success: #2f6b47;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-fraunces);
+  --font-heading: var(--font-display);
 }
 
 body {
@@ -35,22 +47,26 @@ body {
 
 /* Focus clavier visible et identique partout (WCAG 2.4.7). */
 :focus-visible {
-  outline: 2px solid var(--color-dark-sage);
+  outline: 2px solid var(--color-brand-soft);
   outline-offset: 2px;
 }
 
 h1,
 h2,
-h3 {
-  font-family: var(--font-fraunces), Georgia, serif;
+h3,
+.font-heading {
+  font-family: var(--font-display), Georgia, serif;
+  /* Playfair dessine par défaut des chiffres « elzéviriens » (01 qui ressemble
+     à « o1 ») : on force des chiffres alignés, plus lisibles. */
+  font-variant-numeric: lining-nums;
 }
 
 .appointment-calendar.rdp-root {
   --rdp-accent-color: var(--color-beige);
-  --rdp-accent-background-color: var(--color-dark-sage);
-  --rdp-today-color: var(--color-dark-sage);
+  --rdp-accent-background-color: var(--color-brand-soft);
+  --rdp-today-color: var(--color-brand-soft);
   --rdp-day_button-border-radius: 9999px;
-  --rdp-selected-border: 2px solid var(--color-dark-sage);
+  --rdp-selected-border: 2px solid var(--color-brand-soft);
   --rdp-outside-opacity: 0.4;
   --rdp-disabled-opacity: 0.35;
   color: var(--color-anthracite);
@@ -58,14 +74,14 @@ h3 {
 }
 
 .appointment-calendar .rdp-day_button:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--color-sage) 20%, transparent);
+  background-color: color-mix(in srgb, var(--color-sable) 20%, transparent);
 }
 
 .appointment-calendar .rdp-selected .rdp-day_button {
-  background-color: var(--color-dark-sage);
+  background-color: var(--color-brand-soft);
   color: var(--color-beige);
 }
 
 .appointment-calendar .rdp-chevron {
-  fill: var(--color-dark-sage);
+  fill: var(--color-brand-soft);
 }

@@ -149,7 +149,7 @@ export default function ServiceForm({
           {saving ? "Enregistrement..." : submitLabel}
         </button>
         {message && (
-          <p role="status" className={`text-sm font-medium ${message.ok ? "text-forest" : "text-red-700"}`}>
+          <p role="status" className={`text-sm font-medium ${message.ok ? "text-brand" : "text-red-700"}`}>
             {message.text}
           </p>
         )}

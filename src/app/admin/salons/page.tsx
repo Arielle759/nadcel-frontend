@@ -41,7 +41,7 @@ export default function AdminPartnerRequestsPage() {
       description="Vérifiez chaque salon avant de le mettre en ligne. En cas de doute, appelez le numéro indiqué."
     >
       {notice && (
-        <p role="status" className="mb-6 rounded-2xl bg-sage/20 px-5 py-4 text-sm text-forest">
+        <p role="status" className="mb-6 rounded-2xl bg-sable/20 px-5 py-4 text-sm text-brand">
           {notice}
         </p>
       )}
@@ -52,10 +52,10 @@ export default function AdminPartnerRequestsPage() {
       )}
 
       {requests === null ? (
-        !error && <div className="h-64 animate-pulse rounded-2xl bg-sage/15" aria-busy="true" aria-label="Chargement" />
+        !error && <div className="h-64 animate-pulse rounded-2xl bg-sable/15" aria-busy="true" aria-label="Chargement" />
       ) : requests.length === 0 ? (
         <div className={`${ui.surface} p-8 text-center`}>
-          <p className="font-semibold text-forest">Aucune demande en attente</p>
+          <p className="font-semibold text-brand">Aucune demande en attente</p>
           <p className="mt-1 text-sm text-anthracite/70">Les nouvelles demandes envoyées depuis « Inscrire mon salon » apparaîtront ici.</p>
         </div>
       ) : (

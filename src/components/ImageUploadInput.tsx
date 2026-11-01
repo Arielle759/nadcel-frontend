@@ -47,7 +47,7 @@ export default function ImageUploadInput({
       <span className={ui.label}>{label}</span>
       <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} className="sr-only" tabIndex={-1} />
       <div className="flex flex-wrap items-center gap-4">
-        <div className="flex aspect-[4/3] w-40 items-center justify-center overflow-hidden rounded-xl bg-sage/15">
+        <div className="flex aspect-[4/3] w-40 items-center justify-center overflow-hidden rounded-xl bg-sable/15">
           {displayUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={displayUrl} alt="Aperçu de la photo" className="h-full w-full object-cover" />

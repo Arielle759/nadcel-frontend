@@ -1,8 +1,8 @@
 export default function AboutPage() {
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-lg border border-sage/30 border-t-4 border-t-champagne bg-beige p-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-forest">Qui sommes-nous</h1>
+    <main className="flex flex-1 flex-col items-center gap-6 bg-gradient-to-br from-beige to-sable/20 px-6 py-12 sm:px-16">
+      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-lg border border-sable/30 border-t-4 border-t-champagne bg-beige p-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-brand">Qui sommes-nous</h1>
 
         <p className="text-anthracite/75">
           NADCEL est une plateforme multi-salons qui connecte les clientes et clients aux

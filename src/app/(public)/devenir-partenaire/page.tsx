@@ -26,7 +26,7 @@ function formatDate(value: string): string {
 function StatusCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section aria-live="polite" className={`${ui.surface} rounded-3xl p-8 sm:p-10`}>
-      <h2 className="font-heading text-3xl font-semibold text-forest">{title}</h2>
+      <h2 className="font-heading text-3xl font-semibold text-brand">{title}</h2>
       <div className="mt-4 flex flex-col gap-4 leading-7 text-anthracite/80">{children}</div>
     </section>
   );
@@ -111,12 +111,12 @@ export default function BecomePartnerPage() {
   let content: React.ReactNode;
 
   if (!mounted || salonsLoading) {
-    content = <div className="h-96 animate-pulse rounded-3xl bg-sage/15" aria-busy="true" aria-label="Chargement" />;
+    content = <div className="h-96 animate-pulse rounded-3xl bg-sable/15" aria-busy="true" aria-label="Chargement" />;
   } else if (submitted) {
     content = (
       <StatusCard title="Demande envoyée">
         <p>
-          Merci ! La demande pour <strong className="text-forest">{submitted}</strong> est entre les mains de notre équipe.
+          Merci ! La demande pour <strong className="text-brand">{submitted}</strong> est entre les mains de notre équipe.
           Nous revenons vers vous sous 48 heures ouvrées.
         </p>
         <p className="text-sm text-anthracite/70">
@@ -133,7 +133,7 @@ export default function BecomePartnerPage() {
     content = (
       <StatusCard title="Votre salon est partenaire">
         <p>
-          <strong className="text-forest">{verified.name}</strong> est validé et visible par les clientes.
+          <strong className="text-brand">{verified.name}</strong> est validé et visible par les clientes.
         </p>
         {hasRole("gerant") ? (
           <div>
@@ -159,7 +159,7 @@ export default function BecomePartnerPage() {
     content = (
       <StatusCard title="Demande en cours d'examen">
         <p>
-          La demande pour <strong className="text-forest">{pending.name}</strong> ({pending.city}) a été envoyée le{" "}
+          La demande pour <strong className="text-brand">{pending.name}</strong> ({pending.city}) a été envoyée le{" "}
           {formatDate(pending.created_at)}. Notre équipe la vérifie sous 48 heures ouvrées.
         </p>
         <p className="text-sm text-anthracite/70">
@@ -179,7 +179,7 @@ export default function BecomePartnerPage() {
 
         {!authenticated && (
           <fieldset className="flex flex-col gap-5">
-            <legend className="mb-5 font-heading text-2xl font-semibold text-forest">Votre compte</legend>
+            <legend className="mb-5 font-heading text-2xl font-semibold text-brand">Votre compte</legend>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field id="name" label="Nom complet">
                 <input id="name" required autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
@@ -216,7 +216,7 @@ export default function BecomePartnerPage() {
         )}
 
         <fieldset className="flex flex-col gap-5">
-          <legend className="mb-5 font-heading text-2xl font-semibold text-forest">Votre salon</legend>
+          <legend className="mb-5 font-heading text-2xl font-semibold text-brand">Votre salon</legend>
           <Field id="salonName" label="Nom du salon">
             <input id="salonName" required value={salonName} onChange={(e) => setSalonName(e.target.value)} className={ui.input} />
           </Field>
@@ -285,7 +285,7 @@ export default function BecomePartnerPage() {
     <main className="flex flex-1 flex-col px-6 pb-24 pt-12 sm:px-10">
       <div className="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
-          <h1 className="text-4xl font-semibold tracking-tight text-forest sm:text-[2.75rem] sm:leading-[1.1]">
+          <h1 className="text-4xl font-semibold tracking-tight text-brand sm:text-[2.75rem] sm:leading-[1.1]">
             Inscrire mon salon
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-anthracite/75">
@@ -299,11 +299,11 @@ export default function BecomePartnerPage() {
             <Image src="/images/services/coiffure.jpg" alt="" fill sizes="380px" className="object-cover" />
           </div>
           <div className={`${ui.surface} rounded-3xl p-6`}>
-            <p className="font-heading text-xl font-semibold text-forest">Comment ça se passe</p>
+            <p className="font-heading text-xl font-semibold text-brand">Comment ça se passe</p>
             <ol className="mt-5 flex flex-col gap-5">
               {STEPS.map((step, index) => (
                 <li key={step.title} className="flex gap-4">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-forest">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-brand">
                     {index + 1}
                   </span>
                   <div>

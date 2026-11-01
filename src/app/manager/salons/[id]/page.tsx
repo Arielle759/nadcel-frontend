@@ -97,7 +97,7 @@ export default function ManagerSalonDetailPage() {
   if (fetching) {
     return (
       <ManagerPage title="Chargement..." back={{ href: "/manager/salons", label: "Mes salons" }}>
-        <div className="h-96 animate-pulse rounded-2xl bg-sage/15" />
+        <div className="h-96 animate-pulse rounded-2xl bg-sable/15" />
       </ManagerPage>
     );
   }
@@ -116,7 +116,7 @@ export default function ManagerSalonDetailPage() {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
         <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
-          <h2 className="font-heading text-2xl font-semibold text-forest">Fiche du salon</h2>
+          <h2 className="font-heading text-2xl font-semibold text-brand">Fiche du salon</h2>
 
           <div className="flex flex-col gap-2">
             <label htmlFor="name" className={ui.label}>
@@ -159,7 +159,7 @@ export default function ManagerSalonDetailPage() {
               {savingInfo ? "Enregistrement..." : "Enregistrer la fiche"}
             </button>
             {infoMessage && (
-              <p role="status" className={`text-sm font-medium ${infoMessage.ok ? "text-forest" : "text-red-700"}`}>
+              <p role="status" className={`text-sm font-medium ${infoMessage.ok ? "text-brand" : "text-red-700"}`}>
                 {infoMessage.text}
               </p>
             )}
@@ -168,7 +168,7 @@ export default function ManagerSalonDetailPage() {
 
         <div className="flex flex-col gap-6">
           <section className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`} aria-labelledby="hours-title">
-            <h2 id="hours-title" className="font-heading text-2xl font-semibold text-forest">
+            <h2 id="hours-title" className="font-heading text-2xl font-semibold text-brand">
               Horaires d&apos;ouverture
             </h2>
             <OpeningHoursEditor value={openingHours} onChange={setOpeningHours} />
@@ -177,7 +177,7 @@ export default function ManagerSalonDetailPage() {
                 {savingHours ? "Enregistrement..." : "Enregistrer les horaires"}
               </button>
               {hoursMessage && (
-                <p role="status" className={`text-sm font-medium ${hoursMessage.ok ? "text-forest" : "text-red-700"}`}>
+                <p role="status" className={`text-sm font-medium ${hoursMessage.ok ? "text-brand" : "text-red-700"}`}>
                   {hoursMessage.text}
                 </p>
               )}

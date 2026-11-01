@@ -41,7 +41,7 @@ export default function FaqSection() {
         <div className="lg:sticky lg:top-28 lg:self-start">
           <h2 className={ui.sectionTitle}>Questions fréquentes</h2>
           <p className="mt-4 max-w-md leading-7 text-anthracite/70">Tout ce qu&apos;il faut savoir pour réserver sereinement ou rejoindre Nadcel en tant que salon.</p>
-          <a href="mailto:contact@nadcel.sn" className="mt-7 inline-flex items-center gap-2 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-forest shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] transition-shadow hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_12px_28px_rgba(45,59,40,0.12)]">Nous contacter</a>
+          <a href="mailto:contact@nadcel.sn" className="mt-7 inline-flex items-center gap-2 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-brand shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] transition-shadow hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_12px_28px_rgba(90,50,35,0.12)]">Nous contacter</a>
         </div>
         <div className="flex flex-col gap-3">
         {FAQ_ITEMS.map((item, index) => {
@@ -51,8 +51,8 @@ export default function FaqSection() {
               key={item.question}
               className={`overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ${
                 isOpen
-                  ? "shadow-[0_2px_6px_rgba(45,59,40,0.06),0_16px_36px_rgba(45,59,40,0.11)]"
-                  : "shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_12px_30px_rgba(45,59,40,0.09)]"
+                  ? "shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.11)]"
+                  : "shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_12px_30px_rgba(90,50,35,0.09)]"
               }`}
             >
               <button
@@ -61,10 +61,10 @@ export default function FaqSection() {
                 aria-expanded={isOpen}
                 className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-6"
               >
-                <span className="font-semibold text-forest">{item.question}</span>
+                <span className="font-semibold text-brand">{item.question}</span>
                 <ChevronDown
                   size={20}
-                  className={`shrink-0 text-forest/60 transition-transform duration-200 ${
+                  className={`shrink-0 text-brand/60 transition-transform duration-200 ${
                     isOpen ? "rotate-180" : ""
                   }`}
                 />

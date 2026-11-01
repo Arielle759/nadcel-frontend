@@ -237,7 +237,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
   if (success && selectedService && selectedDate) {
     return (
       <section aria-live="polite" className={`${ui.surface} mx-auto w-full max-w-xl rounded-3xl p-8 text-center sm:p-10`}>
-        <p className="font-heading text-3xl font-semibold text-forest">Demande envoyée</p>
+        <p className="font-heading text-3xl font-semibold text-brand">Demande envoyée</p>
         <p className="mt-4 leading-7 text-anthracite/85">
           {selectedService.name} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
         </p>
@@ -258,7 +258,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
   const summary = (
     <div className={`${ui.surface} rounded-3xl p-6`}>
-      <p className="font-heading text-2xl font-semibold text-forest">Récapitulatif</p>
+      <p className="font-heading text-2xl font-semibold text-brand">Récapitulatif</p>
       <dl className="mt-5 flex flex-col gap-4 text-sm">
         <div>
           <dt className="text-anthracite/70">Salon</dt>
@@ -279,14 +279,14 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         </div>
         <div className="flex items-baseline justify-between rounded-2xl bg-beige px-4 py-3">
           <dt className="text-anthracite/70">À régler au salon</dt>
-          <dd className="text-lg font-semibold text-forest">
+          <dd className="text-lg font-semibold text-brand">
             {selectedService ? formatCurrency(Number(selectedService.price)) : "-"}
           </dd>
         </div>
       </dl>
 
       {authRequired ? (
-        <div className="mt-6 rounded-2xl bg-sage/15 p-4">
+        <div className="mt-6 rounded-2xl bg-sable/15 p-4">
           <p className="text-sm leading-6 text-anthracite">
             Connectez-vous pour confirmer. Votre sélection est gardée et vous reviendrez ici ensuite.
           </p>
@@ -320,20 +320,20 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     <div className="grid grid-cols-1 gap-10 pb-28 lg:grid-cols-[minmax(0,1fr)_340px] lg:pb-0">
       <form id="booking-form" onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-12">
         {restoredNotice && (
-          <p className="rounded-2xl bg-sage/15 px-4 py-3 text-sm text-forest">
+          <p className="rounded-2xl bg-sable/15 px-4 py-3 text-sm text-brand">
             Votre sélection a été reprise. Vérifiez le créneau puis confirmez.
           </p>
         )}
 
         <fieldset className="min-w-0">
-          <legend className="font-heading text-2xl font-semibold text-forest">1. Prestation</legend>
+          <legend className="font-heading text-2xl font-semibold text-brand">1. Prestation</legend>
           <div className="mt-4 flex flex-col gap-3">
             {services.map((service) => {
               const checked = service.id === serviceId;
               return (
                 <label
                   key={service.id}
-                  className={`flex cursor-pointer items-center gap-4 rounded-2xl bg-white p-4 transition-all duration-200 ${checked ? "shadow-[0_0_0_2px_var(--color-forest),0_10px_26px_rgba(45,59,40,0.12)]" : "shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_14px_32px_rgba(45,59,40,0.11)]"}`}
+                  className={`flex cursor-pointer items-center gap-4 rounded-2xl bg-white p-4 transition-all duration-200 ${checked ? "shadow-[0_0_0_2px_var(--color-brand),0_10px_26px_rgba(90,50,35,0.12)]" : "shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_14px_32px_rgba(90,50,35,0.11)]"}`}
                 >
                   <input
                     type="radio"
@@ -341,10 +341,10 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                     value={service.id}
                     checked={checked}
                     onChange={() => chooseService(service.id)}
-                    className="h-4 w-4 shrink-0 accent-[var(--color-forest)]"
+                    className="h-4 w-4 shrink-0 accent-[var(--color-brand)]"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block font-semibold text-forest">{service.name}</span>
+                    <span className="block font-semibold text-brand">{service.name}</span>
                     <span className="block text-sm text-anthracite/75">{formatDuration(service.duration)}</span>
                   </span>
                   <span className="shrink-0 font-semibold text-anthracite">{formatCurrency(Number(service.price))}</span>
@@ -355,7 +355,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         </fieldset>
 
         <fieldset className="min-w-0">
-          <legend className="font-heading text-2xl font-semibold text-forest">2. Jour</legend>
+          <legend className="font-heading text-2xl font-semibold text-brand">2. Jour</legend>
           <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Prochains jours">
             {stripDays.map((day) => {
               const unavailable = isDayUnavailable(day);
@@ -370,10 +370,10 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                   onClick={() => chooseDate(day)}
                   className={`flex w-16 shrink-0 flex-col items-center rounded-2xl border py-3 transition-colors ${
                     selected
-                      ? "border-forest bg-forest text-beige"
+                      ? "border-brand bg-brand text-beige"
                       : unavailable
-                        ? "cursor-not-allowed border-transparent bg-sage/10 text-anthracite/40"
-                        : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(45,59,40,0.05),0_6px_16px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.07),0_10px_22px_rgba(45,59,40,0.12)]"
+                        ? "cursor-not-allowed border-transparent bg-sable/10 text-anthracite/40"
+                        : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(90,50,35,0.05),0_6px_16px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.07),0_10px_22px_rgba(90,50,35,0.12)]"
                   }`}
                 >
                   <span className="text-xs">{day.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
@@ -409,7 +409,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         </fieldset>
 
         <fieldset className="min-w-0">
-          <legend className="font-heading text-2xl font-semibold text-forest">3. Heure</legend>
+          <legend className="font-heading text-2xl font-semibold text-brand">3. Heure</legend>
           <div className="mt-4" aria-live="polite">
             {!selectedDate && <p className="text-sm text-anthracite/75">Choisissez d&apos;abord un jour.</p>}
             {selectedDate && slotsLoading && <p className="text-sm text-anthracite/75">Recherche des créneaux libres...</p>}
@@ -434,8 +434,8 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                           }}
                           className={`min-h-11 min-w-20 rounded-full border px-4 text-sm font-medium transition-colors ${
                             heure === slot
-                              ? "border-forest bg-forest text-beige"
-                              : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(45,59,40,0.05),0_6px_16px_rgba(45,59,40,0.06)] hover:shadow-[0_2px_6px_rgba(45,59,40,0.07),0_10px_22px_rgba(45,59,40,0.12)]"
+                              ? "border-brand bg-brand text-beige"
+                              : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(90,50,35,0.05),0_6px_16px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.07),0_10px_22px_rgba(90,50,35,0.12)]"
                           }`}
                         >
                           {formatSlot(slot)}
@@ -456,12 +456,12 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
       {/* Mobile : confirmation toujours accessible en bas de l'écran. */}
       {!authRequired && (
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(45,59,40,0.10)] backdrop-blur lg:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(90,50,35,0.10)] backdrop-blur lg:hidden">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
             <p className="min-w-0 text-sm text-anthracite/80">
               {ready && selectedDate ? (
                 <>
-                  <span className="block font-semibold text-forest">{formatSlot(heure)}</span>
+                  <span className="block font-semibold text-brand">{formatSlot(heure)}</span>
                   {formatLongDate(selectedDate)}
                 </>
               ) : (

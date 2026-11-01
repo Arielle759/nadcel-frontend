@@ -79,12 +79,12 @@ export default async function SalonDetailPage({
           </ol>
         </nav>
 
-        <div className="relative mt-5 h-60 w-full overflow-hidden rounded-3xl bg-sage/20 sm:h-80 lg:h-[420px]">
+        <div className="relative mt-5 h-60 w-full overflow-hidden rounded-3xl bg-sable/20 sm:h-80 lg:h-[420px]">
           {coverSrc ? (
             <Image src={coverSrc} alt={`Intérieur du salon ${salon.name}`} fill sizes="(min-width: 1152px) 1152px, 100vw" className="object-cover" priority />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="font-heading text-8xl font-semibold text-forest/25" aria-hidden="true">
+              <span className="font-heading text-8xl font-semibold text-brand/25" aria-hidden="true">
                 {salon.name.charAt(0)}
               </span>
             </div>
@@ -93,7 +93,7 @@ export default async function SalonDetailPage({
 
         <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="min-w-0">
-            <h1 className="text-4xl font-semibold tracking-tight text-forest sm:text-5xl">{salon.name}</h1>
+            <h1 className="text-4xl font-semibold tracking-tight text-brand sm:text-5xl">{salon.name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-anthracite/80">
               {salon.reviews_count > 0 ? (
                 <SalonRating average={salon.reviews_avg_rating} count={salon.reviews_count} />
@@ -101,14 +101,14 @@ export default async function SalonDetailPage({
                 <span>Pas encore d&apos;avis</span>
               )}
               <span>{salonArea(salon.address, salon.city)}</span>
-              {today && <span className="font-medium text-forest">{today}</span>}
+              {today && <span className="font-medium text-brand">{today}</span>}
             </div>
             {salon.description && (
               <p className="mt-6 max-w-2xl text-lg leading-8 text-anthracite/85">{salon.description}</p>
             )}
 
             <section aria-labelledby="services-title" className="mt-14">
-              <h2 id="services-title" className="text-2xl font-semibold tracking-tight text-forest sm:text-3xl">
+              <h2 id="services-title" className="text-2xl font-semibold tracking-tight text-brand sm:text-3xl">
                 Prestations
               </h2>
 
@@ -125,11 +125,11 @@ export default async function SalonDetailPage({
                         const imageSrc = resolveServiceImage(service);
                         return (
                           <li key={service.id} className={`${ui.surface} flex items-center gap-4 p-3 pr-4 sm:p-4`}>
-                            <div className="relative hidden h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sage/20 sm:block">
+                            <div className="relative hidden h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sable/20 sm:block">
                               {imageSrc && <Image src={imageSrc} alt="" fill sizes="56px" className="object-cover" />}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="font-semibold text-forest">{service.name}</p>
+                              <p className="font-semibold text-brand">{service.name}</p>
                               {service.description && (
                                 <p className="mt-0.5 line-clamp-1 text-sm text-anthracite/75">{service.description}</p>
                               )}
@@ -145,7 +145,7 @@ export default async function SalonDetailPage({
                             </span>
                             <Link
                               href={`${bookingHref}?service=${service.id}`}
-                              className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-forest/[0.07] px-5 text-sm font-semibold text-forest transition-colors hover:bg-forest hover:text-beige"
+                              className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-brand/[0.07] px-5 text-sm font-semibold text-brand transition-colors hover:bg-brand hover:text-beige"
                               aria-label={`Réserver : ${service.name}`}
                             >
                               Réserver
@@ -161,7 +161,7 @@ export default async function SalonDetailPage({
 
             <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2">
               <section aria-labelledby="hours-title">
-                <h2 id="hours-title" className="text-2xl font-semibold tracking-tight text-forest">
+                <h2 id="hours-title" className="text-2xl font-semibold tracking-tight text-brand">
                   Horaires
                 </h2>
                 <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 text-sm">
@@ -169,7 +169,7 @@ export default async function SalonDetailPage({
                       const dayHours = hours[key];
                       const isToday = key === todayKey;
                       return (
-                        <div key={key} className={`contents ${isToday ? "font-semibold text-forest" : "text-anthracite/85"}`}>
+                        <div key={key} className={`contents ${isToday ? "font-semibold text-brand" : "text-anthracite/85"}`}>
                           <dt>{label}</dt>
                           <dd>{dayHours ? `${formatHour(dayHours.open)} à ${formatHour(dayHours.close)}` : "Fermé"}</dd>
                         </div>
@@ -179,7 +179,7 @@ export default async function SalonDetailPage({
               </section>
 
               <section aria-labelledby="address-title">
-                <h2 id="address-title" className="text-2xl font-semibold tracking-tight text-forest">
+                <h2 id="address-title" className="text-2xl font-semibold tracking-tight text-brand">
                   Adresse
                 </h2>
                 <p className="mt-4 text-sm text-anthracite/85">{fullAddress}</p>
@@ -197,7 +197,7 @@ export default async function SalonDetailPage({
 
           <aside aria-label="Réservation" className="hidden lg:sticky lg:top-28 lg:block lg:self-start">
             <div className={`${ui.surface} rounded-3xl p-6`}>
-              <p className="font-heading text-2xl font-semibold text-forest">Réserver</p>
+              <p className="font-heading text-2xl font-semibold text-brand">Réserver</p>
               {minPrice !== null && maxPrice !== null && (
                 <p className="mt-2 text-sm text-anthracite/80">
                   {salon.services.length} {salon.services.length > 1 ? "prestations" : "prestation"},{" "}
@@ -219,10 +219,10 @@ export default async function SalonDetailPage({
       </div>
 
       {/* Mobile : l'action de réservation reste toujours accessible en bas de l'écran. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(45,59,40,0.10)] backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-beige/95 px-6 py-3 shadow-[0_-8px_24px_rgba(90,50,35,0.10)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <p className="min-w-0 text-sm text-anthracite/80">
-            {minPrice !== null ? <>À partir de <span className="font-semibold text-forest">{formatCurrency(minPrice)}</span></> : salon.name}
+            {minPrice !== null ? <>À partir de <span className="font-semibold text-brand">{formatCurrency(minPrice)}</span></> : salon.name}
           </p>
           <Link href={bookingHref} className={`${ui.buttonPrimary} shrink-0`}>
             Choisir un créneau

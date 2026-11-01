@@ -37,7 +37,7 @@ export default function SalonGrid({
         const categories = salon.service_categories.slice(0, 3).join(", ");
         return (
           <Link key={salon.id} href={`/salons/${salon.id}`} className="group flex min-w-0 flex-col">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-sage/20 shadow-[0_1px_2px_rgba(45,59,40,0.06),0_10px_28px_rgba(45,59,40,0.10)] transition-shadow duration-300 group-hover:shadow-[0_2px_6px_rgba(45,59,40,0.08),0_20px_44px_rgba(45,59,40,0.18)]">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-shadow duration-300 group-hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_20px_44px_rgba(90,50,35,0.18)]">
               {cover ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -48,7 +48,7 @@ export default function SalonGrid({
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center">
-                  <span className="font-heading text-6xl font-semibold text-forest/30" aria-hidden="true">
+                  <span className="font-heading text-6xl font-semibold text-brand/30" aria-hidden="true">
                     {salon.name.charAt(0)}
                   </span>
                 </div>
@@ -60,7 +60,7 @@ export default function SalonGrid({
               )}
             </div>
             <div className="mt-4 px-1">
-              <h3 className="text-xl font-semibold text-forest transition-colors group-hover:text-dark-sage">{salon.name}</h3>
+              <h3 className="text-xl font-semibold text-brand transition-colors group-hover:text-brand-soft">{salon.name}</h3>
               <p className="mt-1 text-sm text-anthracite/75">
                 {salonArea(salon.address, salon.city)}
                 {categories && <span className="text-anthracite/60">, {categories.toLowerCase()}</span>}

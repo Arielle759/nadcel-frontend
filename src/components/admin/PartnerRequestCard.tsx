@@ -47,11 +47,11 @@ export default function PartnerRequestCard({
     <li className={compact ? "rounded-xl bg-beige px-4 py-4" : `${ui.surface} p-5 sm:p-6`}>
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <p className={`font-semibold text-forest ${compact ? "" : "font-heading text-xl"}`}>{salon.name}</p>
+          <p className={`font-semibold text-brand ${compact ? "" : "font-heading text-xl"}`}>{salon.name}</p>
           <p className="mt-0.5 text-sm text-anthracite/75">
             {salon.address}, {salon.city}
           </p>
-          <p className={`mt-1 text-xs font-medium ${late ? "text-terracotta" : "text-anthracite/60"}`}>
+          <p className={`mt-1 text-xs font-medium ${late ? "text-alert" : "text-anthracite/60"}`}>
             {sentLabel(salon.created_at, now)}
             {late ? ", délai de 48 h dépassé" : ""}
           </p>

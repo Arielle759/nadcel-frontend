@@ -7,7 +7,7 @@ interface OpeningHoursEditorProps {
 }
 
 const timeInput =
-  "h-10 rounded-lg bg-white px-2 text-sm text-anthracite outline-none shadow-[0_0_0_1px_rgba(45,59,40,0.12)] focus:shadow-[0_0_0_2px_var(--color-forest)]";
+  "h-10 rounded-lg bg-white px-2 text-sm text-anthracite outline-none shadow-[0_0_0_1px_rgba(90,50,35,0.12)] focus:shadow-[0_0_0_2px_var(--color-brand)]";
 
 export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEditorProps) {
   const isCustom = value !== null;
@@ -39,7 +39,7 @@ export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEdit
                     type="checkbox"
                     checked={isOpen}
                     onChange={(e) => setDay(key, e.target.checked ? DEFAULT_DAY_HOURS : null)}
-                    className="h-4 w-4 accent-[var(--color-forest)]"
+                    className="h-4 w-4 accent-[var(--color-brand)]"
                   />
                   {label}
                 </label>

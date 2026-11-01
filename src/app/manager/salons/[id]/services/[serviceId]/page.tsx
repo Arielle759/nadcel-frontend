@@ -39,7 +39,7 @@ export default function EditServicePage() {
   if (fetching || !service) {
     return (
       <ManagerPage title={fetching ? "Chargement..." : "Prestation introuvable"} back={back} width="narrow">
-        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sage/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
+        {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sable/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
       </ManagerPage>
     );
   }

@@ -1,8 +1,8 @@
 export default function PrivacyPage() {
   return (
-    <main className="flex flex-1 flex-col items-center gap-6 bg-gradient-to-br from-beige to-sage/20 px-6 py-12 sm:px-16">
-      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-lg border border-sage/30 border-t-4 border-t-champagne bg-beige p-8">
-        <h1 className="text-3xl font-semibold tracking-tight text-forest">
+    <main className="flex flex-1 flex-col items-center gap-6 bg-gradient-to-br from-beige to-sable/20 px-6 py-12 sm:px-16">
+      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-lg border border-sable/30 border-t-4 border-t-champagne bg-beige p-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-brand">
           Politique de confidentialité
         </h1>
 
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           <p className="text-anthracite/75">
             Vous pouvez à tout moment demander l&apos;accès, la correction ou la suppression
             de vos données personnelles en nous contactant à{" "}
-            <a href="mailto:contact@nadcel.sn" className="font-semibold text-forest transition-colors hover:text-dark-sage">
+            <a href="mailto:contact@nadcel.sn" className="font-semibold text-brand transition-colors hover:text-brand-soft">
               contact@nadcel.sn
             </a>
             .

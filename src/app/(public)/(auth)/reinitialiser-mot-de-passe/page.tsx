@@ -63,7 +63,7 @@ function ResetForm() {
   if (done) {
     return (
       <div role="status" className={`${ui.surface} flex flex-col gap-4 rounded-3xl p-6 sm:p-8`}>
-        <p className="font-heading text-2xl font-semibold text-forest">Mot de passe modifié</p>
+        <p className="font-heading text-2xl font-semibold text-brand">Mot de passe modifié</p>
         <p className="leading-7 text-anthracite/80">
           Vous pouvez vous connecter avec votre nouveau mot de passe. Par sécurité, vos autres sessions ont été fermées.
         </p>
@@ -79,7 +79,7 @@ function ResetForm() {
   return (
     <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 rounded-3xl p-6 sm:p-8`}>
       <p className="text-sm text-anthracite/75">
-        Compte : <strong className="text-forest">{email}</strong>
+        Compte : <strong className="text-brand">{email}</strong>
       </p>
       <PasswordField
         id="password"
@@ -119,7 +119,7 @@ export default function ResetPasswordPage() {
     <AuthShell
       title="Nouveau mot de passe"
       intro="Choisissez un mot de passe que vous n'utilisez pas ailleurs."
-      image="/images/services/login.jpg"
+      image="/images/services/colorationtrois.jpg"
       quote="La beauté, simplement organisée."
     >
       <Suspense fallback={null}>

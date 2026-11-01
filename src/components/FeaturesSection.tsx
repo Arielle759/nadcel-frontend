@@ -32,10 +32,10 @@ export default function FeaturesSection() {
         <ol className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {STEPS.map(({ number, title, description }) => (
             <li key={number} className={`${ui.surface} p-7`}>
-              <span className="font-heading text-3xl font-semibold text-champagne" aria-hidden="true">
+              <span className="font-heading text-3xl font-semibold text-accent" aria-hidden="true">
                 {number}
               </span>
-              <h3 className="mt-5 text-xl font-semibold text-forest">{title}</h3>
+              <h3 className="mt-5 text-xl font-semibold text-brand">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-anthracite/75">{description}</p>
             </li>
           ))}

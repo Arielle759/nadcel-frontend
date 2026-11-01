@@ -5,7 +5,7 @@ import type { ActivityMonth, ActivityTopService } from "@/hooks/useManagerActivi
 import { formatMonthShort } from "@/components/manager/activityFormat";
 
 // Trois séries maximum : au-delà, les courbes deviennent illisibles.
-const SERIES_COLORS = ["var(--color-forest)", "var(--color-dark-sage)", "var(--color-champagne)"];
+const SERIES_COLORS = ["var(--color-brand)", "var(--color-brand-soft)", "var(--color-champagne)"];
 
 export default function ActivityMonthlyChart({
   months,
@@ -24,8 +24,8 @@ export default function ActivityMonthlyChart({
   });
 
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] sm:p-6">
-      <p className="font-semibold text-forest">Évolution sur 12 mois</p>
+    <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6">
+      <p className="font-semibold text-brand">Évolution sur 12 mois</p>
       <p className="mb-4 text-sm text-anthracite/60">
         Prestations réalisées chaque mois. Le dernier mois est en cours.
       </p>

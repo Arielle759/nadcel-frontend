@@ -94,7 +94,11 @@ export default function ManagerAppointmentsPage() {
   useEffect(() => {
     let isMounted = true;
 
-    getAppointments()
+    // Agenda de travail : un mois passé (à clôturer, terminés) et six semaines à venir.
+    const today = new Date();
+    const from = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30);
+    const to = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 45);
+    getAppointments({ from, to })
       .then((data) => {
         if (isMounted) {
           setAppointments(data);
@@ -184,7 +188,7 @@ export default function ManagerAppointmentsPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-5 px-5 py-8 sm:px-10 sm:py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-forest sm:text-4xl">Rendez-vous</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Rendez-vous</h1>
           <p className="mt-1 text-sm text-anthracite/70">
             Après chaque prestation, clôturez le rendez-vous en notant le paiement reçu sur place.
           </p>
@@ -210,7 +214,7 @@ export default function ManagerAppointmentsPage() {
       )}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div role="group" aria-label="Filtrer les rendez-vous" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+        <div role="group" aria-label="Filtrer les rendez-vous" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
           {TABS.map(({ key, label }) => {
             const active = activeTab === key;
             const alert = key === "to_close" && counts.to_close > 0;
@@ -221,13 +225,13 @@ export default function ManagerAppointmentsPage() {
                 aria-pressed={active}
                 onClick={() => setTab(key)}
                 className={`flex min-h-9 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors ${
-                  active ? "bg-forest text-beige shadow-sm" : "text-anthracite/70 hover:bg-sage/10"
+                  active ? "bg-brand text-beige shadow-sm" : "text-anthracite/70 hover:bg-sable/10"
                 }`}
               >
                 {label}
                 <span
                   className={`min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold ${
-                    active ? "bg-beige/20 text-beige" : alert ? "bg-champagne/20 text-champagne" : "bg-sage/15 text-anthracite/60"
+                    active ? "bg-beige/20 text-beige" : alert ? "bg-champagne/20 text-champagne" : "bg-sable/15 text-anthracite/60"
                   }`}
                 >
                   {loading ? "…" : counts[key]}
@@ -245,7 +249,7 @@ export default function ManagerAppointmentsPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Client ou prestation"
-            className="h-11 w-full rounded-full bg-white pl-9 pr-4 text-sm outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06),0_0_0_1px_rgba(45,59,40,0.10)] focus:shadow-[0_0_0_2px_var(--color-forest)]"
+            className="h-11 w-full rounded-full bg-white pl-9 pr-4 text-sm outline-none shadow-[0_1px_2px_rgba(90,50,35,0.06),0_0_0_1px_rgba(90,50,35,0.10)] focus:shadow-[0_0_0_2px_var(--color-brand)]"
           />
         </label>
       </div>
@@ -253,14 +257,14 @@ export default function ManagerAppointmentsPage() {
       {loading && (
         <div className="flex flex-col gap-2" aria-label="Chargement des rendez-vous" aria-busy="true">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className="h-16 animate-pulse rounded-2xl bg-sage/15" />
+            <div key={item} className="h-16 animate-pulse rounded-2xl bg-sable/15" />
           ))}
         </div>
       )}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && groups.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-2xl bg-white py-12 text-center shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-white py-12 text-center shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
           <CalendarX2 size={28} className="text-anthracite/30" aria-hidden="true" />
           <p className="font-medium text-anthracite/75">
             {query ? "Aucun rendez-vous ne correspond à votre recherche." : emptyMessage(activeTab)}
@@ -277,7 +281,7 @@ export default function ManagerAppointmentsPage() {
                 ({group.length})
               </span>
             </h2>
-            <ul className="divide-y divide-sage/15 overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+            <ul className="divide-y divide-sable/15 overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
               {group.map((a) => (
                 <AppointmentRow
                   key={a.id}
@@ -339,11 +343,11 @@ function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now
       case "pending":
         return { label: "À confirmer", className: "bg-amber-100 text-amber-800" };
       case "completed":
-        return { label: "Terminé", className: "bg-sage/20 text-link-sage" };
+        return { label: "Terminé", className: "bg-success/10 text-success" };
       case "cancelled":
-        return { label: "Annulé", className: "bg-terracotta/10 text-terracotta" };
+        return { label: "Annulé", className: "bg-alert/10 text-alert" };
       default:
-        return { label: "Confirmé", className: "bg-forest/10 text-forest" };
+        return { label: "Confirmé", className: "bg-brand/10 text-brand" };
     }
   })();
 
@@ -391,7 +395,7 @@ function AppointmentRow({
     <li className={`flex flex-col gap-3 px-4 py-3 sm:px-5 ${cancelled ? "opacity-60" : ""}`}>
       <div className="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 gap-y-2 md:grid-cols-[4.5rem_minmax(0,1fr)_10rem_8rem_auto]">
         <div className="leading-tight">
-          <p className={`text-base font-semibold text-forest ${cancelled ? "line-through" : ""}`}>{timeLabel(a.scheduled_at)}</p>
+          <p className={`text-base font-semibold text-brand ${cancelled ? "line-through" : ""}`}>{timeLabel(a.scheduled_at)}</p>
           {a.duration > 0 && <p className="text-xs text-anthracite/50">{formatDuration(a.duration)}</p>}
         </div>
 
@@ -409,7 +413,7 @@ function AppointmentRow({
             {!a.client && a.client_phone && (
               <>
                 {", "}
-                <a href={`tel:${a.client_phone.replace(/\s+/g, "")}`} className="font-medium text-forest hover:text-dark-sage">
+                <a href={`tel:${a.client_phone.replace(/\s+/g, "")}`} className="font-medium text-brand hover:text-brand-soft">
                   {a.client_phone}
                 </a>
               </>
@@ -445,7 +449,7 @@ function AppointmentRow({
                   type="button"
                   disabled={busy}
                   onClick={onConfirm}
-                  className="rounded-lg border border-forest/30 px-3 py-1.5 text-xs font-semibold text-forest transition-colors hover:bg-forest/5 disabled:opacity-50"
+                  className="rounded-lg border border-brand/30 px-3 py-1.5 text-xs font-semibold text-brand transition-colors hover:bg-brand/5 disabled:opacity-50"
                 >
                   Confirmer
                 </button>
@@ -455,7 +459,7 @@ function AppointmentRow({
                   type="button"
                   disabled={busy}
                   onClick={onStartClose}
-                  className="rounded-lg bg-forest px-3 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-dark-sage disabled:opacity-50"
+                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-brand-soft disabled:opacity-50"
                 >
                   Clôturer
                 </button>
@@ -464,7 +468,7 @@ function AppointmentRow({
                 type="button"
                 disabled={busy}
                 onClick={onAskCancel}
-                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-terracotta transition-colors hover:bg-terracotta/10 disabled:opacity-50"
+                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-alert transition-colors hover:bg-alert/10 disabled:opacity-50"
               >
                 Annuler
               </button>
@@ -478,11 +482,11 @@ function AppointmentRow({
                 type="button"
                 disabled={busy}
                 onClick={onCancel}
-                className="rounded-lg bg-terracotta px-3 py-1.5 font-semibold text-white transition-colors hover:brightness-95 disabled:opacity-50"
+                className="rounded-lg bg-alert px-3 py-1.5 font-semibold text-white transition-colors hover:brightness-95 disabled:opacity-50"
               >
                 Oui, annuler
               </button>
-              <button type="button" onClick={onKeep} className="rounded-lg px-2.5 py-1.5 font-medium text-anthracite/65 hover:bg-sage/10">
+              <button type="button" onClick={onKeep} className="rounded-lg px-2.5 py-1.5 font-medium text-anthracite/65 hover:bg-sable/10">
                 Non
               </button>
             </span>

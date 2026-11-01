@@ -49,14 +49,14 @@ export default function CloseAppointmentForm({
     <form
       onSubmit={handleSubmit}
       aria-label="Clôturer le rendez-vous"
-      className="flex flex-col gap-3 rounded-xl border border-sage/25 bg-sage/[0.06] px-4 py-3"
+      className="flex flex-col gap-3 rounded-xl border border-sable/25 bg-sable/[0.06] px-4 py-3"
     >
       <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
         <div className="flex flex-col gap-1">
           <label htmlFor={amountId} className="text-xs font-semibold text-anthracite/75">
             Montant encaissé
           </label>
-          <div className="flex items-center rounded-lg border border-sage/35 bg-white focus-within:border-dark-sage focus-within:ring-4 focus-within:ring-sage/10">
+          <div className="flex items-center rounded-lg border border-sable/35 bg-white focus-within:border-brand-soft focus-within:ring-4 focus-within:ring-sable/10">
             <input
               id={amountId}
               type="number"
@@ -85,8 +85,8 @@ export default function CloseAppointmentForm({
                 onClick={() => setMethod(value)}
                 className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   method === value
-                    ? "border-forest bg-forest text-beige"
-                    : "border-sage/40 bg-white text-anthracite/75 hover:border-dark-sage"
+                    ? "border-brand bg-brand text-beige"
+                    : "border-sable/40 bg-white text-anthracite/75 hover:border-brand-soft"
                 }`}
               >
                 {label}
@@ -96,13 +96,13 @@ export default function CloseAppointmentForm({
         </fieldset>
 
         <div className="ml-auto flex items-center gap-2">
-          <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-xs font-medium text-anthracite/65 hover:bg-sage/10">
+          <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-xs font-medium text-anthracite/65 hover:bg-sable/10">
             Annuler
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-lg bg-forest px-4 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-dark-sage disabled:opacity-50"
+            className="rounded-lg bg-brand px-4 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-brand-soft disabled:opacity-50"
           >
             {submitting ? "Enregistrement..." : "Valider la clôture"}
           </button>

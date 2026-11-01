@@ -17,9 +17,9 @@ const FILTERS: { key: SalonState | "all"; label: string }[] = [
 ];
 
 const STATE_STYLES: Record<SalonState, string> = {
-  online: "bg-sage/25 text-forest",
+  online: "bg-sable/25 text-brand",
   pending: "bg-champagne-light/30 text-champagne",
-  suspended: "bg-terracotta/10 text-terracotta",
+  suspended: "bg-alert/10 text-alert",
   rejected: "bg-anthracite/10 text-anthracite/75",
 };
 
@@ -82,7 +82,7 @@ export default function AdminAllSalonsPage() {
       )}
 
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Filtrer par état" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+        <div role="tablist" aria-label="Filtrer par état" className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
           {FILTERS.map(({ key, label }) => (
             <button
               key={key}
@@ -91,7 +91,7 @@ export default function AdminAllSalonsPage() {
               aria-selected={filter === key}
               onClick={() => setFilter(key)}
               className={`min-h-10 shrink-0 whitespace-nowrap rounded-full px-4 text-sm font-semibold transition-colors ${
-                filter === key ? "bg-forest text-beige" : "text-anthracite/75 hover:text-forest"
+                filter === key ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
               }`}
             >
               {label}
@@ -112,10 +112,10 @@ export default function AdminAllSalonsPage() {
       </div>
 
       {salons === null ? (
-        !error && <div className="h-96 animate-pulse rounded-2xl bg-sage/15" aria-busy="true" aria-label="Chargement" />
+        !error && <div className="h-96 animate-pulse rounded-2xl bg-sable/15" aria-busy="true" aria-label="Chargement" />
       ) : visible.length === 0 ? (
         <div className={`${ui.surface} p-8 text-center`}>
-          <p className="font-semibold text-forest">Aucun salon</p>
+          <p className="font-semibold text-brand">Aucun salon</p>
           <p className="mt-1 text-sm text-anthracite/70">
             {query ? "Aucun salon ne correspond à cette recherche." : "Aucun salon dans cet état pour le moment."}
           </p>
@@ -175,11 +175,11 @@ function SalonRow({
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {state === "online" ? (
-            <Link href={`/salons/${salon.id}`} className="font-semibold text-forest hover:text-dark-sage" title="Voir la fiche publique">
+            <Link href={`/salons/${salon.id}`} className="font-semibold text-brand hover:text-brand-soft" title="Voir la fiche publique">
               {salon.name}
             </Link>
           ) : (
-            <p className="font-semibold text-forest">{salon.name}</p>
+            <p className="font-semibold text-brand">{salon.name}</p>
           )}
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATE_STYLES[state]}`}>{SALON_STATE_LABELS[state]}</span>
         </div>

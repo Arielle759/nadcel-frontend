@@ -37,8 +37,19 @@ export default function LoginPage() {
     <AuthShell
       title="Bienvenue sur Nadcel"
       intro="Connectez-vous pour retrouver vos rendez-vous, ou l'espace de votre salon."
-      image="/images/services/login.jpg"
+      image="/images/services/colorationtrois.jpg"
       quote="La beauté, simplement organisée."
+      below={
+        <div className={`${ui.surface} flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:flex-nowrap`}>
+          <div>
+            <p className="text-sm font-semibold text-brand">Vous gérez un salon ?</p>
+            <p className="text-sm text-anthracite/70">Gratuit, validé sous 48 h.</p>
+          </div>
+          <Link href="/devenir-partenaire" className={`${ui.buttonSecondary} shrink-0 px-5`}>
+            Inscrire mon salon
+          </Link>
+        </div>
+      }
     >
       <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 rounded-3xl p-6 sm:p-8`}>
         <div className="flex flex-col gap-2">
@@ -77,14 +88,14 @@ export default function LoginPage() {
         <button type="submit" disabled={loading} className={`${ui.buttonPrimary} mt-1 h-12 text-base`}>
           {loading ? "Connexion..." : "Se connecter"}
         </button>
-      </form>
 
-      <p className="mt-6 text-center text-sm text-anthracite/75">
-        Pas encore de compte ?{" "}
-        <Link href="/register" className={ui.textLink}>
-          Créer un compte
-        </Link>
-      </p>
+        <p className="text-center text-sm text-anthracite/75">
+          Pas encore de compte ?{" "}
+          <Link href="/register" className={ui.textLink}>
+            Créer un compte
+          </Link>
+        </p>
+      </form>
     </AuthShell>
   );
 }

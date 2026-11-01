@@ -51,12 +51,12 @@ export default function ManagerServicesPage() {
       <SalonNav salonId={id} current="services" />
 
       <div className="mt-8">
-        {loading && <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />}
+        {loading && <div className="h-40 animate-pulse rounded-2xl bg-sable/15" />}
         {error && <p className="text-sm text-red-700">{error}</p>}
 
         {!loading && !error && services.length === 0 && (
           <div className={`${ui.surface} px-6 py-12 text-center`}>
-            <p className="font-heading text-2xl font-semibold text-forest">Aucune prestation</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Aucune prestation</p>
             <p className="mt-2 text-sm text-anthracite/75">Ajoutez votre première prestation pour pouvoir recevoir des réservations.</p>
           </div>
         )}
@@ -66,11 +66,11 @@ export default function ManagerServicesPage() {
             const imageSrc = resolveServiceImage(service);
             return (
               <li key={service.id} className={`${ui.surface} flex flex-wrap items-center gap-4 p-4`}>
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sage/20">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sable/20">
                   {imageSrc && <Image src={imageSrc} alt="" fill sizes="56px" className="object-cover" />}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-forest">{service.name}</p>
+                  <p className="font-semibold text-brand">{service.name}</p>
                   <p className="text-sm text-anthracite/75">
                     {service.category}, {formatDuration(service.duration)}
                   </p>

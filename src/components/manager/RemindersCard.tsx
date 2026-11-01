@@ -6,6 +6,13 @@ import { BOOKING_SOURCE_LABELS, appointmentClientName } from "@/lib/bookingSourc
 import WhatsAppReminderButton from "@/components/manager/WhatsAppReminderButton";
 import { ui } from "@/lib/ui";
 
+// « réservé par whatsapp » ou « réservé par sur place » se lisaient mal.
+const BOOKED_VIA: Partial<Record<string, string>> = {
+  whatsapp: "réservé par WhatsApp",
+  phone: "réservé par téléphone",
+  walk_in: "réservé au salon",
+};
+
 function isTomorrow(iso: string, now: number): boolean {
   const date = new Date(iso);
   const today = new Date(now);
@@ -31,7 +38,11 @@ export default function RemindersCard() {
 
   useEffect(() => {
     let active = true;
-    getAppointments()
+    // Seulement la journée de demain : la liste ne dépend pas du volume du salon.
+    const today = new Date();
+    const from = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    const to = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2, 0, 0, -1);
+    getAppointments({ from, to })
       .then((data) => {
         if (!active) return;
         setAppointments(data);
@@ -65,7 +76,7 @@ export default function RemindersCard() {
   return (
     <section aria-labelledby="reminders-title" className={`${ui.surface} mb-6 p-5 sm:p-6`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="reminders-title" className="font-semibold text-forest">
+        <h2 id="reminders-title" className="font-semibold text-brand">
           Rappels à envoyer pour demain
         </h2>
         <p className="text-sm text-anthracite/70">
@@ -83,7 +94,7 @@ export default function RemindersCard() {
                 {timeLabel(a.scheduled_at)}, {appointmentClientName(a)}
               </p>
               <p className="text-sm text-anthracite/70">
-                {a.service?.name}, réservé par {BOOKING_SOURCE_LABELS[a.source].toLowerCase()}
+                {a.service?.name}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
               </p>
             </div>
             <WhatsAppReminderButton

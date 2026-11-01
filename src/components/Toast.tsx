@@ -14,7 +14,7 @@ export default function Toast({ message }: { message: string | null }) {
             transition={{ duration: 0.25, ease: "easeOut" }}
             role="status"
             aria-live="polite"
-            className="pointer-events-auto rounded-full bg-dark-sage px-5 py-3 text-sm font-medium text-beige shadow-lg"
+            className="pointer-events-auto rounded-full bg-cacao px-5 py-3 text-sm font-medium text-beige shadow-lg"
           >
             {message}
           </motion.div>

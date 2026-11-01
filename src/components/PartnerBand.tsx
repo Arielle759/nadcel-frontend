@@ -19,7 +19,7 @@ const BENEFITS = [
 
 export default function PartnerBand() {
   return (
-    <section aria-labelledby="partner-title" className="mt-28 bg-forest px-6 py-24 sm:px-10">
+    <section aria-labelledby="partner-title" className="mt-28 bg-brand px-6 py-24 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="partner-title"

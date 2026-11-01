@@ -78,7 +78,7 @@ function ReviewsContent() {
       title="Avis"
       description="Les avis sont publiés sans validation préalable. Supprimez uniquement un contenu injurieux, hors sujet ou qui expose des données personnelles : un avis simplement négatif reste en ligne."
     >
-      <div role="tablist" aria-label="Filtrer les avis" className="mb-6 inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+      <div role="tablist" aria-label="Filtrer les avis" className="mb-6 inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
         {[
           { value: false, label: "Tous les avis" },
           { value: true, label: "Notes de 1 ou 2" },
@@ -90,7 +90,7 @@ function ReviewsContent() {
             aria-selected={negativeOnly === value}
             onClick={() => router.replace(value ? "/admin/reviews?filtre=negatifs" : "/admin/reviews")}
             className={`min-h-10 rounded-full px-4 text-sm font-semibold transition-colors ${
-              negativeOnly === value ? "bg-forest text-beige" : "text-anthracite/75 hover:text-forest"
+              negativeOnly === value ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
             }`}
           >
             {label}
@@ -105,10 +105,10 @@ function ReviewsContent() {
       )}
 
       {reviews === null ? (
-        !error && <div className="h-96 animate-pulse rounded-2xl bg-sage/15" aria-busy="true" aria-label="Chargement" />
+        !error && <div className="h-96 animate-pulse rounded-2xl bg-sable/15" aria-busy="true" aria-label="Chargement" />
       ) : reviews.length === 0 ? (
         <div className={`${ui.surface} p-8 text-center`}>
-          <p className="font-semibold text-forest">Aucun avis</p>
+          <p className="font-semibold text-brand">Aucun avis</p>
           <p className="mt-1 text-sm text-anthracite/70">
             {negativeOnly ? "Aucun avis noté 1 ou 2 sur 5." : "Les avis laissés après un rendez-vous apparaîtront ici."}
           </p>
@@ -149,7 +149,7 @@ function ReviewsContent() {
                 )}
                 {review.manager_response && (
                   <div className="mt-4 rounded-xl bg-beige px-4 py-3">
-                    <p className="text-xs font-semibold text-forest">Réponse du salon</p>
+                    <p className="text-xs font-semibold text-brand">Réponse du salon</p>
                     <p className="mt-1 text-sm leading-6 text-anthracite/85">{review.manager_response}</p>
                   </div>
                 )}

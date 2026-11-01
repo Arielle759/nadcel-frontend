@@ -144,7 +144,7 @@ export default function ClientAppointmentsPage() {
     <main className="flex flex-1 flex-col px-6 pb-24 pt-12 sm:px-10">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <h1 className={`${ui.sectionTitleBase} text-forest`}>
+          <h1 className={`${ui.sectionTitleBase} text-brand`}>
             Mes réservations
           </h1>
           <Link href="/salons" className={ui.buttonPrimary}>
@@ -166,7 +166,7 @@ export default function ClientAppointmentsPage() {
               aria-selected={tab === key}
               onClick={() => setTab(key)}
               className={`min-h-10 rounded-full px-5 text-sm font-semibold transition-colors ${
-                tab === key ? "bg-forest text-beige" : "text-anthracite/75 hover:text-forest"
+                tab === key ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
               }`}
             >
               {label} {!loading && <span className={tab === key ? "text-beige/70" : "text-anthracite/50"}>({count})</span>}
@@ -176,13 +176,13 @@ export default function ClientAppointmentsPage() {
 
         <div className="mt-8 flex flex-col gap-4" aria-busy={loading}>
           {loading &&
-            [0, 1, 2].map((item) => <div key={item} className="h-36 animate-pulse rounded-2xl bg-sage/15" />)}
+            [0, 1, 2].map((item) => <div key={item} className="h-36 animate-pulse rounded-2xl bg-sable/15" />)}
 
           {error && <p className="text-sm text-red-700">{error}</p>}
 
           {!loading && !error && visible.length === 0 && (
             <div className={`${ui.surface} flex flex-col items-center gap-4 px-6 py-14 text-center`}>
-              <p className="font-heading text-2xl font-semibold text-forest">
+              <p className="font-heading text-2xl font-semibold text-brand">
                 {tab === "upcoming" ? "Aucun rendez-vous à venir" : "Aucune réservation passée"}
               </p>
               <p className="max-w-md text-sm leading-6 text-anthracite/75">
@@ -216,7 +216,7 @@ export default function ClientAppointmentsPage() {
                       <span className="text-xs text-anthracite/70">
                         {date.toLocaleDateString("fr-FR", { weekday: "short" })}
                       </span>
-                      <span className="font-heading text-2xl font-semibold leading-tight text-forest">{date.getDate()}</span>
+                      <span className="text-2xl font-semibold leading-tight tabular-nums text-brand">{date.getDate()}</span>
                       <span className="text-xs text-anthracite/70">{date.toLocaleDateString("fr-FR", { month: "short" })}</span>
                     </div>
 
@@ -225,7 +225,7 @@ export default function ClientAppointmentsPage() {
                         <div className="min-w-0">
                           <Link
                             href={`/salons/${appointment.salon.id}`}
-                            className="text-lg font-semibold text-forest transition-colors hover:text-dark-sage"
+                            className="text-lg font-semibold text-brand transition-colors hover:text-brand-soft"
                           >
                             {appointment.salon.name}
                           </Link>
@@ -257,7 +257,7 @@ export default function ClientAppointmentsPage() {
                         </p>
                       )}
                       {reviewedIds.has(appointment.id) && (
-                        <p className="mt-2 text-sm font-medium text-forest">Merci, votre avis a été publié.</p>
+                        <p className="mt-2 text-sm font-medium text-brand">Merci, votre avis a été publié.</p>
                       )}
 
                       {(canCancel || canReview || appointment.status === "completed" || appointment.status === "cancelled") &&
@@ -313,7 +313,7 @@ export default function ClientAppointmentsPage() {
 
                       {isReviewing && (
                         <div className="mt-4 rounded-2xl bg-beige p-4">
-                          <p className="text-sm font-semibold text-forest">Comment s&apos;est passé votre rendez-vous ?</p>
+                          <p className="text-sm font-semibold text-brand">Comment s&apos;est passé votre rendez-vous ?</p>
                           <div className="mt-2">
                             <StarRating value={reviewNote} onChange={setReviewNote} />
                           </div>
@@ -326,7 +326,7 @@ export default function ClientAppointmentsPage() {
                             onChange={(e) => setReviewComment(e.target.value)}
                             placeholder="Accueil, ponctualité, résultat... (facultatif)"
                             rows={3}
-                            className="mt-3 w-full rounded-2xl bg-white px-4 py-3 text-sm text-anthracite outline-none shadow-[0_1px_2px_rgba(45,59,40,0.06)] focus:shadow-[0_0_0_2px_var(--color-forest)]"
+                            className="mt-3 w-full rounded-2xl bg-white px-4 py-3 text-sm text-anthracite outline-none shadow-[0_1px_2px_rgba(90,50,35,0.06)] focus:shadow-[0_0_0_2px_var(--color-brand)]"
                           />
                           <div className="mt-3 flex flex-wrap gap-2">
                             <button

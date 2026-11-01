@@ -95,23 +95,28 @@ export default function RegisterPage() {
           />
         </div>
 
-        <PasswordField
-          id="password"
-          label="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-          minLength={PASSWORD_MIN_LENGTH}
-          hint={`${PASSWORD_MIN_LENGTH} caractères minimum. Une phrase courte est facile à retenir.`}
-        />
-
-        <PasswordField
-          id="passwordConfirmation"
-          label="Confirmer le mot de passe"
-          value={passwordConfirmation}
-          onChange={(e) => setPasswordConfirmation(e.target.value)}
-          autoComplete="new-password"
-        />
+        <div className="flex flex-col gap-2">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <PasswordField
+              id="password"
+              label="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              minLength={PASSWORD_MIN_LENGTH}
+            />
+            <PasswordField
+              id="passwordConfirmation"
+              label="Confirmation"
+              value={passwordConfirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+          <p className="text-sm text-anthracite/70">
+            {PASSWORD_MIN_LENGTH} caractères minimum. Une phrase courte est facile à retenir.
+          </p>
+        </div>
 
         {error && (
           <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -134,14 +139,14 @@ export default function RegisterPage() {
           </Link>
           .
         </p>
-      </form>
 
-      <p className="mt-6 text-center text-sm text-anthracite/75">
-        Déjà un compte ?{" "}
-        <Link href="/login" className={ui.textLink}>
-          Se connecter
-        </Link>
-      </p>
+        <p className="text-center text-sm text-anthracite/75">
+          Déjà un compte ?{" "}
+          <Link href="/login" className={ui.textLink}>
+            Se connecter
+          </Link>
+        </p>
+      </form>
     </AuthShell>
   );
 }

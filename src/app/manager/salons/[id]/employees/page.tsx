@@ -56,12 +56,12 @@ export default function ManagerEmployeesPage() {
       <SalonNav salonId={id} current="employees" />
 
       <div className="mt-8">
-        {loading && <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />}
+        {loading && <div className="h-40 animate-pulse rounded-2xl bg-sable/15" />}
         {error && <p className="text-sm text-red-700">{error}</p>}
 
         {!loading && !error && employees.length === 0 && (
           <div className={`${ui.surface} px-6 py-12 text-center`}>
-            <p className="font-heading text-2xl font-semibold text-forest">Personne dans l&apos;équipe</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Personne dans l&apos;équipe</p>
             <p className="mt-2 text-sm text-anthracite/75">
               Sans membre de l&apos;équipe, aucun créneau ne peut être proposé aux clientes.
             </p>
@@ -72,11 +72,11 @@ export default function ManagerEmployeesPage() {
           {employees.map((employee) => (
             <li key={employee.id} className={`${ui.surface} flex flex-col gap-4 p-5`}>
               <div className="flex items-center gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-forest" aria-hidden="true">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-beige font-semibold text-brand" aria-hidden="true">
                   {initials(employee.name)}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate font-semibold text-forest">{employee.name}</p>
+                  <p className="truncate font-semibold text-brand">{employee.name}</p>
                   <p className="truncate text-sm text-anthracite/75">{employee.phone}</p>
                 </div>
               </div>

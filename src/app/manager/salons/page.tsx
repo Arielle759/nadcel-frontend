@@ -28,12 +28,12 @@ export default function ManagerSalonsPage() {
         </Link>
       }
     >
-      {loading && <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />}
+      {loading && <div className="h-40 animate-pulse rounded-2xl bg-sable/15" />}
       {error && <p className="text-sm text-red-700">{error}</p>}
 
       {!loading && !error && salons.length === 0 && (
         <div className={`${ui.surface} px-6 py-12 text-center`}>
-          <p className="font-heading text-2xl font-semibold text-forest">Aucun salon pour le moment</p>
+          <p className="font-heading text-2xl font-semibold text-brand">Aucun salon pour le moment</p>
           <p className="mt-2 text-sm text-anthracite/75">Envoyez une demande de partenariat pour inscrire votre salon.</p>
         </div>
       )}
@@ -44,7 +44,7 @@ export default function ManagerSalonsPage() {
           const status = statusOf(salon);
           return (
             <li key={salon.id} className={`${ui.surface} flex flex-col gap-5 p-4 sm:flex-row sm:items-center sm:p-5`}>
-              <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl bg-sage/20 sm:h-24 sm:w-36">
+              <div className="h-40 w-full shrink-0 overflow-hidden rounded-xl bg-sable/20 sm:h-24 sm:w-36">
                 {cover && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={cover} alt="" className="h-full w-full object-cover" />
@@ -52,7 +52,7 @@ export default function ManagerSalonsPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-xl font-semibold text-forest">{salon.name}</h2>
+                  <h2 className="text-xl font-semibold text-brand">{salon.name}</h2>
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}>{status.label}</span>
                 </div>
                 <p className="mt-1 text-sm text-anthracite/75">{salonArea(salon.address, salon.city)}</p>

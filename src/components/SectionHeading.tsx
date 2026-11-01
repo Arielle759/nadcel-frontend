@@ -17,7 +17,7 @@ export default function SectionHeading({
   const centered = align === "center";
   return (
     <div className={centered ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
-      <h2 id={id} className={`${ui.sectionTitleBase} ${onDark ? "text-beige" : "text-forest"}`}>
+      <h2 id={id} className={`${ui.sectionTitleBase} ${onDark ? "text-beige" : "text-brand"}`}>
         {title}
       </h2>
       {description && (

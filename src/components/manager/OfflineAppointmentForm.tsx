@@ -133,7 +133,7 @@ export default function OfflineAppointmentForm({
   return (
     <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-6 p-6 sm:p-8`} aria-labelledby="offline-title">
       <div>
-        <h2 id="offline-title" className="font-heading text-2xl font-semibold text-forest">
+        <h2 id="offline-title" className="font-heading text-2xl font-semibold text-brand">
           Nouveau rendez-vous
         </h2>
         <p className="mt-1 text-sm text-anthracite/75">
@@ -148,7 +148,7 @@ export default function OfflineAppointmentForm({
             <label
               key={s}
               className={`flex min-h-11 cursor-pointer items-center rounded-full px-5 text-sm font-semibold transition-colors ${
-                source === s ? "bg-forest text-beige" : "bg-beige text-anthracite hover:bg-sage/20"
+                source === s ? "bg-brand text-beige" : "bg-beige text-anthracite hover:bg-sable/20"
               }`}
             >
               <input type="radio" name="source" value={s} checked={source === s} onChange={() => setSource(s)} className="sr-only" />
@@ -231,7 +231,7 @@ export default function OfflineAppointmentForm({
                 aria-pressed={time === slot}
                 onClick={() => setTime(slot)}
                 className={`min-h-10 min-w-16 rounded-full px-4 text-sm font-medium transition-colors ${
-                  time === slot ? "bg-forest text-beige" : "bg-beige text-anthracite hover:bg-sage/20"
+                  time === slot ? "bg-brand text-beige" : "bg-beige text-anthracite hover:bg-sable/20"
                 }`}
               >
                 {slotLabel(slot)}

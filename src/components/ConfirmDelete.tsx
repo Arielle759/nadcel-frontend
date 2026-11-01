@@ -50,7 +50,7 @@ export default function ConfirmDelete({
       <button type="button" onClick={confirm} disabled={busy} className={ui.buttonDanger}>
         {busy ? busyLabel : confirmLabel}
       </button>
-      <button type="button" onClick={() => setAsking(false)} className="min-h-11 rounded-full px-3 text-sm font-semibold text-anthracite/80 hover:text-forest">
+      <button type="button" onClick={() => setAsking(false)} className="min-h-11 rounded-full px-3 text-sm font-semibold text-anthracite/80 hover:text-brand">
         Annuler
       </button>
       {error && <p className="w-full text-sm text-red-800">{error}</p>}

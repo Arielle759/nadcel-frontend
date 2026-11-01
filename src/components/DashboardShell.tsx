@@ -36,7 +36,7 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-beige md:flex-row">
-      <aside className="flex w-full flex-col gap-4 bg-forest px-4 py-4 text-beige md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:gap-8 md:px-4 md:py-6">
+      <aside className="flex w-full flex-col gap-4 bg-brand px-4 py-4 text-beige md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:gap-8 md:px-4 md:py-6">
         <div className="flex items-center justify-between gap-3 px-2">
           <Link href="/" className="flex items-center gap-2.5" title="Voir le site public">
             <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-8 w-auto" />
@@ -58,7 +58,7 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={`flex min-h-11 shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 text-sm font-semibold transition-colors ${
-                    active ? "bg-beige text-forest" : "text-beige/75 hover:bg-beige/10 hover:text-beige"
+                    active ? "bg-beige text-brand" : "text-beige/75 hover:bg-beige/10 hover:text-beige"
                   }`}
                 >
                   <Icon size={18} className="shrink-0" aria-hidden="true" />

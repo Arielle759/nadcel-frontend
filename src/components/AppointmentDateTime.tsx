@@ -16,11 +16,11 @@ export default function AppointmentDateTime({ scheduledAt }: { scheduledAt: stri
   return (
     <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-anthracite/75">
       <span className="inline-flex items-center gap-2">
-        <CalendarDays size={16} className="text-link-sage" aria-hidden="true" />
+        <CalendarDays size={16} className="text-brand-link" aria-hidden="true" />
         <span className="first-letter:uppercase">{dateLabel}</span>
       </span>
       <span className="inline-flex items-center gap-2">
-        <Clock3 size={16} className="text-link-sage" aria-hidden="true" />
+        <Clock3 size={16} className="text-brand-link" aria-hidden="true" />
         {timeLabel}
       </span>
     </div>

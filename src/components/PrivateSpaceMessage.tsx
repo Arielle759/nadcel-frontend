@@ -30,23 +30,23 @@ export default function PrivateSpaceMessage({ message, title, icon: Icon, showLo
     <main className="flex min-h-screen flex-1 flex-col items-center justify-center gap-8 bg-beige px-6 py-12">
       <Link href="/" className="flex items-center gap-2.5">
         <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-10 w-auto" />
-        <span className="font-heading text-xl font-semibold tracking-tight text-forest">Nadcel</span>
+        <span className="font-heading text-xl font-semibold tracking-tight text-brand">Nadcel</span>
       </Link>
 
       {title ? (
-        <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-sage/20 bg-white/60 p-8 text-center shadow-sm">
+        <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-sable/20 bg-white/60 p-8 text-center shadow-sm">
           {Icon && <Icon size={32} className="text-champagne" aria-hidden="true" />}
-          <h1 className="text-xl font-semibold text-forest">{title}</h1>
+          <h1 className="text-xl font-semibold text-brand">{title}</h1>
           <p className="text-sm text-anthracite/75">{message}</p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/" className="text-sm font-semibold text-forest transition-colors hover:text-dark-sage">
+            <Link href="/" className="text-sm font-semibold text-brand transition-colors hover:text-brand-soft">
               Retour à l&apos;accueil
             </Link>
             {showLogout && (
               <button
                 type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-dark-sage"
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-medium text-beige transition-colors hover:bg-brand-soft"
               >
                 <LogOut size={16} aria-hidden="true" />
                 Se déconnecter

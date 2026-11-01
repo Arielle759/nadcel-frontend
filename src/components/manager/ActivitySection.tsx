@@ -29,7 +29,7 @@ const PERIODS: { key: ActivityPeriod; label: string }[] = [
 
 const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
-const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] sm:p-6";
+const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6";
 
 export default function ActivitySection({
   upcoming,
@@ -44,8 +44,8 @@ export default function ActivitySection({
   return (
     <section className="flex flex-col gap-4" aria-busy={loading}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-forest">Activité du salon</h2>
-        <div role="group" aria-label="Période analysée" className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)]">
+        <h2 className="text-lg font-semibold text-brand">Activité du salon</h2>
+        <div role="group" aria-label="Période analysée" className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
@@ -53,7 +53,7 @@ export default function ActivitySection({
               onClick={() => setPeriod(key)}
               aria-pressed={period === key}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
-                period === key ? "bg-forest text-beige" : "text-anthracite/70 hover:bg-sage/10"
+                period === key ? "bg-brand text-beige" : "text-anthracite/70 hover:bg-sable/10"
               }`}
             >
               {label}
@@ -73,14 +73,14 @@ export default function ActivitySection({
       {!data && loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Chargement de l'activité">
           {[0, 1, 2, 3].map((item) => (
-            <div key={item} className="h-56 animate-pulse rounded-2xl bg-sage/15" />
+            <div key={item} className="h-56 animate-pulse rounded-2xl bg-sable/15" />
           ))}
         </div>
       )}
 
       {data && data.totals.completed === 0 && data.monthly.every((m) => m.total === 0) ? (
         <div className={`${CARD} text-center`}>
-          <p className="font-semibold text-forest">Pas encore d&apos;activité à analyser</p>
+          <p className="font-semibold text-brand">Pas encore d&apos;activité à analyser</p>
           <p className="mt-1 text-sm text-anthracite/65">
             Les statistiques apparaîtront dès que vos premiers rendez-vous seront marqués comme terminés.
           </p>
@@ -165,7 +165,7 @@ function Kpi({
   const body = (
     <>
       <p className="text-sm font-medium text-anthracite/75">{label}</p>
-      <p className={`mt-1 font-heading text-3xl font-semibold tracking-tight ${tone === "warning" ? "text-champagne" : "text-forest"}`}>
+      <p className={`mt-1 text-3xl font-semibold tabular-nums tracking-tight ${tone === "warning" ? "text-alert" : "text-brand"}`}>
         {value}
       </p>
       <div className="mt-1 flex min-h-4 items-center gap-2 text-xs text-anthracite/55">
@@ -174,9 +174,7 @@ function Kpi({
       </div>
     </>
   );
-  const className = `rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(45,59,40,0.05),0_8px_24px_rgba(45,59,40,0.07)] ${
-    tone === "warning" ? "ring-1 ring-inset ring-champagne/50" : ""
-  } ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(45,59,40,0.06),0_16px_36px_rgba(45,59,40,0.12)]" : ""}`;
+  const className = `rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.12)]" : ""}`;
 
   return href ? (
     <Link href={href} className={className}>
@@ -191,7 +189,7 @@ function PaymentMethods({ data }: { data: ManagerActivity }) {
   const used = data.payment_methods.filter((m) => m.count > 0);
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-forest">
+      <p className="mb-2 font-semibold text-brand">
         Encaissements
       </p>
       {used.length === 0 ? (
@@ -217,7 +215,7 @@ function BookingSources({ data }: { data: ManagerActivity }) {
   if (sources.length === 0) return null;
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-forest">Canaux de réservation</p>
+      <p className="mb-2 font-semibold text-brand">Canaux de réservation</p>
       <ul className="flex flex-col gap-1.5 text-sm">
         {sources.map((s) => (
           <li key={s.source} className="flex items-center justify-between gap-2">
@@ -240,7 +238,7 @@ function TrendBadge({ trend }: { trend: number | null }) {
   const up = trend! >= 0;
   return (
     <span
-      className={`inline-flex items-center gap-1 text-xs font-semibold ${up ? "text-link-sage" : "text-terracotta"}`}
+      className={`inline-flex items-center gap-1 text-xs font-semibold ${up ? "text-success" : "text-alert"}`}
       title="Par rapport à la période précédente de même durée"
     >
       {label}
@@ -251,7 +249,7 @@ function TrendBadge({ trend }: { trend: number | null }) {
 function TopServices({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="font-semibold text-forest">
+      <p className="font-semibold text-brand">
         Prestations préférées des clients
       </p>
       <p className="mb-4 text-sm text-anthracite/60">
@@ -271,8 +269,8 @@ function TopServices({ data }: { data: ManagerActivity }) {
                 </span>
                 <TrendBadge trend={service.trend} />
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-sage/15" aria-hidden="true">
-                <div className="h-full rounded-full bg-forest" style={{ width: `${service.share}%` }} />
+              <div className="h-2 overflow-hidden rounded-full bg-sable/15" aria-hidden="true">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${service.share}%` }} />
               </div>
               <p className="text-xs text-anthracite/60">
                 {service.count} fois, {service.share.toLocaleString("fr-FR")} % des prestations,{" "}
@@ -292,7 +290,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
 
   return (
     <div className={`${CARD} flex flex-col gap-3`}>
-      <p className="font-semibold text-forest">
+      <p className="font-semibold text-brand">
         Prévision pour {month}
       </p>
       {forecast.expected === null ? (
@@ -302,7 +300,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
         </p>
       ) : (
         <>
-          <p className="text-4xl font-semibold tracking-tight text-forest">
+          <p className="text-4xl font-semibold tracking-tight text-brand">
             ≈ {forecast.expected}
             <span className="ml-2 text-base font-medium text-anthracite/60">prestations attendues</span>
           </p>
@@ -313,7 +311,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
             Estimation indicative, à confronter à votre connaissance du salon.
           </p>
           {forecast.peak_month && (
-            <p className="rounded-xl bg-sage/10 px-3 py-2 text-sm text-anthracite/75">
+            <p className="rounded-xl bg-sable/10 px-3 py-2 text-sm text-anthracite/75">
               Mois le plus chargé de l&apos;année écoulée : <strong>{formatMonthLong(forecast.peak_month.month)}</strong> (
               {forecast.peak_month.total} prestations).
             </p>
@@ -330,7 +328,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
 
   return (
     <div className={CARD}>
-      <p className="font-semibold text-forest">Jours et moments les plus chargés</p>
+      <p className="font-semibold text-brand">Jours et moments les plus chargés</p>
       <p className="mb-4 text-sm text-anthracite/60">Plus la case est foncée, plus il y a eu de prestations.</p>
       <table className="w-full table-fixed border-separate border-spacing-1 text-center text-xs">
         <caption className="sr-only">Nombre de prestations par jour de la semaine et moment de la journée</caption>
@@ -356,7 +354,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
                 return (
                   <td
                     key={index}
-                    className={`h-10 rounded-lg font-semibold ${intensity > 0.55 ? "text-beige" : "text-forest"}`}
+                    className={`h-10 rounded-lg font-semibold ${intensity > 0.55 ? "text-beige" : "text-brand"}`}
                     style={{
                       backgroundColor:
                         count === 0 ? "rgba(163, 177, 138, 0.12)" : `rgba(45, 59, 40, ${0.15 + intensity * 0.85})`,
@@ -379,13 +377,13 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
 function Employees({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="mb-3 font-semibold text-forest">
+      <p className="mb-3 font-semibold text-brand">
         Activité par employé
       </p>
       {data.employees.length === 0 ? (
         <p className="text-sm text-anthracite/60">Aucune prestation attribuée sur cette période.</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-sage/15">
+        <ul className="flex flex-col divide-y divide-sable/15">
           {data.employees.map((employee) => (
             <li key={employee.employee_id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <span className="font-medium text-anthracite">{employee.name}</span>
@@ -404,10 +402,10 @@ function Loyalty({ data }: { data: ManagerActivity }) {
   const { loyalty } = data;
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-forest">
+      <p className="mb-2 font-semibold text-brand">
         Fidélité des clients
       </p>
-      <p className="text-3xl font-semibold tracking-tight text-forest">{loyalty.rate.toLocaleString("fr-FR")} %</p>
+      <p className="text-3xl font-semibold tracking-tight text-brand">{loyalty.rate.toLocaleString("fr-FR")} %</p>
       <p className="mt-1 text-sm text-anthracite/65">
         {loyalty.returning} client{loyalty.returning > 1 ? "s" : ""} sur {loyalty.clients} {loyalty.returning > 1 ? "sont venus" : "est venu"} au
         moins deux fois sur la période.
@@ -447,10 +445,9 @@ function Insights({ data }: { data: ManagerActivity }) {
   if (insights.length === 0) return null;
 
   return (
-    <div className="rounded-2xl bg-champagne-light/25 p-5">
-      <p className="mb-2 font-semibold text-forest">À retenir
-      </p>
-      <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-anthracite/80">
+    <div className={CARD}>
+      <p className="font-semibold text-brand">À retenir</p>
+      <ul className="mt-2 flex flex-col gap-2 text-sm leading-6 text-anthracite/80">
         {insights.map((insight) => (
           <li key={insight}>{insight}</li>
         ))}

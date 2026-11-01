@@ -53,7 +53,7 @@ export default function HeroSection() {
         sizes="100vw"
         className="object-cover object-center"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-forest/95 via-forest/75 to-forest/15" />
+      <div className="absolute inset-0 bg-gradient-to-r from-brand/95 via-brand/75 to-brand/15" />
 
       <div className="relative mx-auto flex w-full max-w-6xl items-center">
         <div className="max-w-2xl">
@@ -80,7 +80,7 @@ export default function HeroSection() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             onSubmit={handleSubmit}
             role="search"
-            className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(20,30,18,0.25)] sm:flex-row sm:items-center"
+            className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(40,25,18,0.25)] sm:flex-row sm:items-center"
           >
             <label htmlFor="hero-search" className="sr-only">
               Prestation, salon, quartier ou ville
@@ -115,7 +115,7 @@ export default function HeroSection() {
                   aria-pressed={selected}
                   className={`rounded-full border px-3 py-1 transition-colors ${
                     selected
-                      ? "border-beige bg-beige font-semibold text-forest"
+                      ? "border-beige bg-beige font-semibold text-brand"
                       : "border-beige/25 text-beige/90 hover:border-beige/60 hover:text-beige"
                   }`}
                 >

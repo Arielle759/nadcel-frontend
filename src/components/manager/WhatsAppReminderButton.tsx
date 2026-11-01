@@ -56,7 +56,7 @@ export default function WhatsAppReminderButton({
         onClick={handleClick}
         className={
           sent
-            ? "inline-flex min-h-9 items-center rounded-full px-3 text-xs font-semibold text-forest/70 hover:text-forest"
+            ? "inline-flex min-h-9 items-center rounded-full px-3 text-xs font-semibold text-brand/70 hover:text-brand"
             : `inline-flex items-center rounded-full bg-[#1f7a4d] font-semibold text-white transition-colors hover:bg-[#186440] ${
                 compact ? "min-h-9 px-3 text-xs" : "min-h-11 px-5 text-sm"
               }`

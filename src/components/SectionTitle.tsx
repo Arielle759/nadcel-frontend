@@ -8,5 +8,5 @@ export default function SectionTitle({
   icon?: LucideIcon;
   children: React.ReactNode;
 }) {
-  return <h2 className="text-lg font-semibold text-forest">{children}</h2>;
+  return <h2 className="text-lg font-semibold text-brand">{children}</h2>;
 }

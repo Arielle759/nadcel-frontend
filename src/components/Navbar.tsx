@@ -9,9 +9,9 @@ import { logout } from "@/lib/auth";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/useAuthState";
 
 const navLink =
-  "rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sage/10 hover:text-forest";
+  "rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sable/10 hover:text-brand";
 const partnerButton =
-  "inline-flex min-h-11 items-center justify-center rounded-full bg-champagne-light px-5 font-semibold text-forest shadow-sm transition-colors hover:bg-[#cca35a]";
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-5 font-semibold text-beige shadow-sm transition-colors hover:bg-cacao";
 
 export default function Navbar() {
   const router = useRouter();
@@ -37,11 +37,11 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-sage/20 bg-beige/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-sable/20 bg-beige/95 backdrop-blur">
       <nav aria-label="Navigation principale" className="mx-auto flex min-h-18 max-w-6xl items-center justify-between gap-5 px-6 py-3 sm:px-10">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setMenuOpen(false)}>
           <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-10 w-auto" priority />
-          <span className="font-heading text-xl font-semibold tracking-tight text-forest">Nadcel</span>
+          <span className="font-heading text-xl font-semibold tracking-tight text-brand">Nadcel</span>
         </Link>
 
         {/* Hiérarchie : « Inscrire mon salon » est l'action mise en avant (doré),
@@ -61,7 +61,7 @@ export default function Navbar() {
           {authed ? (
             <>
               <span className="ml-2 inline-flex items-center gap-2 px-2 text-anthracite/75">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-forest text-beige" aria-hidden="true">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-beige" aria-hidden="true">
                   <UserRound size={15} />
                 </span>
                 {user?.name ?? "Mon compte"}
@@ -83,20 +83,20 @@ export default function Navbar() {
           )}
         </div>
 
-        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"} className="flex h-11 w-11 items-center justify-center rounded-full border border-sage/30 text-forest lg:hidden">
+        <button type="button" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"} className="flex h-11 w-11 items-center justify-center rounded-full border border-sable/30 text-brand lg:hidden">
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </nav>
 
       {menuOpen && (
-        <div className="border-t border-sage/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
+        <div className="border-t border-sable/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 text-sm font-medium">
-            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Trouver un salon</Link>}
-            {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">{dashboardLabel}</Link>}
+            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">Trouver un salon</Link>}
+            {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">{dashboardLabel}</Link>}
             {authed ? (
-              <button type="button" onClick={handleLogout} className="rounded-xl px-4 py-3 text-left hover:bg-sage/10">Se déconnecter</button>
+              <button type="button" onClick={handleLogout} className="rounded-xl px-4 py-3 text-left hover:bg-sable/10">Se déconnecter</button>
             ) : (
-              <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sage/10">Se connecter</Link>
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">Se connecter</Link>
             )}
             {showPartnerLink && (
               <Link href="/devenir-partenaire" onClick={() => setMenuOpen(false)} className={`${partnerButton} mt-2 w-full`}>

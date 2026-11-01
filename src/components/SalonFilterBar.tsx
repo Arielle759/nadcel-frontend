@@ -23,14 +23,14 @@ export default function SalonFilterBar({ filters }: { filters: UseSalonFiltersRe
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Coiffure, Plateau, nom du salon..."
         autoComplete="off"
-        className="h-12 w-full rounded-full border border-sage/40 bg-white/70 pl-11 pr-11 text-base text-anthracite outline-none transition-colors placeholder:text-anthracite/50 focus:border-forest/50 [&::-webkit-search-cancel-button]:hidden"
+        className="h-12 w-full rounded-full border border-sable/40 bg-white/70 pl-11 pr-11 text-base text-anthracite outline-none transition-colors placeholder:text-anthracite/50 focus:border-brand/50 [&::-webkit-search-cancel-button]:hidden"
       />
       {query && (
         <button
           type="button"
           onClick={() => setQuery("")}
           aria-label="Effacer la recherche"
-          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-anthracite/60 hover:bg-sage/15 hover:text-forest"
+          className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-anthracite/60 hover:bg-sable/15 hover:text-brand"
         >
           <X size={16} aria-hidden="true" />
         </button>

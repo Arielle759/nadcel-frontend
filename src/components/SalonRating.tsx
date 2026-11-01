@@ -8,11 +8,11 @@ export default function SalonRating({
   count: number;
 }) {
   if (!count || average === null) {
-    return <span className="text-xs font-semibold text-forest">Nouveau</span>;
+    return <span className="text-xs font-semibold text-brand">Nouveau</span>;
   }
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold text-forest">
+    <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand">
       <Star size={14} className="fill-champagne text-champagne" aria-hidden="true" />
       {Number(average).toFixed(1)}
       <span className="font-normal text-anthracite/60">({count})</span>

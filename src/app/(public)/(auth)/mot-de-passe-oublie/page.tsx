@@ -30,14 +30,14 @@ export default function ForgotPasswordPage() {
     <AuthShell
       title="Mot de passe oublié"
       intro="Indiquez l'e-mail de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe."
-      image="/images/services/login.jpg"
+      image="/images/services/colorationtrois.jpg"
       quote="La beauté, simplement organisée."
     >
       {sent ? (
         <div role="status" className={`${ui.surface} flex flex-col gap-4 rounded-3xl p-6 sm:p-8`}>
-          <p className="font-heading text-2xl font-semibold text-forest">Vérifiez votre boîte e-mail</p>
+          <p className="font-heading text-2xl font-semibold text-brand">Vérifiez votre boîte e-mail</p>
           <p className="leading-7 text-anthracite/80">
-            Si un compte existe avec <strong className="text-forest">{email}</strong>, un lien vient d&apos;y être envoyé. Il est
+            Si un compte existe avec <strong className="text-brand">{email}</strong>, un lien vient d&apos;y être envoyé. Il est
             valable une heure. Pensez à regarder dans les courriers indésirables.
           </p>
           <div>
@@ -71,15 +71,14 @@ export default function ForgotPasswordPage() {
           <button type="submit" disabled={loading} className={`${ui.buttonPrimary} h-12 text-base`}>
             {loading ? "Envoi..." : "Recevoir le lien"}
           </button>
+          <p className="text-center text-sm text-anthracite/75">
+            Vous vous en souvenez ?{" "}
+            <Link href="/login" className={ui.textLink}>
+              Se connecter
+            </Link>
+          </p>
         </form>
       )}
-
-      <p className="mt-6 text-center text-sm text-anthracite/75">
-        Vous vous en souvenez ?{" "}
-        <Link href="/login" className={ui.textLink}>
-          Se connecter
-        </Link>
-      </p>
     </AuthShell>
   );
 }

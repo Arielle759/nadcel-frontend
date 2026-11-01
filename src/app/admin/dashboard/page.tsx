@@ -53,13 +53,13 @@ export default function AdminDashboardPage() {
       {!stats || !requests ? (
         !error && (
           <div className="flex flex-col gap-4" aria-busy="true" aria-label="Chargement du tableau de bord">
-            <div className="h-40 animate-pulse rounded-2xl bg-sage/15" />
+            <div className="h-40 animate-pulse rounded-2xl bg-sable/15" />
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="h-28 animate-pulse rounded-2xl bg-sage/15" />
+                <div key={i} className="h-28 animate-pulse rounded-2xl bg-sable/15" />
               ))}
             </div>
-            <div className="h-72 animate-pulse rounded-2xl bg-sage/15" />
+            <div className="h-72 animate-pulse rounded-2xl bg-sable/15" />
           </div>
         )
       ) : (
@@ -67,7 +67,7 @@ export default function AdminDashboardPage() {
           <ToReview stats={stats} requests={requests} onDecide={decide} />
 
           <section aria-labelledby="health-title" className="flex flex-col gap-4">
-            <h2 id="health-title" className="text-2xl font-semibold tracking-tight text-forest">
+            <h2 id="health-title" className="text-2xl font-semibold tracking-tight text-brand">
               Santé de la plateforme
             </h2>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -97,7 +97,7 @@ export default function AdminDashboardPage() {
           </section>
 
           <section aria-labelledby="evolution-title" className="flex flex-col gap-4">
-            <h2 id="evolution-title" className="text-2xl font-semibold tracking-tight text-forest">
+            <h2 id="evolution-title" className="text-2xl font-semibold tracking-tight text-brand">
               Évolution sur 12 mois
             </h2>
             <AdminMonthlyCharts months={stats.monthly} />
@@ -123,7 +123,7 @@ function ToReview({
   if (pending === 0 && lowReviews === 0) {
     return (
       <section className={`${ui.surface} p-5 sm:p-6`}>
-        <h2 className="font-semibold text-forest">Rien à traiter</h2>
+        <h2 className="font-semibold text-brand">Rien à traiter</h2>
         <p className="mt-1 text-sm text-anthracite/70">
           Aucune demande de partenariat en attente et aucun avis négatif récent.
         </p>
@@ -133,7 +133,7 @@ function ToReview({
 
   return (
     <section aria-labelledby="review-title" className={`${ui.surface} p-5 sm:p-6`}>
-      <h2 id="review-title" className="text-2xl font-semibold tracking-tight text-forest">
+      <h2 id="review-title" className="text-2xl font-semibold tracking-tight text-brand">
         À traiter
       </h2>
 
@@ -191,7 +191,7 @@ function Kpi({
   const body = (
     <>
       <p className="text-sm font-medium text-anthracite/75">{label}</p>
-      <p className="mt-1 font-heading text-3xl font-semibold tracking-tight text-forest">{value}</p>
+      <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-brand">{value}</p>
       <p className="mt-1 min-h-4 text-xs text-anthracite/60">{hint}</p>
     </>
   );
@@ -209,7 +209,7 @@ function Trend({ value }: { value: number | null }) {
   if (label === null) return <>Pas de comparaison possible</>;
   return (
     <span title="Du 1er à aujourd'hui, comparé à la même période du mois dernier">
-      <span className={`font-semibold ${value! >= 0 ? "text-link-sage" : "text-terracotta"}`}>{label}</span> sur un mois
+      <span className={`font-semibold ${value! >= 0 ? "text-success" : "text-alert"}`}>{label}</span> sur un mois
     </span>
   );
 }
@@ -221,7 +221,7 @@ function BookingChannels({ share }: { share: number | null }) {
   return (
     <div className={`${ui.surface} p-5 sm:p-6`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="font-semibold text-forest">Canaux de réservation</p>
+        <p className="font-semibold text-brand">Canaux de réservation</p>
         <p className="text-sm text-anthracite/65">30 derniers jours</p>
       </div>
       <div
@@ -229,11 +229,11 @@ function BookingChannels({ share }: { share: number | null }) {
         role="img"
         aria-label={`${percent(share)} en ligne, ${percent(offline)} hors ligne`}
       >
-        <div className="h-full rounded-full bg-forest" style={{ width: `${share}%` }} />
+        <div className="h-full rounded-full bg-accent" style={{ width: `${share}%` }} />
       </div>
       <div className="mt-3 flex flex-wrap justify-between gap-2 text-sm">
         <p>
-          <span className="font-semibold text-forest">{percent(share)}</span>{" "}
+          <span className="font-semibold text-brand">{percent(share)}</span>{" "}
           <span className="text-anthracite/75">réservés en ligne sur Nadcel</span>
         </p>
         <p>

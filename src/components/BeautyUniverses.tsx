@@ -30,7 +30,7 @@ export default function BeautyUniverses() {
             <li key={label}>
               <Link
                 href={`/salons?q=${encodeURIComponent(query)}`}
-                className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-sage/20 shadow-[0_1px_2px_rgba(45,59,40,0.06),0_10px_28px_rgba(45,59,40,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_6px_rgba(45,59,40,0.08),0_22px_44px_rgba(45,59,40,0.2)]"
+                className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_22px_44px_rgba(90,50,35,0.2)]"
               >
                 <Image
                   src={image}
@@ -39,7 +39,7 @@ export default function BeautyUniverses() {
                   sizes="(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw"
                   className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
                 />
-                <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-forest/85 to-transparent" aria-hidden="true" />
+                <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-brand/85 to-transparent" aria-hidden="true" />
                 <span className="absolute bottom-4 left-4 right-4 text-base font-semibold text-beige">{label}</span>
               </Link>
             </li>

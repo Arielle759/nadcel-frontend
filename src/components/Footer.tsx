@@ -6,7 +6,7 @@ const CITIES = ["Dakar", "Thiès", "Saint-Louis", "Mbour"];
 
 export default function Footer() {
   return (
-    <footer className="bg-[#243020] px-6 pb-8 pt-16 text-beige sm:px-10">
+    <footer className="bg-cacao px-6 pb-8 pt-16 text-beige sm:px-10">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="flex max-w-sm flex-col gap-4">
