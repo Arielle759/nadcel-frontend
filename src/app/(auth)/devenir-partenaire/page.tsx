@@ -9,6 +9,7 @@ import { useManager } from "@/hooks/useManager";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { useMySalons, type MySalon } from "@/hooks/useMySalons";
 import PasswordField from "@/components/PasswordField";
+import FocusTopBar from "@/components/FocusTopBar";
 import { ui } from "@/lib/ui";
 
 const PASSWORD_MIN_LENGTH = 12;
@@ -282,8 +283,11 @@ export default function BecomePartnerPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col px-6 pb-24 pt-12 sm:px-10">
-      <div className="mx-auto grid w-full max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="flex flex-1 flex-col px-5 pb-20 pt-5 sm:px-10 lg:pt-8">
+      <div className="mx-auto w-full max-w-6xl">
+        <FocusTopBar />
+      </div>
+      <div className="mx-auto mt-10 grid w-full max-w-6xl gap-12 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0">
           <h1 className="text-4xl font-semibold tracking-tight text-brand sm:text-[2.75rem] sm:leading-[1.1]">
             Inscrire mon salon
@@ -294,7 +298,7 @@ export default function BecomePartnerPage() {
           <div className="mt-10">{content}</div>
         </div>
 
-        <aside className="flex flex-col gap-6 lg:sticky lg:top-28 lg:self-start">
+        <aside className="flex flex-col gap-6 lg:sticky lg:top-8 lg:self-start">
           <div className="relative hidden aspect-[4/3] overflow-hidden rounded-3xl lg:block">
             <Image src="/images/services/coiffure.jpg" alt="" fill sizes="380px" className="object-cover" />
           </div>
@@ -316,6 +320,6 @@ export default function BecomePartnerPage() {
           </div>
         </aside>
       </div>
-    </main>
+    </div>
   );
 }
