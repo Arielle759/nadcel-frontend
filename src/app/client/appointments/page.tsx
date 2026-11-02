@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ClientAppointment, useClientAppointments } from "@/hooks/useClientAppointments";
 import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
+import AddToCalendar from "@/components/AddToCalendar";
+import type { CalendarEvent } from "@/lib/calendar";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
@@ -25,6 +27,29 @@ function isUpcoming(appointment: ClientAppointment, now: number): boolean {
     (appointment.status === "pending" || appointment.status === "confirmed") &&
     new Date(appointment.scheduled_at).getTime() >= now
   );
+}
+
+function calendarEventFor(appointment: ClientAppointment): CalendarEvent {
+  const start = new Date(appointment.scheduled_at);
+  const minutes = appointment.duration ?? appointment.service.duration;
+  const { salon } = appointment;
+  const location = [salon.name, salon.address, salon.city].filter(Boolean).join(", ");
+  const details = [
+    `${appointment.service.name}${appointment.employee?.name ? ` avec ${appointment.employee.name}` : ""}.`,
+    `Prix : ${formatCurrency(Number(appointment.price))}, à régler au salon.`,
+    salon.phone ? `Salon : ${salon.phone}` : null,
+    "Réservé sur Nadcel.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return {
+    uid: `rdv-${appointment.id}@nadcel.sn`,
+    title: `${appointment.service.name} chez ${salon.name}`,
+    start,
+    end: new Date(start.getTime() + minutes * 60_000),
+    location,
+    details,
+  };
 }
 
 function formatTime(date: Date): string {
@@ -202,6 +227,8 @@ export default function ClientAppointmentsPage() {
             visible.map((appointment) => {
               const date = new Date(appointment.scheduled_at);
               const canCancel = clientCanCancel(appointment, now);
+              // Seulement une fois confirmé : un rendez-vous en attente peut encore être refusé.
+              const canAddToCalendar = appointment.status === "confirmed" && isUpcoming(appointment, now);
               const tooLateToCancel = appointment.status === "confirmed" && isUpcoming(appointment, now) && !canCancel;
               const canReview =
                 appointment.status === "completed" && !appointment.review && !reviewedIds.has(appointment.id);
@@ -260,10 +287,13 @@ export default function ClientAppointmentsPage() {
                         <p className="mt-2 text-sm font-medium text-brand">Merci, votre avis a été publié.</p>
                       )}
 
-                      {(canCancel || canReview || appointment.status === "completed" || appointment.status === "cancelled") &&
+                      {(canCancel || canReview || canAddToCalendar || appointment.status === "completed" || appointment.status === "cancelled") &&
                         !isReviewing &&
                         !isConfirmingCancel && (
                           <div className="mt-4 flex flex-wrap gap-2">
+                            {canAddToCalendar && (
+                              <AddToCalendar event={calendarEventFor(appointment)} filename={`nadcel-rendez-vous-${appointment.id}.ics`} />
+                            )}
                             {canReview && (
                               <button type="button" onClick={() => openReviewForm(appointment.id)} className={ui.buttonPrimary}>
                                 Laisser un avis

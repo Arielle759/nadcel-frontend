@@ -5,6 +5,9 @@ import type { AppointmentStatus, PaymentStatus } from "@/hooks/useManagerAppoint
 export interface ClientAppointmentSalon {
   id: number;
   name: string;
+  address?: string;
+  city?: string;
+  phone?: string | null;
 }
 
 export interface ClientAppointmentService {
