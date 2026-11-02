@@ -141,11 +141,11 @@ export default function ClientAppointmentsPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col px-6 pb-24 pt-12 sm:px-10">
+    <main className="flex flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10">
       <div className="mx-auto w-full max-w-4xl">
         <div className="flex flex-wrap items-end justify-between gap-6">
-          <h1 className={`${ui.sectionTitleBase} text-brand`}>
-            Mes réservations
+          <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">
+            Mes rendez-vous
           </h1>
           <Link href="/salons" className={ui.buttonPrimary}>
             Nouvelle réservation
