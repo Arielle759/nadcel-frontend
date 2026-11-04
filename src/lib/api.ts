@@ -79,6 +79,11 @@ function resolveErrorMessage(error: AxiosError<ApiErrorBody>): string {
 
   const { status, data } = error.response;
 
+  // Limite de requêtes : Laravel répond « Too Many Attempts. » en anglais.
+  if (status === 429) {
+    return "Trop de tentatives en peu de temps. Patientez une minute avant de réessayer.";
+  }
+
   if (data?.message) {
     return data.message;
   }
