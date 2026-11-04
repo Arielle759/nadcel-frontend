@@ -20,7 +20,6 @@ function EditEmployeeContent() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [serviceIds, setServiceIds] = useState<number[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
@@ -39,7 +38,6 @@ function EditEmployeeContent() {
         }
         setName(employee.name);
         setPhone(employee.phone);
-        setEmail(employee.user.email);
         setServiceIds(employee.services.map((service) => service.id));
       })
       .catch(() => {
@@ -101,17 +99,11 @@ function EditEmployeeContent() {
             </label>
             <input id="name" required value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
           </div>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="phone" className={ui.label}>
-                Téléphone
-              </label>
-              <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className={ui.input} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className={ui.label}>E-mail</span>
-              <p className="flex h-12 items-center px-1 text-anthracite/75">{email}</p>
-            </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="phone" className={ui.label}>
+              Téléphone
+            </label>
+            <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} className={ui.input} />
           </div>
         </section>
 

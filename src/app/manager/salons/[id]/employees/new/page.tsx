@@ -13,12 +13,11 @@ export default function NewEmployeePage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     try {
-      const employee = await createEmployee({ salon_id: Number(id), name, phone, email });
+      const employee = await createEmployee({ salon_id: Number(id), name, phone });
       // Étape suivante immédiate : choisir les prestations qu'il réalise.
       router.push(`/manager/salons/${id}/employees/${employee.id}?nouveau=1`);
     } catch {
@@ -40,19 +39,12 @@ export default function NewEmployeePage() {
           </label>
           <input id="name" required value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
         </div>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="phone" className={ui.label}>
-              Téléphone
-            </label>
-            <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="77 123 45 67" className={ui.input} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className={ui.label}>
-              E-mail
-            </label>
-            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={ui.input} />
-          </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="phone" className={ui.label}>
+            Téléphone
+          </label>
+          <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="77 123 45 67" className={ui.input} />
+          <p className="text-sm text-anthracite/70">Les membres de l&apos;équipe n&apos;ont pas de compte : vous gérez leur planning pour eux.</p>
         </div>
 
         {error && (

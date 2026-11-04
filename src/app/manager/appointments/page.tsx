@@ -444,7 +444,7 @@ function AppointmentRow({
 
           {open && !closing && !canceling && (
             <>
-              {a.status === "pending" && (
+              {a.status === "pending" && !started && (
                 <button
                   type="button"
                   disabled={busy}
@@ -454,7 +454,7 @@ function AppointmentRow({
                   Confirmer
                 </button>
               )}
-              {a.status !== "pending" && started && (
+              {started && (
                 <button
                   type="button"
                   disabled={busy}

@@ -8,13 +8,15 @@ export interface EmployeeUser {
   email: string;
 }
 
+// Un membre de l'équipe n'a pas de compte : user est absent pour les fiches
+// créées depuis cette version (les anciennes peuvent en avoir un).
 export interface Employee {
   id: number;
-  user_id: number;
+  user_id: number | null;
   salon_id: number;
   name: string;
   phone: string;
-  user: EmployeeUser;
+  user?: EmployeeUser | null;
   services: Service[];
 }
 
@@ -22,7 +24,6 @@ export interface CreateEmployeeData {
   salon_id: number;
   name: string;
   phone: string;
-  email: string;
 }
 
 export interface UpdateEmployeeData {
