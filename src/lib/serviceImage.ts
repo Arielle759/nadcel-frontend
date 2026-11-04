@@ -10,7 +10,7 @@ const SERVICE_NAME_IMAGES: Record<string, string> = {
 const CATEGORY_IMAGES: Record<string, string> = {
   coiffure: "/images/services/coiffure.jpg",
   coloration: "/images/services/coloration.jpg",
-  manucure: "/images/services/manucure.jpg",
+  manucure: "/images/services/manicure.jpg",
   soin: "/images/services/soin.jpg",
   massage: "/images/services/massage.jpg",
   epilation: "/images/services/epilation.jpg",

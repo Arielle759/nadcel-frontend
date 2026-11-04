@@ -11,6 +11,8 @@ export interface Service {
   category: string;
   image: string | null;
   is_active: boolean;
+  // Membres de l'équipe qui réalisent la prestation : 0 = aucun créneau possible.
+  employees_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -77,7 +79,7 @@ export function useServices(): UseServicesResult {
     setError(null);
     try {
       const { data } = await api.get<PaginatedResponse<Service>>("/services", {
-        params: { salon_id: salonId },
+        params: { salon_id: salonId, per_page: 100 },
       });
       return data.data;
     } catch (err) {

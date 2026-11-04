@@ -2,7 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SERVICE_CATEGORIES = ["Coiffure", "Coloration", "Manucure", "Massage", "Soin", "Épilation"];
-const CITIES = ["Dakar", "Thiès", "Saint-Louis", "Mbour"];
+// Seulement les villes où des salons sont déjà inscrits, pour ne jamais
+// promettre une recherche vide. « Tous les salons » couvre le reste.
+const CITIES = ["Dakar"];
 
 export default function Footer() {
   return (
@@ -56,13 +58,16 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-semibold text-beige">Villes populaires</span>
+          <span className="text-sm font-semibold text-beige">Villes</span>
           <nav className="flex flex-col gap-2.5 text-sm text-beige/75">
             {CITIES.map((city) => (
               <Link key={city} href={`/salons?q=${encodeURIComponent(city)}`} className="hover:text-beige">
                 Salons à {city}
               </Link>
             ))}
+            <Link href="/salons" className="hover:text-beige">
+              Tous les salons
+            </Link>
           </nav>
         </div>
         </div>

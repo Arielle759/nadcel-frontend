@@ -26,6 +26,7 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+  phone?: string | null;
   roles: AuthRole[];
 }
 
@@ -110,6 +111,8 @@ export function setUser(user: AuthUser): void {
   if (typeof window !== "undefined") {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   }
+  // Le nom affiché dans la barre latérale suit une modification du profil.
+  notifyAuthChange();
 }
 
 export function hasRole(role: string): boolean {

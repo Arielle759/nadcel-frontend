@@ -20,7 +20,7 @@ export default function Navbar() {
   const user = useCurrentUser();
   const isAdmin = user?.roles?.some((r) => r.name === "admin") ?? false;
   const isGerant = user?.roles?.some((r) => r.name === "gerant") ?? false;
-  const dashboardLabel = isAdmin ? "Administration" : isGerant ? "Tableau de bord" : "Mes réservations";
+  const dashboardLabel = isAdmin ? "Administration" : isGerant ? "Tableau de bord" : "Mes rendez-vous";
   const dashboardHref = isAdmin
     ? "/admin/dashboard"
     : isGerant

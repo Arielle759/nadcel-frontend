@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, Calendar, Clock3, XCircle } from "lucide-react";
+import { LayoutDashboard, Building2, Calendar, Clock3, XCircle, UserRound } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { useManagerSalons } from "@/hooks/useManagerSalons";
@@ -31,6 +31,7 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/manager/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/manager/salons", label: "Mes salons", icon: Building2, matchSubpaths: true },
   { href: "/manager/appointments", label: "Rendez-vous", icon: Calendar, matchSubpaths: true },
+  { href: "/manager/profil", label: "Mon profil", icon: UserRound },
 ];
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {

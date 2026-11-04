@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarCheck, Search } from "lucide-react";
+import { CalendarCheck, Search, UserRound } from "lucide-react";
 import { useIsAuthenticated } from "@/hooks/useAuthState";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
@@ -14,6 +14,7 @@ import PrivateSpaceMessage from "@/components/PrivateSpaceMessage";
 const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/client/appointments", label: "Mes rendez-vous", icon: CalendarCheck },
   { href: "/salons", label: "Réserver un salon", icon: Search },
+  { href: "/client/profil", label: "Mon profil", icon: UserRound },
 ];
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {

@@ -143,13 +143,18 @@ export default async function SalonDetailPage({
                             <span className="hidden w-28 shrink-0 text-right font-semibold text-anthracite sm:block">
                               {formatCurrency(service.price)}
                             </span>
-                            <Link
-                              href={`${bookingHref}?service=${service.id}`}
-                              className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-brand/[0.07] px-5 text-sm font-semibold text-brand transition-colors hover:bg-brand hover:text-beige"
-                              aria-label={`Réserver : ${service.name}`}
-                            >
-                              Réserver
-                            </Link>
+                            {service.employees_count === 0 ? (
+                              // Personne ne la réalise encore : pas de faux bouton menant à un calendrier vide.
+                              <span className="w-24 shrink-0 text-right text-xs font-medium text-anthracite/60">Sur place uniquement</span>
+                            ) : (
+                              <Link
+                                href={`${bookingHref}?service=${service.id}`}
+                                className="inline-flex min-h-11 shrink-0 items-center rounded-full bg-brand/[0.07] px-5 text-sm font-semibold text-brand transition-colors hover:bg-brand hover:text-beige"
+                                aria-label={`Réserver : ${service.name}`}
+                              >
+                                Réserver
+                              </Link>
+                            )}
                           </li>
                         );
                       })}

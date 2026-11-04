@@ -8,7 +8,7 @@ import { ui } from "@/lib/ui";
 const UNIVERSES = [
   { label: "Coiffure", query: "Coiffure", image: "/images/services/coiffure.jpg" },
   { label: "Barbier", query: "Coupe homme", image: "/images/services/coupe-homme.jpg" },
-  { label: "Onglerie", query: "Manucure", image: "/images/services/manucure.jpg" },
+  { label: "Onglerie", query: "Manucure", image: "/images/services/manicure.jpg" },
   { label: "Soin du visage", query: "Soin", image: "/images/services/soin.jpg" },
   { label: "Massage", query: "Massage", image: "/images/services/massage.jpg" },
   { label: "Épilation", query: "Épilation", image: "/images/services/epilation.jpg" },

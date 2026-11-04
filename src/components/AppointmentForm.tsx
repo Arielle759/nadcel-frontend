@@ -194,6 +194,11 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
   const selectedService = services.find((s) => s.id === serviceId);
   const isDayUnavailable = (date: Date) => availability[toDateInputValue(date)] === false;
+  // Personne ne réalise cette prestation : aucun créneau ne pourra s'ouvrir.
+  const noStaffForService = selectedService?.employees_count === 0;
+  // Disponibilités chargées et aucun des prochains jours n'est libre.
+  const noDayInStrip =
+    !availabilityLoading && Object.keys(availability).length > 0 && stripDays.every((day) => isDayUnavailable(day));
   const ready = Boolean(selectedService && selectedDate && heure);
 
   function chooseService(id: number) {
@@ -356,55 +361,69 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
         <fieldset className="min-w-0">
           <legend className="font-heading text-2xl font-semibold text-brand">2. Jour</legend>
-          <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Prochains jours">
-            {stripDays.map((day) => {
-              const unavailable = isDayUnavailable(day);
-              const selected = sameDay(selectedDate, day);
-              return (
+          {noStaffForService ? (
+            <div className="mt-4 rounded-2xl bg-sable/20 px-5 py-4 text-sm leading-6 text-anthracite/85">
+              <p className="font-semibold text-brand">Cette prestation n&apos;est pas encore réservable en ligne.</p>
+              <p className="mt-1">Choisissez une autre prestation ci-dessus, ou contactez directement le salon.</p>
+            </div>
+          ) : (
+            <>
+              <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-2" role="group" aria-label="Prochains jours">
+                {stripDays.map((day) => {
+                  const unavailable = isDayUnavailable(day);
+                  const selected = sameDay(selectedDate, day);
+                  return (
+                    <button
+                      key={toDateInputValue(day)}
+                      type="button"
+                      disabled={unavailable}
+                      aria-pressed={selected}
+                      aria-label={`${formatLongDate(day)}${unavailable ? ", complet ou fermé" : ""}`}
+                      onClick={() => chooseDate(day)}
+                      className={`flex w-16 shrink-0 flex-col items-center rounded-2xl border py-3 transition-colors ${
+                        selected
+                          ? "border-brand bg-brand text-beige"
+                          : unavailable
+                            ? "cursor-not-allowed border-transparent bg-sable/10 text-anthracite/40"
+                            : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(90,50,35,0.05),0_6px_16px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.07),0_10px_22px_rgba(90,50,35,0.12)]"
+                      }`}
+                    >
+                      <span className="text-xs">{day.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
+                      <span className="text-lg font-semibold">{day.getDate()}</span>
+                      <span className="text-xs">{day.toLocaleDateString("fr-FR", { month: "short" })}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 <button
-                  key={toDateInputValue(day)}
                   type="button"
-                  disabled={unavailable}
-                  aria-pressed={selected}
-                  aria-label={`${formatLongDate(day)}${unavailable ? ", complet ou fermé" : ""}`}
-                  onClick={() => chooseDate(day)}
-                  className={`flex w-16 shrink-0 flex-col items-center rounded-2xl border py-3 transition-colors ${
-                    selected
-                      ? "border-brand bg-brand text-beige"
-                      : unavailable
-                        ? "cursor-not-allowed border-transparent bg-sable/10 text-anthracite/40"
-                        : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(90,50,35,0.05),0_6px_16px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.07),0_10px_22px_rgba(90,50,35,0.12)]"
-                  }`}
+                  onClick={() => setShowCalendar((open) => !open)}
+                  aria-expanded={showCalendar}
+                  className={`${ui.buttonSecondary} min-h-10 px-5`}
                 >
-                  <span className="text-xs">{day.toLocaleDateString("fr-FR", { weekday: "short" })}</span>
-                  <span className="text-lg font-semibold">{day.getDate()}</span>
-                  <span className="text-xs">{day.toLocaleDateString("fr-FR", { month: "short" })}</span>
+                  {showCalendar ? "Masquer le calendrier" : "Choisir une date plus lointaine"}
                 </button>
-              );
-            })}
-          </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <button
-              type="button"
-              onClick={() => setShowCalendar((open) => !open)}
-              aria-expanded={showCalendar}
-              className={`${ui.buttonSecondary} min-h-10 px-5`}
-            >
-              {showCalendar ? "Masquer le calendrier" : "Choisir une date plus lointaine"}
-            </button>
-            {availabilityLoading && <span className="text-anthracite/70">Mise à jour des disponibilités...</span>}
-          </div>
-          {showCalendar && (
-            <DayPicker
-              mode="single"
-              selected={selectedDate}
-              onSelect={chooseDate}
-              month={calendarMonth}
-              onMonthChange={setCalendarMonth}
-              disabled={[{ before: today }, isDayUnavailable]}
-              locale={fr}
-              className={`appointment-calendar ${ui.surface} mt-4 w-fit p-4`}
-            />
+                {availabilityLoading && <span className="text-anthracite/70">Mise à jour des disponibilités...</span>}
+              </div>
+              {showCalendar && (
+                <DayPicker
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={chooseDate}
+                  month={calendarMonth}
+                  onMonthChange={setCalendarMonth}
+                  disabled={[{ before: today }, isDayUnavailable]}
+                  locale={fr}
+                  className={`appointment-calendar ${ui.surface} mt-4 w-fit p-4`}
+                />
+              )}
+              {noDayInStrip && !showCalendar && (
+                <p className="mt-3 text-sm text-anthracite/75" role="status">
+                  Aucun créneau libre sur les {STRIP_DAYS} prochains jours. Ouvrez le calendrier pour voir les semaines suivantes.
+                </p>
+              )}
+            </>
           )}
         </fieldset>
 

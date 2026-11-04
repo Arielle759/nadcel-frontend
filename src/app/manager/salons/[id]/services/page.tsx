@@ -74,6 +74,14 @@ export default function ManagerServicesPage() {
                   <p className="text-sm text-anthracite/75">
                     {service.category}, {formatDuration(service.duration)}
                   </p>
+                  {service.employees_count === 0 && (
+                    <p className="mt-1 text-sm font-medium text-alert">
+                      Personne dans l&apos;équipe ne la réalise : elle n&apos;est pas réservable.{" "}
+                      <Link href={`/manager/salons/${id}/employees`} className={ui.textLink}>
+                        Ouvrir l&apos;équipe
+                      </Link>
+                    </p>
+                  )}
                 </div>
                 <p className="w-28 text-right font-semibold text-anthracite">{formatCurrency(Number(service.price))}</p>
                 <div className="flex flex-wrap items-center gap-1">
