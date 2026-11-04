@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { resizeImage } from "@/lib/resizeImage";
 import { ui } from "@/lib/ui";
 
 export default function ImageUploadInput({
@@ -16,6 +17,7 @@ export default function ImageUploadInput({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   // Un clic sur « Retirer » vide le cadre au lieu de revenir à currentImageUrl.
   const [removed, setRemoved] = useState(false);
+  const [preparing, setPreparing] = useState(false);
 
   // Libère l'URL temporaire quand elle est remplacée ou que le formulaire disparaît.
   useEffect(() => {
@@ -24,10 +26,14 @@ export default function ImageUploadInput({
     };
   }, [previewUrl]);
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
+  async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const original = e.target.files?.[0] ?? null;
+    if (!original) return;
+    setPreparing(true);
+    const file = await resizeImage(original);
+    setPreparing(false);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(file ? URL.createObjectURL(file) : null);
+    setPreviewUrl(URL.createObjectURL(file));
     setRemoved(false);
     onChange(file);
   }
@@ -56,15 +62,15 @@ export default function ImageUploadInput({
           )}
         </div>
         <div className="flex flex-col items-start gap-1">
-          <button type="button" onClick={() => inputRef.current?.click()} className={ui.buttonSecondary}>
-            {displayUrl ? "Changer la photo" : "Choisir une photo"}
+          <button type="button" onClick={() => inputRef.current?.click()} disabled={preparing} className={ui.buttonSecondary}>
+            {preparing ? "Préparation de la photo..." : displayUrl ? "Changer la photo" : "Choisir une photo"}
           </button>
           {displayUrl && (
             <button type="button" onClick={handleRemove} className="px-2 py-1 text-sm font-semibold text-red-800 hover:text-red-900">
               Retirer
             </button>
           )}
-          <span className="px-2 text-xs text-anthracite/60">JPG ou PNG, format paysage de préférence.</span>
+          <span className="px-2 text-xs text-anthracite/60">JPG ou PNG, format paysage de préférence. Les photos du téléphone sont acceptées.</span>
         </div>
       </div>
     </div>
