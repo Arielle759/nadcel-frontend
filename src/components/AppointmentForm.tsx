@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import SuccessMark from "@/components/motion/SuccessMark";
 import Link from "next/link";
 import { DayPicker } from "react-day-picker";
 import { fr } from "date-fns/locale";
@@ -241,7 +243,16 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
   if (success && selectedService && selectedDate) {
     return (
-      <section aria-live="polite" className={`${ui.surface} mx-auto w-full max-w-xl rounded-3xl p-8 text-center sm:p-10`}>
+      <motion.section
+        aria-live="polite"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className={`${ui.surface} mx-auto w-full max-w-xl rounded-3xl p-8 text-center sm:p-10`}
+      >
+        <div className="mb-5 flex justify-center">
+          <SuccessMark />
+        </div>
         <p className="font-heading text-3xl font-semibold text-brand">Demande envoyée</p>
         <p className="mt-4 leading-7 text-anthracite/85">
           {selectedService.name} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
@@ -257,7 +268,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
             Retour au salon
           </Link>
         </div>
-      </section>
+      </motion.section>
     );
   }
 

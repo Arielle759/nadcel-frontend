@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 import { useSalons } from "@/hooks/useSalons";
 import SalonGrid from "@/components/SalonGrid";
 import SectionHeading from "@/components/SectionHeading";
@@ -12,7 +13,7 @@ export default function PopularSalons() {
   return (
     <section aria-labelledby="salons-title" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+        <Reveal className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
             id="salons-title"
             title="Salons à découvrir"
@@ -23,7 +24,7 @@ export default function PopularSalons() {
               Voir les {total} salons
             </Link>
           )}
-        </div>
+        </Reveal>
 
         <SalonGrid salons={salons} loading={loading} error={error} emptyMessage="Aucun salon disponible pour le moment." />
       </div>

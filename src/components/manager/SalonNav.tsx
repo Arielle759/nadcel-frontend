@@ -20,7 +20,7 @@ export default function SalonNav({ salonId, current }: { salonId: string | numbe
           key={item.key}
           href={item.href}
           aria-current={item.key === current ? "page" : undefined}
-          className={`flex min-h-10 shrink-0 items-center rounded-full px-5 text-sm font-semibold transition-colors ${
+          className={`flex min-h-10 shrink-0 items-center rounded-full px-5 text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
             item.key === current ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
           }`}
         >

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 import type { Salon } from "@/hooks/useSalons";
 import { assetUrl } from "@/lib/api";
 import SalonRating from "@/components/SalonRating";
@@ -32,11 +33,12 @@ export default function SalonGrid({
 
   return (
     <div className="grid w-full grid-cols-1 gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-      {salons.map((salon) => {
+      {salons.map((salon, index) => {
         const cover = assetUrl(salon.cover ?? salon.logo);
         const categories = salon.service_categories.slice(0, 3).join(", ");
         return (
-          <Link key={salon.id} href={`/salons/${salon.id}`} className="group flex min-w-0 flex-col">
+          <Reveal key={salon.id} delay={(index % 3) * 110} className="min-w-0">
+          <Link href={`/salons/${salon.id}`} className="group flex min-w-0 flex-col">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-shadow duration-300 group-hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_20px_44px_rgba(90,50,35,0.18)]">
               {cover ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -67,6 +69,7 @@ export default function SalonGrid({
               </p>
             </div>
           </Link>
+          </Reveal>
         );
       })}
     </div>

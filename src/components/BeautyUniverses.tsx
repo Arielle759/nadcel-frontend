@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
@@ -18,16 +19,16 @@ export default function BeautyUniverses() {
   return (
     <section aria-labelledby="universes-title" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <div className="flex flex-wrap items-end justify-between gap-6">
+        <Reveal className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading id="universes-title" title="Que souhaitez-vous faire ?" />
           <Link href="/salons" className={ui.buttonSecondary}>
             Tous les salons
           </Link>
-        </div>
+        </Reveal>
 
         <ul className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          {UNIVERSES.map(({ label, query, image }) => (
-            <li key={label}>
+          {UNIVERSES.map(({ label, query, image }, index) => (
+            <Reveal as="li" key={label} delay={index * 70}>
               <Link
                 href={`/salons?q=${encodeURIComponent(query)}`}
                 className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_22px_44px_rgba(90,50,35,0.2)]"
@@ -42,7 +43,7 @@ export default function BeautyUniverses() {
                 <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-brand/85 to-transparent" aria-hidden="true" />
                 <span className="absolute bottom-4 left-4 right-4 text-base font-semibold text-beige">{label}</span>
               </Link>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CountUp from "@/components/motion/CountUp";
 import { useCallback, useEffect, useState } from "react";
 import { AdminSalon, AdminStats, useAdmin } from "@/hooks/useAdmin";
 import ManagerPage from "@/components/manager/ManagerPage";
@@ -73,23 +74,32 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
               <Kpi
                 label="Salons en ligne"
-                value={stats.salons.online}
+                value={<CountUp value={stats.salons.online} />}
                 hint={stats.salons.suspended > 0 ? `${stats.salons.suspended} suspendu${stats.salons.suspended > 1 ? "s" : ""}` : "Aucun suspendu"}
                 href="/admin/salons/all"
               />
               <Kpi
                 label="Clientes inscrites"
-                value={stats.users.clients.toLocaleString("fr-FR")}
+                value={<CountUp value={stats.users.clients} />}
                 hint={`${stats.users.new_clients} ce mois-ci`}
               />
               <Kpi
                 label="Rendez-vous ce mois-ci"
-                value={stats.appointments.this_month.toLocaleString("fr-FR")}
+                value={<CountUp value={stats.appointments.this_month} />}
                 hint={<Trend value={stats.appointments.trend} />}
               />
               <Kpi
                 label="Taux d'annulation"
-                value={percent(stats.appointments.cancellation_rate)}
+                value={
+                  stats.appointments.cancellation_rate === null ? (
+                    percent(null)
+                  ) : (
+                    <CountUp
+                      value={stats.appointments.cancellation_rate}
+                      format={(n) => `${n.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`}
+                    />
+                  )
+                }
                 hint="Sur les 30 derniers jours"
               />
             </div>
@@ -184,7 +194,7 @@ function Kpi({
   href,
 }: {
   label: string;
-  value: number | string;
+  value: React.ReactNode;
   hint?: React.ReactNode;
   href?: string;
 }) {

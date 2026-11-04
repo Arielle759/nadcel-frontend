@@ -70,7 +70,7 @@ function MonthlyBars({
             separator=""
             contentStyle={{ borderRadius: 12, border: "none", boxShadow: "0 8px 24px rgba(90,50,35,0.12)" }}
           />
-          <Bar dataKey={dataKey} radius={[6, 6, 0, 0]} maxBarSize={28} isAnimationActive={false}>
+          <Bar dataKey={dataKey} radius={[6, 6, 0, 0]} maxBarSize={28} animationDuration={700} animationEasing="ease-out">
             {data.map((row) => (
               <Cell key={row.month} fill={color} fillOpacity={row.is_partial ? 0.4 : 1} />
             ))}

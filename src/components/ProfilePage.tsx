@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useProfile } from "@/hooks/useProfile";
+import SuccessMark from "@/components/motion/SuccessMark";
 import ManagerPage from "@/components/manager/ManagerPage";
 import PasswordField from "@/components/PasswordField";
 import { ui } from "@/lib/ui";
@@ -13,9 +15,17 @@ type Feedback = { ok: boolean; text: string } | null;
 function FeedbackLine({ feedback }: { feedback: Feedback }) {
   if (!feedback) return null;
   return (
-    <p role={feedback.ok ? "status" : "alert"} className={`text-sm font-medium ${feedback.ok ? "text-success" : "text-alert"}`}>
+    <motion.p
+      key={feedback.text}
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      role={feedback.ok ? "status" : "alert"}
+      className={`flex items-center gap-2 text-sm font-medium ${feedback.ok ? "text-success" : "text-alert"}`}
+    >
+      {feedback.ok && <SuccessMark size={20} />}
       {feedback.text}
-    </p>
+    </motion.p>
   );
 }
 

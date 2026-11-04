@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import CountUp from "@/components/motion/CountUp";
 import { useState } from "react";
 
 import {
@@ -127,18 +128,18 @@ function KpiRow({
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <Kpi
         label="Prestations réalisées"
-        value={data ? data.totals.completed : placeholder}
+        value={data ? <CountUp value={data.totals.completed} /> : placeholder}
         trend={data ? <TrendBadge trend={data.totals.trend} /> : null}
       />
       <Kpi
         label="Chiffre d'affaires encaissé"
-        value={data ? formatCurrency(data.totals.revenue) : placeholder}
+        value={data ? <CountUp value={data.totals.revenue} format={formatCurrency} /> : placeholder}
         hint="Payé sur place, noté à la clôture"
       />
-      <Kpi label="Rendez-vous à venir" value={upcoming ?? placeholder} />
+      <Kpi label="Rendez-vous à venir" value={upcoming !== null ? <CountUp value={upcoming} /> : placeholder} />
       <Kpi
         label="À clôturer"
-        value={toClose ?? placeholder}
+        value={toClose !== null ? <CountUp value={toClose} /> : placeholder}
         tone={toClose ? "warning" : "neutral"}
         hint={toClose ? "Rendez-vous passés sans paiement noté" : "Tout est à jour"}
         href={toClose ? "/manager/appointments" : undefined}
@@ -156,7 +157,7 @@ function Kpi({
   href,
 }: {
   label: string;
-  value: number | string;
+  value: React.ReactNode;
   trend?: React.ReactNode;
   hint?: string;
   tone?: "neutral" | "warning";

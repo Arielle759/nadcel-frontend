@@ -1,6 +1,7 @@
 "use client";
 
 import { useSalons } from "@/hooks/useSalons";
+import CountUp from "@/components/motion/CountUp";
 
 function formatRating(value: number): string {
   return value.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -18,16 +19,19 @@ export default function TrustSection() {
   );
   const averageRating = reviewCount > 0 ? weightedSum / reviewCount : null;
 
-  const items = [
+  const items: { value: React.ReactNode; label: string }[] = [
     {
-      value: loading || total === null ? "…" : String(total),
+      value: loading || total === null ? "…" : <CountUp value={total} />,
       label: total === 1 ? "salon vérifié par notre équipe" : "salons vérifiés par notre équipe",
     },
     averageRating !== null
-      ? { value: `${formatRating(averageRating)} / 5`, label: `note moyenne sur ${reviewCount} avis` }
+      ? {
+          value: <CountUp value={averageRating} format={(n) => `${formatRating(n)} / 5`} />,
+          label: `note moyenne sur ${reviewCount} avis`,
+        }
       : { value: "Avis", label: "laissés uniquement après un rendez-vous terminé" },
     { value: "0 F", label: "de frais de réservation, vous payez au salon" },
-    { value: "24 h", label: "avant le rendez-vous, un rappel par e-mail" },
+    { value: <CountUp value={24} format={(n) => `${Math.round(n)} h`} />, label: "avant le rendez-vous, un rappel par e-mail" },
   ];
 
   return (

@@ -85,3 +85,47 @@ h3,
 .appointment-calendar .rdp-chevron {
   fill: var(--color-brand-soft);
 }
+
+/* Mouvement ----------------------------------------------------------------
+   Discret et utile : apparition des sections au défilement, photos de
+   l'accueil qui se relaient. Tout s'arrête si l'utilisateur a demandé à
+   réduire les animations dans les réglages de son appareil. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  [data-reveal="shown"] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .hero-slide-zoom {
+    animation: hero-zoom 9s ease-out forwards;
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

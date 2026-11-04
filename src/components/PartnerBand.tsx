@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
 
@@ -21,6 +22,7 @@ export default function PartnerBand() {
   return (
     <section aria-labelledby="partner-title" className="mt-28 bg-brand px-6 py-24 sm:px-10">
       <div className="mx-auto max-w-6xl">
+        <Reveal>
         <SectionHeading
           id="partner-title"
           title="Vous gérez un salon ?"
@@ -35,13 +37,19 @@ export default function PartnerBand() {
             Déjà partenaire ? Se connecter
           </Link>
         </div>
+        </Reveal>
 
         <ul className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {BENEFITS.map(({ title, description }) => (
-            <li key={title} className="rounded-2xl bg-beige/[0.06] p-7 ring-1 ring-inset ring-beige/10">
+          {BENEFITS.map(({ title, description }, index) => (
+            <Reveal
+              as="li"
+              key={title}
+              delay={index * 120}
+              className="rounded-2xl bg-beige/[0.06] p-7 ring-1 ring-inset ring-beige/10"
+            >
               <h3 className="text-lg font-semibold text-beige">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-beige/75">{description}</p>
-            </li>
+            </Reveal>
           ))}
         </ul>
       </div>

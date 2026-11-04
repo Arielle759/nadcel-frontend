@@ -1,4 +1,5 @@
 import SectionHeading from "@/components/SectionHeading";
+import Reveal from "@/components/motion/Reveal";
 import { ui } from "@/lib/ui";
 
 const STEPS = [
@@ -23,21 +24,23 @@ export default function FeaturesSection() {
   return (
     <section aria-labelledby="how-it-works" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          id="how-it-works"
-          title="Votre rendez-vous, sans passer un appel"
-          description="Trois étapes depuis votre téléphone. Le salon confirme ensuite votre rendez-vous, et vous le retrouvez dans votre espace."
-        />
+        <Reveal>
+          <SectionHeading
+            id="how-it-works"
+            title="Votre rendez-vous, sans passer un appel"
+            description="Trois étapes depuis votre téléphone. Le salon confirme ensuite votre rendez-vous, et vous le retrouvez dans votre espace."
+          />
+        </Reveal>
 
         <ol className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {STEPS.map(({ number, title, description }) => (
-            <li key={number} className={`${ui.surface} p-7`}>
+          {STEPS.map(({ number, title, description }, index) => (
+            <Reveal as="li" key={number} delay={index * 120} className={`${ui.surface} p-7`}>
               <span className="font-heading text-3xl font-semibold text-accent" aria-hidden="true">
                 {number}
               </span>
               <h3 className="mt-5 text-xl font-semibold text-brand">{title}</h3>
               <p className="mt-2 text-sm leading-6 text-anthracite/75">{description}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </div>

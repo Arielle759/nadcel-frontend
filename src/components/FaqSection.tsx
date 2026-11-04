@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Reveal from "@/components/motion/Reveal";
 import { ChevronDown } from "lucide-react";
 import { ui } from "@/lib/ui";
 
@@ -38,17 +39,17 @@ export default function FaqSection() {
   return (
     <section className="px-6 pt-28 sm:px-10">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
-        <div className="lg:sticky lg:top-28 lg:self-start">
+        <Reveal className="lg:sticky lg:top-28 lg:self-start">
           <h2 className={ui.sectionTitle}>Questions fréquentes</h2>
           <p className="mt-4 max-w-md leading-7 text-anthracite/70">Tout ce qu&apos;il faut savoir pour réserver sereinement ou rejoindre Nadcel en tant que salon.</p>
           <a href="mailto:contact@nadcel.sn" className="mt-7 inline-flex items-center gap-2 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-brand shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] transition-shadow hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_12px_28px_rgba(90,50,35,0.12)]">Nous contacter</a>
-        </div>
+        </Reveal>
         <div className="flex flex-col gap-3">
         {FAQ_ITEMS.map((item, index) => {
           const isOpen = openIndex === index;
           return (
+            <Reveal key={item.question} delay={index * 70}>
             <div
-              key={item.question}
               className={`overflow-hidden rounded-2xl bg-white transition-shadow duration-200 ${
                 isOpen
                   ? "shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.11)]"
@@ -73,6 +74,7 @@ export default function FaqSection() {
                 <div className="px-5 pb-5 text-sm leading-7 text-anthracite/80 sm:px-6">{item.answer}</div>
               )}
             </div>
+            </Reveal>
           );
         })}
         </div>

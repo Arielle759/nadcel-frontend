@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import { logout } from "@/lib/auth";
@@ -57,12 +58,21 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
                   key={href}
                   href={href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-11 shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 text-sm font-semibold transition-colors ${
-                    active ? "bg-beige text-brand" : "text-beige/75 hover:bg-beige/10 hover:text-beige"
+                  className={`relative flex min-h-11 shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 text-sm font-semibold transition-colors ${
+                    active ? "text-brand" : "text-beige/75 hover:bg-beige/10 hover:text-beige"
                   }`}
                 >
-                  <Icon size={18} className="shrink-0" aria-hidden="true" />
-                  {label}
+                  {/* Le fond ivoire glisse d'une rubrique à l'autre. */}
+                  {active && (
+                    <motion.span
+                      layoutId="dashboard-nav-active"
+                      className="absolute inset-0 rounded-xl bg-beige"
+                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                      aria-hidden="true"
+                    />
+                  )}
+                  <Icon size={18} className="relative shrink-0" aria-hidden="true" />
+                  <span className="relative">{label}</span>
                 </Link>
               );
             })}
@@ -85,7 +95,17 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+      {/* Changement de rubrique : léger fondu montant. Pas d'animation de sortie
+          (voir PageTransition : elle lancerait les appels de la page deux fois). */}
+      <motion.div
+        key={pathname}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="flex min-w-0 flex-1 flex-col"
+      >
+        {children}
+      </motion.div>
     </div>
   );
 }

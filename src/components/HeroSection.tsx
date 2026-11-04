@@ -2,7 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import HeroSlideshow from "@/components/HeroSlideshow";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
@@ -45,14 +45,7 @@ export default function HeroSection() {
       variants={containerVariants}
       className="relative flex min-h-[620px] overflow-hidden px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
     >
-      <Image
-        src="/images/services/soin.jpg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-center"
-      />
+      <HeroSlideshow />
       <div className="absolute inset-0 bg-gradient-to-r from-brand/95 via-brand/75 to-brand/15" />
 
       <div className="relative mx-auto flex w-full max-w-6xl items-center">

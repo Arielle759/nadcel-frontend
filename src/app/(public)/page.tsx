@@ -5,8 +5,10 @@ import FeaturesSection from "@/components/FeaturesSection";
 import PopularSalons from "@/components/PopularSalons";
 import FaqSection from "@/components/FaqSection";
 import PartnerBand from "@/components/PartnerBand";
+import ReviewsShowcase from "@/components/ReviewsShowcase";
 
-// Pas d'apparition au défilement : le contenu reste visible même si le
+// Les sections apparaissent en douceur au défilement (composant Reveal), mais
+// leur contenu est rendu visible côté serveur : il reste lisible même si le
 // JavaScript tarde à charger (connexion mobile lente).
 export default function Home() {
   return (
@@ -16,6 +18,7 @@ export default function Home() {
       <BeautyUniverses />
       <FeaturesSection />
       <PopularSalons />
+      <ReviewsShowcase />
       <FaqSection />
       <PartnerBand />
     </main>
