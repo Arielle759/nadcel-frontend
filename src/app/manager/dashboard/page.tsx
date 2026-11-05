@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useManager, ManagerStats } from "@/hooks/useManager";
 import ActivitySection from "@/components/manager/ActivitySection";
 import RemindersCard from "@/components/manager/RemindersCard";
 import ManagerPage from "@/components/manager/ManagerPage";
-import { ui } from "@/lib/ui";
+import WelcomeBanner from "@/components/manager/WelcomeBanner";
 
 export default function ManagerDashboardPage() {
   const { getSalonStats } = useManager();
@@ -33,16 +32,7 @@ export default function ManagerDashboardPage() {
     <ManagerPage
       title="Tableau de bord"
       description="L'activité de votre salon et ce qui demande votre attention."
-      actions={
-        <>
-          <Link href="/manager/appointments" className={ui.buttonPrimary}>
-            Voir les rendez-vous
-          </Link>
-          <Link href="/manager/salons" className={ui.buttonSecondary}>
-            Mes salons
-          </Link>
-        </>
-      }
+      hero={<WelcomeBanner upcoming={stats?.upcoming ?? null} toClose={stats?.to_close ?? null} />}
     >
       {error && (
         <p role="alert" className="mb-4 text-sm text-red-700">

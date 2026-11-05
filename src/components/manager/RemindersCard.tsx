@@ -76,7 +76,7 @@ export default function RemindersCard() {
   return (
     <section aria-labelledby="reminders-title" className={`${ui.surface} mb-6 p-5 sm:p-6`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="reminders-title" className="font-semibold text-brand">
+        <h2 id="reminders-title" className="text-lg font-semibold text-anthracite">
           Rappels à envoyer pour demain
         </h2>
         <p className="text-sm text-anthracite/70">
@@ -86,16 +86,24 @@ export default function RemindersCard() {
       <p className="mt-1 text-sm text-anthracite/70">
         Ces clientes ont réservé par WhatsApp, téléphone ou au salon : elles ne reçoivent pas l&apos;e-mail automatique.
       </p>
-      <ul className="mt-4 flex flex-col gap-2">
+      <ul className="mt-5 flex flex-col gap-4">
         {toRemind.map((a) => (
-          <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-beige px-4 py-3">
-            <div className="min-w-0">
-              <p className="font-semibold text-anthracite">
-                {timeLabel(a.scheduled_at)}, {appointmentClientName(a)}
-              </p>
-              <p className="text-sm text-anthracite/70">
-                {a.service?.name}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
-              </p>
+          <li key={a.id} className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-4">
+              <span
+                aria-hidden="true"
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-beige font-heading text-lg font-semibold text-brand"
+              >
+                {appointmentClientName(a).charAt(0).toUpperCase()}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-anthracite">
+                  {timeLabel(a.scheduled_at)}, {appointmentClientName(a)}
+                </p>
+                <p className="mt-0.5 text-xs text-anthracite/55">
+                  {a.service?.name}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
+                </p>
+              </div>
             </div>
             <WhatsAppReminderButton
               appointment={a}

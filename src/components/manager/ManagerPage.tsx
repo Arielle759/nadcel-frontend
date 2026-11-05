@@ -7,6 +7,7 @@ export default function ManagerPage({
   description,
   actions,
   back,
+  hero,
   children,
   width = "wide",
 }: {
@@ -14,6 +15,8 @@ export default function ManagerPage({
   description?: string;
   actions?: React.ReactNode;
   back?: { href: string; label: string };
+  // Remplace le titre par un bandeau (tableau de bord).
+  hero?: React.ReactNode;
   children: React.ReactNode;
   width?: "wide" | "narrow";
 }) {
@@ -25,13 +28,15 @@ export default function ManagerPage({
             {back.label}
           </Link>
         )}
-        <div className={`flex flex-wrap items-end justify-between gap-4 ${back ? "mt-3" : ""}`}>
-          <div className="min-w-0">
-            <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">{title}</h1>
-            {description && <p className="mt-2 max-w-2xl text-anthracite/75">{description}</p>}
+        {hero ?? (
+          <div className={`flex flex-wrap items-end justify-between gap-4 ${back ? "mt-3" : ""}`}>
+            <div className="min-w-0">
+              <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">{title}</h1>
+              {description && <p className="mt-2 max-w-2xl text-anthracite/75">{description}</p>}
+            </div>
+            {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
           </div>
-          {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
-        </div>
+        )}
         <div className="mt-8">{children}</div>
       </div>
     </main>

@@ -31,6 +31,8 @@ const PERIODS: { key: ActivityPeriod; label: string }[] = [
 const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
 const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6";
+// Petit libellé en capitales au-dessus des chiffres.
+const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/55";
 
 export default function ActivitySection({
   upcoming,
@@ -45,7 +47,7 @@ export default function ActivitySection({
   return (
     <section className="flex flex-col gap-4" aria-busy={loading}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-brand">Activité du salon</h2>
+        <h2 className="text-lg font-semibold text-anthracite">Activité du salon</h2>
         <div role="group" aria-label="Période analysée" className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
           {PERIODS.map(({ key, label }) => (
             <button
@@ -125,7 +127,7 @@ function KpiRow({
 }) {
   const placeholder = "—";
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       <Kpi
         label="Prestations réalisées"
         value={data ? <CountUp value={data.totals.completed} /> : placeholder}
@@ -135,6 +137,7 @@ function KpiRow({
         label="Chiffre d'affaires encaissé"
         value={data ? <CountUp value={data.totals.revenue} format={formatCurrency} /> : placeholder}
         hint="Payé sur place, noté à la clôture"
+        tone="highlight"
       />
       <Kpi label="Rendez-vous à venir" value={upcoming !== null ? <CountUp value={upcoming} /> : placeholder} />
       <Kpi
@@ -160,22 +163,32 @@ function Kpi({
   value: React.ReactNode;
   trend?: React.ReactNode;
   hint?: string;
-  tone?: "neutral" | "warning";
+  // highlight : la carte mise en avant, sur fond chocolat.
+  tone?: "neutral" | "warning" | "highlight";
   href?: string;
 }) {
+  const highlight = tone === "highlight";
   const body = (
     <>
-      <p className="text-sm font-medium text-anthracite/75">{label}</p>
-      <p className={`mt-1 text-3xl font-semibold tabular-nums tracking-tight ${tone === "warning" ? "text-alert" : "text-brand"}`}>
+      <p className={highlight ? `${LABEL} text-beige/65` : LABEL}>{label}</p>
+      <p
+        className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${
+          highlight ? "text-beige" : tone === "warning" ? "text-alert" : "text-brand"
+        }`}
+      >
         {value}
       </p>
-      <div className="mt-1 flex min-h-4 items-center gap-2 text-xs text-anthracite/55">
+      <div className={`mt-2 flex min-h-4 items-center gap-2 text-xs ${highlight ? "text-beige/70" : "text-anthracite/55"}`}>
         {trend}
         {hint && <span>{hint}</span>}
       </div>
     </>
   );
-  const className = `rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.12)]" : ""}`;
+  const className = `rounded-2xl p-6 ${
+    highlight
+      ? "bg-brand shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)]"
+      : "bg-white shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]"
+  } ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.12)]" : ""}`;
 
   return href ? (
     <Link href={href} className={className}>
@@ -190,22 +203,20 @@ function PaymentMethods({ data }: { data: ManagerActivity }) {
   const used = data.payment_methods.filter((m) => m.count > 0);
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-brand">
-        Encaissements
-      </p>
+      <p className={`${LABEL} mb-3`}>Encaissements</p>
       {used.length === 0 ? (
         <p className="text-sm text-anthracite/60">Aucun paiement noté à la clôture sur cette période.</p>
       ) : (
-        <ul className="flex flex-col gap-1.5 text-sm">
+        <dl className="text-sm">
           {used.map((m) => (
-            <li key={m.method} className="flex items-center justify-between gap-2">
-              <span className="text-anthracite">{METHOD_LABELS[m.method] ?? m.method}</span>
-              <span className="text-anthracite/65">
-                {formatCurrency(m.amount)} ({m.share.toLocaleString("fr-FR")} %)
-              </span>
-            </li>
+            <div key={m.method} className="flex items-baseline justify-between gap-2 py-1.5">
+              <dt className="text-anthracite/60">
+                {METHOD_LABELS[m.method] ?? m.method}, {m.share.toLocaleString("fr-FR")} %
+              </dt>
+              <dd className="font-medium tabular-nums text-anthracite">{formatCurrency(m.amount)}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       )}
     </div>
   );
@@ -216,17 +227,17 @@ function BookingSources({ data }: { data: ManagerActivity }) {
   if (sources.length === 0) return null;
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-brand">Canaux de réservation</p>
-      <ul className="flex flex-col gap-1.5 text-sm">
+      <p className={`${LABEL} mb-3`}>Canaux de réservation</p>
+      <dl className="text-sm">
         {sources.map((s) => (
-          <li key={s.source} className="flex items-center justify-between gap-2">
-            <span className="text-anthracite">{BOOKING_SOURCE_LABELS[s.source]}</span>
-            <span className="text-anthracite/65">
-              {s.count} ({s.share.toLocaleString("fr-FR")} %)
-            </span>
-          </li>
+          <div key={s.source} className="flex items-baseline justify-between gap-2 py-1.5">
+            <dt className="text-anthracite/60">
+              {BOOKING_SOURCE_LABELS[s.source]}, {s.share.toLocaleString("fr-FR")} %
+            </dt>
+            <dd className="font-medium tabular-nums text-anthracite">{s.count}</dd>
+          </div>
         ))}
-      </ul>
+      </dl>
     </div>
   );
 }
@@ -250,9 +261,7 @@ function TrendBadge({ trend }: { trend: number | null }) {
 function TopServices({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="font-semibold text-brand">
-        Prestations préférées des clients
-      </p>
+      <p className="text-base font-semibold text-anthracite">Prestations préférées des clients</p>
       <p className="mb-4 text-sm text-anthracite/60">
         {data.totals.completed} prestation{data.totals.completed > 1 ? "s" : ""} réalisée{data.totals.completed > 1 ? "s" : ""}, soit{" "}
         {formatCurrency(data.totals.revenue)}
@@ -260,23 +269,23 @@ function TopServices({ data }: { data: ManagerActivity }) {
       {data.top_services.length === 0 ? (
         <p className="text-sm text-anthracite/60">Aucune prestation réalisée sur cette période.</p>
       ) : (
-        <ol className="flex flex-col gap-4">
+        <ol className="flex flex-col gap-5">
           {data.top_services.map((service, index) => (
-            <li key={service.service_id} className="flex flex-col gap-1.5">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-medium text-anthracite">
-                  <span className="mr-2 text-anthracite/45">{index + 1}.</span>
-                  {service.name}
-                </span>
-                <TrendBadge trend={service.trend} />
+            <li key={service.service_id} className="flex items-center gap-4">
+              <span
+                aria-hidden="true"
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-beige font-heading text-lg font-semibold text-accent"
+              >
+                {index + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-anthracite">{service.name}</p>
+                <p className="mt-0.5 text-xs text-anthracite/55">
+                  {service.count} fois, {service.share.toLocaleString("fr-FR")} % des prestations,{" "}
+                  {formatCurrency(service.revenue)}
+                </p>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-sable/15" aria-hidden="true">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${service.share}%` }} />
-              </div>
-              <p className="text-xs text-anthracite/60">
-                {service.count} fois, {service.share.toLocaleString("fr-FR")} % des prestations,{" "}
-                {formatCurrency(service.revenue)}
-              </p>
+              <TrendBadge trend={service.trend} />
             </li>
           ))}
         </ol>
@@ -291,9 +300,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
 
   return (
     <div className={`${CARD} flex flex-col gap-3`}>
-      <p className="font-semibold text-brand">
-        Prévision pour {month}
-      </p>
+      <p className={LABEL}>Prévision pour {month}</p>
       {forecast.expected === null ? (
         <p className="text-sm text-anthracite/65">
           Il faut au moins 3 mois d&apos;activité pour établir une prévision fiable ({forecast.months_of_history} mois disponible
@@ -329,7 +336,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
 
   return (
     <div className={CARD}>
-      <p className="font-semibold text-brand">Jours et moments les plus chargés</p>
+      <p className="text-base font-semibold text-anthracite">Jours et moments les plus chargés</p>
       <p className="mb-4 text-sm text-anthracite/60">Plus la case est foncée, plus il y a eu de prestations.</p>
       <table className="w-full table-fixed border-separate border-spacing-1 text-center text-xs">
         <caption className="sr-only">Nombre de prestations par jour de la semaine et moment de la journée</caption>
@@ -358,7 +365,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
                     className={`h-10 rounded-lg font-semibold ${intensity > 0.55 ? "text-beige" : "text-brand"}`}
                     style={{
                       backgroundColor:
-                        count === 0 ? "rgba(163, 177, 138, 0.12)" : `rgba(45, 59, 40, ${0.15 + intensity * 0.85})`,
+                        count === 0 ? "rgba(220, 198, 180, 0.22)" : `rgba(74, 51, 40, ${0.15 + intensity * 0.85})`,
                     }}
                     title={`${DAY_LABELS[index]} ${PART_LABELS[part]} : ${count} prestation${count > 1 ? "s" : ""}`}
                   >
@@ -378,22 +385,20 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
 function Employees({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="mb-3 font-semibold text-brand">
-        Activité par employé
-      </p>
+      <p className={`${LABEL} mb-3`}>Activité par employé</p>
       {data.employees.length === 0 ? (
         <p className="text-sm text-anthracite/60">Aucune prestation attribuée sur cette période.</p>
       ) : (
-        <ul className="flex flex-col divide-y divide-sable/15">
+        <dl className="text-sm">
           {data.employees.map((employee) => (
-            <li key={employee.employee_id} className="flex items-center justify-between gap-3 py-2 text-sm">
-              <span className="font-medium text-anthracite">{employee.name}</span>
-              <span className="text-anthracite/65">
-                {employee.count} prestation{employee.count > 1 ? "s" : ""}, {formatCurrency(employee.revenue)}
-              </span>
-            </li>
+            <div key={employee.employee_id} className="flex items-baseline justify-between gap-3 py-1.5">
+              <dt className="text-anthracite/60">
+                {employee.name}, {employee.count} prestation{employee.count > 1 ? "s" : ""}
+              </dt>
+              <dd className="font-medium tabular-nums text-anthracite">{formatCurrency(employee.revenue)}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       )}
     </div>
   );
@@ -403,11 +408,12 @@ function Loyalty({ data }: { data: ManagerActivity }) {
   const { loyalty } = data;
   return (
     <div className={CARD}>
-      <p className="mb-2 font-semibold text-brand">
-        Fidélité des clients
+      <p className={LABEL}>Fidélité des clients</p>
+      <p className="mt-3 text-5xl font-light tabular-nums tracking-tight text-brand">
+        {loyalty.rate.toLocaleString("fr-FR")}
+        <span className="ml-1 text-2xl">%</span>
       </p>
-      <p className="text-3xl font-semibold tracking-tight text-brand">{loyalty.rate.toLocaleString("fr-FR")} %</p>
-      <p className="mt-1 text-sm text-anthracite/65">
+      <p className="mt-2 text-sm text-anthracite/65">
         {loyalty.returning} client{loyalty.returning > 1 ? "s" : ""} sur {loyalty.clients} {loyalty.returning > 1 ? "sont venus" : "est venu"} au
         moins deux fois sur la période.
       </p>
@@ -447,7 +453,7 @@ function Insights({ data }: { data: ManagerActivity }) {
 
   return (
     <div className={CARD}>
-      <p className="font-semibold text-brand">À retenir</p>
+      <p className={LABEL}>À retenir</p>
       <ul className="mt-2 flex flex-col gap-2 text-sm leading-6 text-anthracite/80">
         {insights.map((insight) => (
           <li key={insight}>{insight}</li>

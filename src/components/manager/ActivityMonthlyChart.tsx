@@ -25,7 +25,7 @@ export default function ActivityMonthlyChart({
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6">
-      <p className="font-semibold text-brand">Évolution sur 12 mois</p>
+      <p className="text-base font-semibold text-anthracite">Évolution sur 12 mois</p>
       <p className="mb-4 text-sm text-anthracite/60">
         Prestations réalisées chaque mois. Le dernier mois est en cours.
       </p>

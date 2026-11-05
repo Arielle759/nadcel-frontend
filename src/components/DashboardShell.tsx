@@ -22,8 +22,8 @@ interface DashboardShellProps {
   children: React.ReactNode;
 }
 
-// Cadre commun des espaces privés (gérant, administrateur) : barre latérale
-// verte avec la navigation en haut et le compte en bas. Sur mobile, la
+// Cadre commun des espaces privés : barre latérale blanche, rubrique active
+// en chocolat, navigation en haut et compte en bas. Sur mobile, la
 // navigation passe en bandeau horizontal au-dessus du contenu.
 export default function DashboardShell({ title, navItems, children }: DashboardShellProps) {
   const pathname = usePathname();
@@ -37,19 +37,19 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
 
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-beige md:flex-row">
-      <aside className="flex w-full flex-col gap-4 bg-brand px-4 py-4 text-beige md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:gap-8 md:px-4 md:py-6">
+      <aside className="z-10 flex w-full flex-col gap-4 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(90,50,35,0.06)] md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:gap-10 md:px-4 md:py-7 md:shadow-[8px_0_32px_rgba(90,50,35,0.05)]">
         <div className="flex items-center justify-between gap-3 px-2">
           <Link href="/" className="flex items-center gap-2.5" title="Voir le site public">
             <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-8 w-auto" />
-            <span className="font-heading text-xl font-semibold tracking-tight text-beige">Nadcel</span>
+            <span className="font-heading text-xl font-semibold tracking-tight text-brand">Nadcel</span>
           </Link>
-          <button type="button" onClick={handleLogout} className="text-sm font-semibold text-beige/80 hover:text-beige md:hidden">
+          <button type="button" onClick={handleLogout} className="text-sm font-semibold text-anthracite/70 hover:text-brand md:hidden">
             Se déconnecter
           </button>
         </div>
 
         <div className="md:flex md:flex-1 md:flex-col">
-          <p className="mb-2 hidden px-3 text-xs font-medium text-beige/55 md:block">{title}</p>
+          <p className="mb-3 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/45 md:block">{title}</p>
           <nav aria-label={title} className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
             {navItems.map(({ href, label, icon: Icon, matchSubpaths }) => {
               const active = pathname === href || (matchSubpaths === true && pathname.startsWith(`${href}/`));
@@ -59,14 +59,14 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={`relative flex min-h-11 shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 text-sm font-semibold transition-colors ${
-                    active ? "text-brand" : "text-beige/75 hover:bg-beige/10 hover:text-beige"
+                    active ? "text-beige" : "text-anthracite/75 hover:bg-beige hover:text-brand"
                   }`}
                 >
-                  {/* Le fond ivoire glisse d'une rubrique à l'autre. */}
+                  {/* Le fond chocolat glisse d'une rubrique à l'autre. */}
                   {active && (
                     <motion.span
                       layoutId="dashboard-nav-active"
-                      className="absolute inset-0 rounded-xl bg-beige"
+                      className="absolute inset-0 rounded-xl bg-brand shadow-[0_6px_16px_rgba(74,51,40,0.25)]"
                       transition={{ type: "spring", stiffness: 420, damping: 34 }}
                       aria-hidden="true"
                     />
@@ -79,15 +79,15 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
           </nav>
 
           <div className="mt-auto hidden flex-col gap-1 pt-6 md:flex">
-            <p className="truncate px-3 text-sm font-semibold text-beige">{user?.name ?? "Mon compte"}</p>
-            <p className="truncate px-3 pb-2 text-xs text-beige/60">{user?.email}</p>
-            <Link href="/" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-medium text-beige/75 transition-colors hover:bg-beige/10 hover:text-beige">
+            <p className="truncate px-3 text-sm font-semibold text-anthracite">{user?.name ?? "Mon compte"}</p>
+            <p className="truncate px-3 pb-2 text-xs text-anthracite/55">{user?.email}</p>
+            <Link href="/" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-medium text-anthracite/70 transition-colors hover:bg-beige hover:text-brand">
               Voir le site
             </Link>
             <button
               type="button"
               onClick={handleLogout}
-              className="flex min-h-10 items-center rounded-xl px-3 text-left text-sm font-medium text-beige/75 transition-colors hover:bg-beige/10 hover:text-beige"
+              className="flex min-h-10 items-center rounded-xl px-3 text-left text-sm font-medium text-anthracite/70 transition-colors hover:bg-beige hover:text-brand"
             >
               Se déconnecter
             </button>
