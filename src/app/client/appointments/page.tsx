@@ -10,6 +10,7 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
 import DashboardBanner from "@/components/DashboardBanner";
+import { BeautyJourney, NextAppointmentCard } from "@/components/client/ClientHighlights";
 import { useCurrentUser } from "@/hooks/useAuthState";
 
 const CANCELLATION_HOURS = 24;
@@ -22,6 +23,11 @@ function clientCanCancel(appointment: ClientAppointment, now: number): boolean {
   if (appointment.status === "pending") return true;
   if (appointment.status !== "confirmed") return false;
   return new Date(appointment.scheduled_at).getTime() - now > CANCELLATION_HOURS * 60 * 60 * 1000;
+}
+
+// « Bonsoir » à partir de 18 h. Calculé après chargement (pas côté serveur).
+function greeting(now: number | null): string {
+  return now !== null && new Date(now).getHours() >= 18 ? "Bonsoir" : "Bonjour";
 }
 
 // Résumé du bandeau : le prochain rendez-vous, ou une invitation à réserver.
@@ -187,7 +193,7 @@ export default function ClientAppointmentsPage() {
       <div className="mx-auto w-full max-w-4xl">
         <DashboardBanner
           eyebrow="Mes rendez-vous"
-          title={firstName ? `Bonjour ${firstName},` : "Mes rendez-vous"}
+          title={firstName ? `${greeting(now)} ${firstName},` : "Mes rendez-vous"}
           summary={bannerSummary(loading ? null : upcoming)}
           image="/images/services/manucure.jpg"
           actions={
@@ -197,7 +203,21 @@ export default function ClientAppointmentsPage() {
           }
         />
 
-        <div role="tablist" aria-label="Période" className={`${ui.surface} mt-10 inline-flex gap-1 rounded-full p-1`}>
+        {!loading && now !== null && (
+          <div className="mt-8 flex flex-col gap-8">
+            {upcoming[0] && (
+              <NextAppointmentCard
+                appointment={upcoming[0]}
+                now={now}
+                calendarEvent={upcoming[0].status === "confirmed" ? calendarEventFor(upcoming[0]) : null}
+              />
+            )}
+            <BeautyJourney appointments={appointments} />
+          </div>
+        )}
+
+        <h2 className="mt-12 text-xl font-semibold tracking-tight text-brand">Tous mes rendez-vous</h2>
+        <div role="tablist" aria-label="Période" className={`${ui.surface} mt-4 inline-flex gap-1 rounded-full p-1`}>
           {(
             [
               ["upcoming", "À venir", upcoming.length],

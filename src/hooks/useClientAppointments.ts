@@ -8,12 +8,15 @@ export interface ClientAppointmentSalon {
   address?: string;
   city?: string;
   phone?: string | null;
+  cover?: string | null;
 }
 
 export interface ClientAppointmentService {
   id: number;
   name: string;
   duration: number;
+  image?: string | null;
+  category?: string;
 }
 
 export interface ClientAppointmentEmployee {
