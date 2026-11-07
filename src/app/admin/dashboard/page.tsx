@@ -9,6 +9,8 @@ import PartnerRequestCard from "@/components/admin/PartnerRequestCard";
 import AdminMonthlyCharts from "@/components/admin/AdminMonthlyCharts";
 import { formatTrend } from "@/components/manager/activityFormat";
 import { ui } from "@/lib/ui";
+import DashboardBanner from "@/components/DashboardBanner";
+import { useCurrentUser } from "@/hooks/useAuthState";
 
 const PREVIEW_REQUESTS = 3;
 
@@ -16,11 +18,21 @@ function percent(value: number | null): string {
   return value === null ? "—" : `${value.toLocaleString("fr-FR")} %`;
 }
 
+function bannerSummary(stats: AdminStats | null): string {
+  if (!stats) return "Ce qui attend une décision, puis la santé de la plateforme.";
+  const pending = stats.to_review.pending_salons;
+  const online = `${stats.salons.online} salon${stats.salons.online > 1 ? "s" : ""} en ligne`;
+  if (pending === 0) return `Rien à traiter. ${online}.`;
+  return `${pending} demande${pending > 1 ? "s" : ""} de partenariat à examiner, ${online}.`;
+}
+
 export default function AdminDashboardPage() {
   const { getStats, getPendingSalons, changeSalonState } = useAdmin();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [requests, setRequests] = useState<AdminSalon[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const user = useCurrentUser();
+  const firstName = user?.name?.trim().split(/\s+/)[0];
 
   const load = useCallback(async () => {
     try {
@@ -44,7 +56,27 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <ManagerPage title="Tableau de bord" description="Ce qui attend une décision, puis la santé de la plateforme.">
+    <ManagerPage
+      title="Tableau de bord"
+      hero={
+        <DashboardBanner
+          eyebrow="Administration Nadcel"
+          title={firstName ? `Bonjour ${firstName},` : "Tableau de bord"}
+          summary={bannerSummary(stats)}
+          image="/images/services/soin.jpg"
+          actions={
+            <>
+              <Link href="/admin/salons" className={ui.buttonOnDark}>
+                {stats && stats.to_review.pending_salons > 0 ? "Examiner les demandes" : "Demandes"}
+              </Link>
+              <Link href="/admin/salons/all" className={ui.buttonGhostOnDark}>
+                Tous les salons
+              </Link>
+            </>
+          }
+        />
+      }
+    >
       {error && (
         <p role="alert" className="mb-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
           {error}
@@ -71,12 +103,13 @@ export default function AdminDashboardPage() {
             <h2 id="health-title" className="text-2xl font-semibold tracking-tight text-brand">
               Santé de la plateforme
             </h2>
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Kpi
                 label="Salons en ligne"
                 value={<CountUp value={stats.salons.online} />}
                 hint={stats.salons.suspended > 0 ? `${stats.salons.suspended} suspendu${stats.salons.suspended > 1 ? "s" : ""}` : "Aucun suspendu"}
                 href="/admin/salons/all"
+                highlight
               />
               <Kpi
                 label="Clientes inscrites"
@@ -133,7 +166,7 @@ function ToReview({
   if (pending === 0 && lowReviews === 0) {
     return (
       <section className={`${ui.surface} p-5 sm:p-6`}>
-        <h2 className="font-semibold text-brand">Rien à traiter</h2>
+        <h2 className="text-lg font-semibold text-anthracite">Rien à traiter</h2>
         <p className="mt-1 text-sm text-anthracite/70">
           Aucune demande de partenariat en attente et aucun avis négatif récent.
         </p>
@@ -192,25 +225,35 @@ function Kpi({
   value,
   hint,
   href,
+  highlight = false,
 }: {
   label: string;
   value: React.ReactNode;
   hint?: React.ReactNode;
   href?: string;
+  // La carte mise en avant, sur fond chocolat.
+  highlight?: boolean;
 }) {
   const body = (
     <>
-      <p className="text-sm font-medium text-anthracite/75">{label}</p>
-      <p className="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-brand">{value}</p>
-      <p className="mt-1 min-h-4 text-xs text-anthracite/60">{hint}</p>
+      <p className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${highlight ? "text-beige/65" : "text-anthracite/55"}`}>
+        {label}
+      </p>
+      <p className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${highlight ? "text-beige" : "text-brand"}`}>
+        {value}
+      </p>
+      <p className={`mt-2 min-h-4 text-xs ${highlight ? "text-beige/70" : "text-anthracite/60"}`}>{hint}</p>
     </>
   );
+  const card = highlight
+    ? "rounded-2xl bg-brand shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)] transition-all duration-200 hover:-translate-y-0.5"
+    : ui.surfaceInteractive;
   return href ? (
-    <Link href={href} className={`${ui.surfaceInteractive} block p-5`}>
+    <Link href={href} className={`${card} block p-6`}>
       {body}
     </Link>
   ) : (
-    <div className={`${ui.surface} p-5`}>{body}</div>
+    <div className={`${ui.surface} p-6`}>{body}</div>
   );
 }
 
@@ -231,7 +274,7 @@ function BookingChannels({ share }: { share: number | null }) {
   return (
     <div className={`${ui.surface} p-5 sm:p-6`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="font-semibold text-brand">Canaux de réservation</p>
+        <p className="text-base font-semibold text-anthracite">Canaux de réservation</p>
         <p className="text-sm text-anthracite/65">30 derniers jours</p>
       </div>
       <div
