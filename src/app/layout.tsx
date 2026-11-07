@@ -1,22 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import MotionProvider from "@/components/motion/MotionProvider";
 
-const geistSans = Geist({
+// Polices intégrées au projet (dossier fonts, licence SIL OFL) : l'apparence ne
+// dépend pas d'internet, ni en local (démonstration hors ligne) ni au déploiement.
+const geistSans = localFont({
+  src: "./fonts/Geist-Variable.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/GeistMono-Variable.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
+  preload: false,
 });
 
 // Titres : Playfair Display, serif à fort contraste des magazines de beauté.
-const display = Playfair_Display({
+const display = localFont({
+  src: "./fonts/PlayfairDisplay-Variable-latin.woff2",
   variable: "--font-display",
-  subsets: ["latin"],
+  weight: "400 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
