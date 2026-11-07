@@ -7,6 +7,7 @@ import { AdminSalon, AdminStats, useAdmin } from "@/hooks/useAdmin";
 import ManagerPage from "@/components/manager/ManagerPage";
 import PartnerRequestCard from "@/components/admin/PartnerRequestCard";
 import AdminMonthlyCharts from "@/components/admin/AdminMonthlyCharts";
+import BookingChannels from "@/components/admin/BookingChannels";
 import { formatTrend } from "@/components/manager/activityFormat";
 import { ui } from "@/lib/ui";
 import DashboardBanner from "@/components/DashboardBanner";
@@ -136,7 +137,7 @@ export default function AdminDashboardPage() {
                 hint="Sur les 30 derniers jours"
               />
             </div>
-            <BookingChannels share={stats.appointments.online_share} />
+            <BookingChannels appointments={stats.appointments} />
           </section>
 
           <section aria-labelledby="evolution-title" className="flex flex-col gap-4">
@@ -264,36 +265,5 @@ function Trend({ value }: { value: number | null }) {
     <span title="Du 1er à aujourd'hui, comparé à la même période du mois dernier">
       <span className={`font-semibold ${value! >= 0 ? "text-success" : "text-alert"}`}>{label}</span> sur un mois
     </span>
-  );
-}
-
-// Part des rendez-vous pris en ligne : l'indicateur d'adoption de la plateforme.
-function BookingChannels({ share }: { share: number | null }) {
-  if (share === null) return null;
-  const offline = Math.round((100 - share) * 10) / 10;
-  return (
-    <div className={`${ui.surface} p-5 sm:p-6`}>
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-base font-semibold text-anthracite">Canaux de réservation</p>
-        <p className="text-sm text-anthracite/65">30 derniers jours</p>
-      </div>
-      <div
-        className="mt-4 flex h-3 overflow-hidden rounded-full bg-champagne-light/40"
-        role="img"
-        aria-label={`${percent(share)} en ligne, ${percent(offline)} hors ligne`}
-      >
-        <div className="h-full rounded-full bg-accent" style={{ width: `${share}%` }} />
-      </div>
-      <div className="mt-3 flex flex-wrap justify-between gap-2 text-sm">
-        <p>
-          <span className="font-semibold text-brand">{percent(share)}</span>{" "}
-          <span className="text-anthracite/75">réservés en ligne sur Nadcel</span>
-        </p>
-        <p>
-          <span className="font-semibold text-champagne">{percent(offline)}</span>{" "}
-          <span className="text-anthracite/75">saisis par les salons (WhatsApp, téléphone, sur place)</span>
-        </p>
-      </div>
-    </div>
   );
 }

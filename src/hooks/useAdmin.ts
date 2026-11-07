@@ -1,3 +1,4 @@
+import type { BookingSource } from "@/hooks/useManagerAppointments";
 import { useCallback } from "react";
 import { api, toErrorMessage } from "@/lib/api";
 
@@ -11,6 +12,9 @@ export interface AdminStats {
     trend: number | null; // en %, null sans période de comparaison
     cancellation_rate: number | null; // en %, sur les 30 derniers jours
     online_share: number | null; // en %, sur les 30 derniers jours
+    // Détail par canal sur les 30 derniers jours (absent avec une ancienne API).
+    sources?: { source: BookingSource; count: number; share: number }[];
+    recent_total?: number;
   };
   to_review: { pending_salons: number; low_reviews: number };
   monthly: AdminMonth[];
