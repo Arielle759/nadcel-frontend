@@ -50,6 +50,15 @@ export interface ActivityForecast {
   peak_month: { month: string; total: number } | null;
 }
 
+export interface ActivityTopClient {
+  name: string;
+  phone: string | null;
+  has_account: boolean;
+  visits: number;
+  spent: number;
+  last_visit: string;
+}
+
 export interface ManagerActivity {
   period: { key: ActivityPeriod; days: number; start: string; end: string };
   totals: {
@@ -64,6 +73,8 @@ export interface ManagerActivity {
   busy_slots: ActivityBusySlot[];
   employees: ActivityEmployee[];
   loyalty: { clients: number; returning: number; rate: number };
+  // Clients les plus fidèles de la période (absent avec une ancienne API).
+  top_clients?: ActivityTopClient[];
   payment_methods: ActivityPaymentMethod[];
   // Prestations réalisées par canal de réservation (absent des anciennes réponses de l'API).
   sources?: { source: "online" | "whatsapp" | "phone" | "walk_in"; count: number; share: number }[];

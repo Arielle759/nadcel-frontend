@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import CountUp from "@/components/motion/CountUp";
+import TopClients from "@/components/manager/TopClients";
 import { useState } from "react";
 
 import {
@@ -96,6 +97,7 @@ export default function ActivitySection({
               <TopServices data={data} />
               <Forecast data={data} />
             </div>
+            <TopClients clients={data.top_clients ?? []} period={period} />
             <ActivityMonthlyChart months={data.monthly} services={data.top_services} />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <BusySlots slots={data.busy_slots} />
