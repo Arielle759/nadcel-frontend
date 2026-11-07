@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { register } from "@/lib/auth";
+import { register, CLIENT_HOME } from "@/lib/auth";
 import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
 import AuthShell from "@/components/AuthShell";
@@ -48,7 +48,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({ name, email, password });
-      router.push(nextUrlForBookingDraft());
+      router.push(nextUrlForBookingDraft(CLIENT_HOME));
     } catch (err) {
       setError(registrationErrorMessage(err));
     } finally {

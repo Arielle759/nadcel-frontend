@@ -3,7 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { homePathFor, login } from "@/lib/auth";
+import { CLIENT_HOME, homePathFor, login } from "@/lib/auth";
 import { nextUrlForBookingDraft } from "@/lib/bookingDraft";
 import PasswordField from "@/components/PasswordField";
 import AuthShell from "@/components/AuthShell";
@@ -22,10 +22,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { user } = await login({ email, password });
-      // Le gérant et l'administrateur arrivent directement dans leur espace ;
-      // le client reprend sa réservation en cours, ou revient à l'accueil.
+      // Chacun arrive dans son espace ; le client qui s'est connecté au milieu
+      // d'une réservation la reprend d'abord.
       const home = homePathFor(user);
-      router.replace(home === "/" ? nextUrlForBookingDraft(home) : home);
+      router.replace(home === CLIENT_HOME ? nextUrlForBookingDraft(home) : home);
     } catch {
       setError("E-mail ou mot de passe incorrect.");
     } finally {

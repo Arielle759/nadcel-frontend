@@ -119,12 +119,15 @@ export function hasRole(role: string): boolean {
   return getUser()?.roles?.some((r) => r.name === role) ?? false;
 }
 
-// Page d'arrivée après connexion : chaque rôle arrive directement dans son espace.
+// Page d'arrivée après connexion : chaque rôle arrive directement dans son espace
+// (le client sur ses rendez-vous).
+export const CLIENT_HOME = "/client/appointments";
+
 export function homePathFor(user: AuthUser | null): string {
   const roles = user?.roles?.map((r) => r.name) ?? [];
   if (roles.includes("admin")) return "/admin/dashboard";
   if (roles.includes("gerant")) return "/manager/dashboard";
-  return "/";
+  return CLIENT_HOME;
 }
 
 export function isAuthenticated(): boolean {

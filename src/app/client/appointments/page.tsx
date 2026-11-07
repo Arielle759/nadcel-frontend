@@ -9,6 +9,8 @@ import type { CalendarEvent } from "@/lib/calendar";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
+import DashboardBanner from "@/components/DashboardBanner";
+import { useCurrentUser } from "@/hooks/useAuthState";
 
 const CANCELLATION_HOURS = 24;
 
@@ -20,6 +22,19 @@ function clientCanCancel(appointment: ClientAppointment, now: number): boolean {
   if (appointment.status === "pending") return true;
   if (appointment.status !== "confirmed") return false;
   return new Date(appointment.scheduled_at).getTime() - now > CANCELLATION_HOURS * 60 * 60 * 1000;
+}
+
+// Résumé du bandeau : le prochain rendez-vous, ou une invitation à réserver.
+function bannerSummary(upcoming: ClientAppointment[] | null): string {
+  if (upcoming === null) return "Vos rendez-vous à venir et votre historique.";
+  const next = upcoming[0];
+  if (!next) return "Aucun rendez-vous à venir pour le moment.";
+  const date = new Date(next.scheduled_at);
+  const day = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  const time =
+    date.getMinutes() === 0 ? `${date.getHours()} h` : `${date.getHours()} h ${String(date.getMinutes()).padStart(2, "0")}`;
+  const where = next.salon?.name ? ` chez ${next.salon.name}` : "";
+  return `Prochain rendez-vous : ${day} à ${time}${where}.`;
 }
 
 function isUpcoming(appointment: ClientAppointment, now: number): boolean {
@@ -87,6 +102,8 @@ export default function ClientAppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("upcoming");
+  const user = useCurrentUser();
+  const firstName = user?.name?.trim().split(/\s+/)[0];
 
   const [confirmCancelId, setConfirmCancelId] = useState<number | null>(null);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
@@ -168,14 +185,17 @@ export default function ClientAppointmentsPage() {
   return (
     <main className="flex flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">
-            Mes rendez-vous
-          </h1>
-          <Link href="/salons" className={ui.buttonPrimary}>
-            Nouvelle réservation
-          </Link>
-        </div>
+        <DashboardBanner
+          eyebrow="Mes rendez-vous"
+          title={firstName ? `Bonjour ${firstName},` : "Mes rendez-vous"}
+          summary={bannerSummary(loading ? null : upcoming)}
+          image="/images/services/manucure.jpg"
+          actions={
+            <Link href="/salons" className={ui.buttonOnDark}>
+              Nouvelle réservation
+            </Link>
+          }
+        />
 
         <div role="tablist" aria-label="Période" className={`${ui.surface} mt-10 inline-flex gap-1 rounded-full p-1`}>
           {(
