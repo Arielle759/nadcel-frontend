@@ -44,7 +44,7 @@ export default function NewEmployeePage() {
             Téléphone
           </label>
           <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="77 123 45 67" className={ui.input} />
-          <p className="text-sm text-anthracite/70">Les membres de l&apos;équipe n&apos;ont pas de compte : vous gérez leur planning pour eux.</p>
+          <p className="text-sm text-anthracite/70">Les membres de l&apos;équipe n&apos;ont pas de compte : c&apos;est vous qui organisez leur planning.</p>
         </div>
 
         {error && (

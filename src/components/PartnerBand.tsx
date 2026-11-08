@@ -25,7 +25,7 @@ export default function PartnerBand() {
         <Reveal>
         <SectionHeading
           id="partner-title"
-          title="Vous gérez un salon ?"
+          title="Vous avez un salon ?"
           description="Recevez des réservations en ligne, suivez votre agenda et votre chiffre d'affaires au même endroit. L'inscription est gratuite et votre fiche est vérifiée par notre équipe avant sa mise en ligne."
           onDark
         />

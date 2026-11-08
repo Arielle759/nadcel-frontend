@@ -119,7 +119,7 @@ export default function HeroSection() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="mt-10 flex flex-wrap items-center gap-3 text-sm text-beige/75">
-            <span>Vous gérez un salon ?</span>
+            <span>Vous avez un salon ?</span>
             <Link href="/devenir-partenaire" className={`${ui.buttonGhostOnDark} min-h-9 px-4`}>
               Inscrivez-le gratuitement
             </Link>

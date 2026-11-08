@@ -27,7 +27,7 @@ export default function AuthShell({
   image: string;
   quote: string;
   children: React.ReactNode;
-  // Bloc facultatif sous le formulaire (ex. « Vous gérez un salon ? »).
+  // Bloc facultatif sous le formulaire (ex. « Vous avez un salon ? »).
   below?: React.ReactNode;
 }) {
   return (

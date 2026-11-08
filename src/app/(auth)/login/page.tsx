@@ -42,7 +42,7 @@ export default function LoginPage() {
       below={
         <div className={`${ui.surface} flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:flex-nowrap`}>
           <div>
-            <p className="text-sm font-semibold text-brand">Vous gérez un salon ?</p>
+            <p className="text-sm font-semibold text-brand">Vous avez un salon ?</p>
             <p className="text-sm text-anthracite/70">Gratuit, validé sous 48 h.</p>
           </div>
           <Link href="/devenir-partenaire" className={`${ui.buttonSecondary} shrink-0 px-5`}>

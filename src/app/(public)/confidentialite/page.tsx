@@ -11,7 +11,7 @@ export default function PrivacyPage() {
             Données collectées
           </h2>
           <p className="text-anthracite/75">
-            Pour créer un compte et gérer vos réservations, NADCEL collecte votre nom, votre
+            Pour créer un compte et suivre vos réservations, NADCEL collecte votre nom, votre
             adresse email et les informations liées à vos rendez-vous (salon, service, date
             et heure). Les salons partenaires fournissent quant à eux les informations
             nécessaires à la présentation de leur établissement.
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           </h2>
           <p className="text-anthracite/75">
             Ces informations servent uniquement à faire fonctionner la plateforme : créer et
-            afficher vos réservations, permettre aux salons de les gérer, et vous permettre
+            afficher vos réservations, permettre aux salons de les traiter, et vous permettre
             de laisser un avis après une prestation terminée. NADCEL ne vend aucune donnée
             personnelle à des tiers.
           </p>

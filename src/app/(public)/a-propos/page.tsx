@@ -7,7 +7,7 @@ export default function AboutPage() {
         <p className="text-anthracite/75">
           NADCEL est une plateforme multi-salons qui connecte les clientes et clients aux
           salons de beauté et spas au Sénégal. Notre objectif est simple : donner aux salons
-          plus de visibilité et un outil de gestion simplifié, et permettre à chacun de
+          plus de visibilité et un outil simple pour organiser leurs rendez-vous, et permettre à chacun de
           réserver un rendez-vous en quelques clics, sans avoir à appeler chaque salon
           individuellement.
         </p>
@@ -19,8 +19,8 @@ export default function AboutPage() {
         </p>
 
         <p className="text-anthracite/75">
-          Vous gérez un salon de beauté ou un spa ? Rejoignez les salons partenaires de
-          NADCEL pour gagner en visibilité et simplifier la gestion de vos rendez-vous.
+          Vous avez un salon de beauté ou un spa ? Rejoignez les salons partenaires de
+          NADCEL pour gagner en visibilité et simplifier l&apos;organisation de vos rendez-vous.
         </p>
       </div>
     </main>

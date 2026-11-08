@@ -60,7 +60,7 @@ export default function ManagerSalonsPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link href={`/manager/salons/${salon.id}`} className={ui.buttonPrimary}>
-                  Gérer
+                  Consulter
                 </Link>
                 {salon.is_verified && salon.is_active && !salon.deactivated_at && (
                   <Link href={`/salons/${salon.id}`} className={ui.buttonSecondary}>

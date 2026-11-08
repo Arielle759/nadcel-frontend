@@ -181,7 +181,7 @@ function SalonRow({
         </div>
         <p className="mt-1 text-sm text-anthracite/75">
           {salon.city}
-          {salon.manager ? `, géré par ${salon.manager.name}` : ""}
+          {salon.manager ? `, gérant : ${salon.manager.name}` : ""}
         </p>
         {/* Une demande n'a jamais été visible : pas de note à afficher. */}
         {(state === "online" || state === "suspended") && (

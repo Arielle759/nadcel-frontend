@@ -293,7 +293,7 @@ export default function BecomePartnerPage() {
             Inscrire mon salon
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-anthracite/75">
-            Recevez des réservations en ligne et gérez votre agenda depuis un seul espace. L&apos;inscription est gratuite.
+            Recevez des réservations en ligne et suivez votre agenda depuis un seul espace. L&apos;inscription est gratuite.
           </p>
           <div className="mt-10">{content}</div>
         </div>
