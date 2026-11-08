@@ -28,7 +28,7 @@ function normalize(value: string): string {
 }
 
 export default function AdminAllSalonsPage() {
-  const { getSalons, changeSalonState, deleteSalon } = useAdmin();
+  const { getSalons, changeSalonState } = useAdmin();
   const [salons, setSalons] = useState<AdminSalon[] | null>(null);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -127,10 +127,6 @@ export default function AdminAllSalonsPage() {
               key={salon.id}
               salon={salon}
               onChange={async (action) => replace(await changeSalonState(salon.id, action))}
-              onDelete={async () => {
-                await deleteSalon(salon.id);
-                setSalons((current) => current?.filter((s) => s.id !== salon.id) ?? null);
-              }}
             />
           ))}
         </ul>
@@ -148,11 +144,9 @@ export default function AdminAllSalonsPage() {
 function SalonRow({
   salon,
   onChange,
-  onDelete,
 }: {
   salon: AdminSalon;
   onChange: (action: "verify" | "reactivate" | "suspend") => Promise<void>;
-  onDelete: () => Promise<void>;
 }) {
   const state = salonState(salon);
   const [busy, setBusy] = useState(false);
@@ -225,10 +219,7 @@ function SalonRow({
             {busy ? "Validation..." : "Valider finalement"}
           </button>
         )}
-        {/* Un salon en ligne doit d'abord être suspendu : pas de suppression en un geste. */}
-        {(state === "suspended" || state === "rejected") && (
-          <ConfirmDelete question={`Supprimer ${salon.name} ? Ses rendez-vous passés restent conservés.`} onConfirm={onDelete} />
-        )}
+        {/* Pas de suppression : un salon suspendu garde ses données et son historique. */}
       </div>
     </li>
   );

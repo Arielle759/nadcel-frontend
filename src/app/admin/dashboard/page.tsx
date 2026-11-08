@@ -169,7 +169,7 @@ function ToReview({
       <section className={`${ui.surface} p-5 sm:p-6`}>
         <h2 className="text-lg font-semibold text-anthracite">Rien à traiter</h2>
         <p className="mt-1 text-sm text-anthracite/70">
-          Aucune demande de partenariat en attente et aucun avis négatif récent.
+          Aucune demande de partenariat en attente et aucun avis négatif ces 30 derniers jours.
         </p>
       </section>
     );
@@ -210,10 +210,12 @@ function ToReview({
             <p className="font-semibold text-anthracite">
               {lowReviews} avis noté{lowReviews > 1 ? "s" : ""} 1 ou 2 sur 5
             </p>
-            <p className="text-sm text-anthracite/65">Publiés ces 30 derniers jours. À relire en cas de contenu abusif.</p>
+            <p className="text-sm text-anthracite/65">
+              Publiés ces 30 derniers jours. Des plaintes répétées sur un même salon peuvent justifier sa suspension.
+            </p>
           </div>
           <Link href="/admin/reviews?filtre=negatifs" className={ui.buttonSecondary}>
-            Relire ces avis
+            Consulter ces avis
           </Link>
         </div>
       )}

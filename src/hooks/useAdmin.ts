@@ -111,13 +111,6 @@ export function useAdmin() {
     []
   );
 
-  const deleteSalon = useCallback(
-    async (id: number) => {
-      await call(() => api.delete(`/admin/salons/${id}`), "Impossible de supprimer le salon.");
-    },
-    []
-  );
-
   const getReviews = useCallback(
     (page = 1, maxRating?: number) =>
       call(
@@ -130,12 +123,5 @@ export function useAdmin() {
     []
   );
 
-  const deleteReview = useCallback(
-    async (id: number) => {
-      await call(() => api.delete(`/admin/reviews/${id}`), "Impossible de supprimer l'avis.");
-    },
-    []
-  );
-
-  return { getStats, getPendingSalons, getSalons, changeSalonState, deleteSalon, getReviews, deleteReview };
+  return { getStats, getPendingSalons, getSalons, changeSalonState, getReviews };
 }

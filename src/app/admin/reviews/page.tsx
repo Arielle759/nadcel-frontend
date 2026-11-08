@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { AdminReview, useAdmin } from "@/hooks/useAdmin";
 import ManagerPage from "@/components/manager/ManagerPage";
-import ConfirmDelete from "@/components/ConfirmDelete";
 import { ui } from "@/lib/ui";
 
 // « ?filtre=negatifs » : lien direct depuis le tableau de bord.
@@ -30,7 +29,7 @@ function Stars({ rating }: { rating: number }) {
 function ReviewsContent() {
   const router = useRouter();
   const negativeOnly = useSearchParams().get("filtre") === "negatifs";
-  const { getReviews, deleteReview } = useAdmin();
+  const { getReviews } = useAdmin();
   const [reviews, setReviews] = useState<AdminReview[] | null>(null);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -67,16 +66,10 @@ function ReviewsContent() {
     setLoadingMore(false);
   }
 
-  async function remove(review: AdminReview) {
-    await deleteReview(review.id);
-    setReviews((current) => current?.filter((r) => r.id !== review.id) ?? null);
-    setTotal((t) => t - 1);
-  }
-
   return (
     <ManagerPage
       title="Avis"
-      description="Les avis sont publiés sans validation préalable. Supprimez uniquement un contenu injurieux, hors sujet ou qui expose des données personnelles : un avis simplement négatif reste en ligne."
+      description="Les avis sont laissés uniquement par des clients venus au salon, après une prestation terminée. Ils sont publiés tels quels : la plateforme ne retire aucun avis, pour rester impartiale envers les clients comme envers les salons."
     >
       <div role="tablist" aria-label="Filtrer les avis" className="mb-6 inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
         {[
@@ -136,11 +129,6 @@ function ReviewsContent() {
                       , le {formatDate(review.created_at)}
                     </p>
                   </div>
-                  <ConfirmDelete
-                    question="Supprimer définitivement cet avis ?"
-                    confirmLabel="Oui, supprimer l'avis"
-                    onConfirm={() => remove(review)}
-                  />
                 </div>
                 {review.comment ? (
                   <p className="mt-3 leading-7 text-anthracite/90">{review.comment}</p>
