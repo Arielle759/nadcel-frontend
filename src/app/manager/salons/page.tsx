@@ -9,6 +9,7 @@ import { ui } from "@/lib/ui";
 import type { Salon } from "@/hooks/useSalons";
 
 function statusOf(salon: Salon): { label: string; className: string } {
+  if (salon.is_verified && salon.is_active && salon.deactivated_at) return { label: "Désactivé", className: "bg-anthracite/10 text-anthracite/80" };
   if (salon.is_verified && salon.is_active) return { label: "En ligne", className: "bg-emerald-100 text-emerald-900" };
   if (salon.is_verified) return { label: "Suspendu", className: "bg-red-100 text-red-900" };
   if (salon.is_active) return { label: "En attente de validation", className: "bg-amber-100 text-amber-900" };
@@ -61,7 +62,7 @@ export default function ManagerSalonsPage() {
                 <Link href={`/manager/salons/${salon.id}`} className={ui.buttonPrimary}>
                   Gérer
                 </Link>
-                {salon.is_verified && salon.is_active && (
+                {salon.is_verified && salon.is_active && !salon.deactivated_at && (
                   <Link href={`/salons/${salon.id}`} className={ui.buttonSecondary}>
                     Page publique
                   </Link>

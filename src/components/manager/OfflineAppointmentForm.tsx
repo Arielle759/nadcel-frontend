@@ -40,7 +40,7 @@ export default function OfflineAppointmentForm({
   const { getDayAvailability } = useAvailability();
   const { createOfflineAppointment } = useManagerAppointments();
 
-  const bookableSalons = useMemo(() => salons.filter((s) => s.is_verified && s.is_active), [salons]);
+  const bookableSalons = useMemo(() => salons.filter((s) => s.is_verified && s.is_active && !s.deactivated_at), [salons]);
   const [salonChoice, setSalonChoice] = useState<number | null>(null);
   const salonId = salonChoice ?? bookableSalons[0]?.id ?? null;
 

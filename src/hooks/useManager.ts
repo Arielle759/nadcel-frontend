@@ -56,7 +56,7 @@ interface UseManagerResult {
   createSalon: (data: CreateSalonData) => Promise<SalonDetail>;
   updateSalon: (id: number | string, data: UpdateSalonData) => Promise<SalonDetail>;
   updateOpeningHours: (id: number | string, openingHours: OpeningHours | null) => Promise<SalonDetail>;
-  deleteSalon: (id: number | string) => Promise<void>;
+  setSalonListed: (id: number | string, listed: boolean) => Promise<SalonDetail>;
   loading: boolean;
   error: string | null;
 }
@@ -155,13 +155,15 @@ export function useManager(): UseManagerResult {
     []
   );
 
-  const deleteSalon = useCallback(async (id: number | string): Promise<void> => {
+  // Pas de suppression : le gérant retire son salon de la plateforme ou l'y remet.
+  const setSalonListed = useCallback(async (id: number | string, listed: boolean): Promise<SalonDetail> => {
     setLoading(true);
     setError(null);
     try {
-      await api.delete(`/salons/${id}`);
+      const { data } = await api.patch<SalonDetail>(`/salons/${id}/${listed ? "activate" : "deactivate"}`);
+      return data;
     } catch (err) {
-      const message = toErrorMessage(err, "Impossible de supprimer le salon.");
+      const message = toErrorMessage(err, "L'action n'a pas pu être enregistrée.");
       setError(message);
       throw new Error(message);
     } finally {
@@ -169,5 +171,5 @@ export function useManager(): UseManagerResult {
     }
   }, []);
 
-  return { getSalonStats, createSalon, updateSalon, updateOpeningHours, deleteSalon, loading, error };
+  return { getSalonStats, createSalon, updateSalon, updateOpeningHours, setSalonListed, loading, error };
 }

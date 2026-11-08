@@ -14,6 +14,7 @@ export interface Salon {
   reviews_count: number;
   is_verified: boolean;
   is_active: boolean;
+  deactivated_at?: string | null; // retiré de la plateforme par son gérant
   service_categories: string[];
 }
 

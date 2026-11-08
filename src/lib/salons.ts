@@ -15,6 +15,7 @@ export interface SalonDetail {
   reviews_count: number;
   opening_hours: OpeningHours | null;
   services: Service[];
+  deactivated_at?: string | null; // retiré de la plateforme par son gérant
 }
 
 export async function getSalon(id: string): Promise<SalonDetail | null> {

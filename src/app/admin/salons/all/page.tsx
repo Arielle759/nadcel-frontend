@@ -11,6 +11,7 @@ import { ui } from "@/lib/ui";
 const FILTERS: { key: SalonState | "all"; label: string }[] = [
   { key: "all", label: "Tous" },
   { key: "online", label: "En ligne" },
+  { key: "deactivated", label: "Désactivés" },
   { key: "suspended", label: "Suspendus" },
   { key: "pending", label: "En attente" },
   { key: "rejected", label: "Refusés" },
@@ -18,6 +19,7 @@ const FILTERS: { key: SalonState | "all"; label: string }[] = [
 
 const STATE_STYLES: Record<SalonState, string> = {
   online: "bg-sable/25 text-brand",
+  deactivated: "bg-anthracite/10 text-anthracite/75",
   pending: "bg-champagne-light/30 text-champagne",
   suspended: "bg-alert/10 text-alert",
   rejected: "bg-anthracite/10 text-anthracite/75",
@@ -51,7 +53,7 @@ export default function AdminAllSalonsPage() {
   }, [load]);
 
   const counts = useMemo(() => {
-    const result: Record<SalonState | "all", number> = { all: 0, online: 0, pending: 0, suspended: 0, rejected: 0 };
+    const result: Record<SalonState | "all", number> = { all: 0, online: 0, deactivated: 0, pending: 0, suspended: 0, rejected: 0 };
     for (const salon of salons ?? []) {
       result.all += 1;
       result[salonState(salon)] += 1;

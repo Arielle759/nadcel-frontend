@@ -27,7 +27,7 @@ export interface AdminMonth {
   is_partial: boolean;
 }
 
-export type SalonState = "online" | "pending" | "suspended" | "rejected";
+export type SalonState = "online" | "deactivated" | "pending" | "suspended" | "rejected";
 
 export interface AdminSalon {
   id: number;
@@ -38,6 +38,7 @@ export interface AdminSalon {
   phone: string | null;
   is_verified: boolean;
   is_active: boolean;
+  deactivated_at?: string | null; // retiré de la plateforme par son gérant
   created_at: string;
   reviews_count?: number;
   reviews_avg_rating?: number | string | null;
@@ -61,13 +62,15 @@ export interface Page<T> {
   total: number;
 }
 
-export function salonState(salon: Pick<AdminSalon, "is_verified" | "is_active">): SalonState {
+export function salonState(salon: Pick<AdminSalon, "is_verified" | "is_active" | "deactivated_at">): SalonState {
+  if (salon.is_verified && salon.is_active && salon.deactivated_at) return "deactivated";
   if (salon.is_verified) return salon.is_active ? "online" : "suspended";
   return salon.is_active ? "pending" : "rejected";
 }
 
 export const SALON_STATE_LABELS: Record<SalonState, string> = {
   online: "En ligne",
+  deactivated: "Désactivé par le gérant",
   pending: "En attente",
   suspended: "Suspendu",
   rejected: "Refusé",

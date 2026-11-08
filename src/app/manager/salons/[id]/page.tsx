@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { api, assetUrl } from "@/lib/api";
 import { useManager } from "@/hooks/useManager";
@@ -15,8 +15,7 @@ import { ui } from "@/lib/ui";
 
 export default function ManagerSalonDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const { updateSalon, updateOpeningHours, deleteSalon } = useManager();
+  const { updateSalon, updateOpeningHours, setSalonListed } = useManager();
 
   const [salon, setSalon] = useState<SalonDetail | null>(null);
   const [fetching, setFetching] = useState(true);
@@ -89,9 +88,9 @@ export default function ManagerSalonDetailPage() {
     }
   }
 
-  async function handleDelete() {
-    await deleteSalon(id);
-    router.push("/manager/salons");
+  async function handleListed(listed: boolean) {
+    const updated = await setSalonListed(id, listed);
+    setSalon((current) => (current ? { ...current, deactivated_at: updated.deactivated_at ?? null } : current));
   }
 
   if (fetching) {
@@ -184,15 +183,29 @@ export default function ManagerSalonDetailPage() {
             </div>
           </section>
 
-          <section className={`${ui.surface} flex flex-col gap-3 p-6 sm:p-8`} aria-labelledby="danger-title">
-            <h2 id="danger-title" className="text-base font-semibold text-anthracite">
-              Retirer le salon de Nadcel
+          <section className={`${ui.surface} flex flex-col gap-3 p-6 sm:p-8`} aria-labelledby="listing-title">
+            <h2 id="listing-title" className="text-base font-semibold text-anthracite">
+              {salon.deactivated_at ? "Salon désactivé" : "Désactiver le salon"}
             </h2>
             <p className="text-sm leading-6 text-anthracite/75">
-              Le salon disparaît des recherches et ne peut plus recevoir de réservations.
+              {salon.deactivated_at
+                ? "Le salon n'apparaît plus sur Nadcel et ne reçoit plus de réservations. Ses prestations, son équipe, ses rendez-vous et ses avis sont conservés : vous pouvez le remettre en ligne à tout moment."
+                : "Le salon disparaît des recherches et ne reçoit plus de réservations. Rien n'est supprimé : vous pourrez le remettre en ligne à tout moment. Les rendez-vous déjà pris restent dans votre agenda."}
             </p>
             <div>
-              <ConfirmDelete label="Supprimer ce salon" question="Supprimer définitivement ce salon ?" onConfirm={handleDelete} />
+              {salon.deactivated_at ? (
+                <button type="button" onClick={() => handleListed(true)} className={ui.buttonPrimary}>
+                  Remettre en ligne
+                </button>
+              ) : (
+                <ConfirmDelete
+                  label="Désactiver le salon"
+                  question="Désactiver ce salon ? Il ne sera plus visible sur Nadcel."
+                  confirmLabel="Oui, désactiver"
+                  busyLabel="Désactivation..."
+                  onConfirm={() => handleListed(false)}
+                />
+              )}
             </div>
           </section>
         </div>
