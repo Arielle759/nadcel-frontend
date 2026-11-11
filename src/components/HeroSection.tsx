@@ -6,6 +6,7 @@ import HeroSlideshow from "@/components/HeroSlideshow";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
+import SearchSuggest from "@/components/SearchSuggest";
 import { ui } from "@/lib/ui";
 
 const containerVariants = {
@@ -43,10 +44,14 @@ export default function HeroSection() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="relative flex min-h-[620px] overflow-hidden px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
+      className="relative z-20 flex min-h-[620px] px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
     >
-      <HeroSlideshow />
-      <div className="absolute inset-0 bg-gradient-to-r from-brand/95 via-brand/75 to-brand/15" />
+      {/* Le fond est découpé à part : la liste de suggestions peut ainsi
+          déborder sous la section sans être coupée. */}
+      <div className="absolute inset-0 overflow-hidden">
+        <HeroSlideshow />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand/95 via-brand/75 to-brand/15" />
+      </div>
 
       <div className="relative mx-auto flex w-full max-w-6xl items-center">
         <div className="max-w-2xl">
@@ -80,15 +85,14 @@ export default function HeroSection() {
             </label>
             <div className="flex flex-1 items-center gap-3 px-4">
               <Search size={18} className="shrink-0 text-anthracite/50" aria-hidden="true" />
-              <input
-                ref={inputRef}
+              <SearchSuggest
+                inputRef={inputRef}
                 id="hero-search"
-                type="search"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={setQuery}
+                onPickTerm={(term) => router.push(`/salons?q=${encodeURIComponent(term)}`)}
                 placeholder="Service, salon, quartier ou ville"
-                autoComplete="off"
-                className="h-12 w-full bg-transparent text-base text-anthracite outline-none placeholder:text-anthracite/50"
+                className="h-12 w-full bg-transparent text-base text-anthracite outline-none placeholder:text-anthracite/50 [&::-webkit-search-cancel-button]:hidden"
               />
             </div>
             <button type="submit" className={`${ui.buttonPrimary} h-12 px-7`}>

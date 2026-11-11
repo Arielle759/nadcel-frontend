@@ -2,6 +2,7 @@
 
 import { Search, X } from "lucide-react";
 import type { UseSalonFiltersResult } from "@/hooks/useSalonFilters";
+import SearchSuggest from "@/components/SearchSuggest";
 
 export default function SalonFilterBar({ filters }: { filters: UseSalonFiltersResult }) {
   const { query, setQuery } = filters;
@@ -16,13 +17,12 @@ export default function SalonFilterBar({ filters }: { filters: UseSalonFiltersRe
         className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-anthracite/50"
         aria-hidden="true"
       />
-      <input
+      <SearchSuggest
         id="salon-search"
-        type="search"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={setQuery}
+        onPickTerm={setQuery}
         placeholder="Coiffure, Plateau, nom du salon..."
-        autoComplete="off"
         className="h-12 w-full rounded-full border border-sable/40 bg-white/70 pl-11 pr-11 text-base text-anthracite outline-none transition-colors placeholder:text-anthracite/50 focus:border-brand/50 [&::-webkit-search-cancel-button]:hidden"
       />
       {query && (
