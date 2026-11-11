@@ -22,7 +22,7 @@ export interface ManagerAppointmentClient {
 }
 
 // online : réservé par la cliente sur Nadcel ; les autres sont saisis par le salon.
-export type BookingSource = "online" | "whatsapp" | "phone" | "walk_in";
+export type BookingSource = "online" | "whatsapp" | "instagram" | "facebook" | "tiktok" | "phone" | "walk_in";
 export type OfflineBookingSource = Exclude<BookingSource, "online">;
 
 export interface OfflineAppointmentData {

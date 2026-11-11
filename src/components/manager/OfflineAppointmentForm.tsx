@@ -14,7 +14,7 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
 
-const SOURCES: OfflineBookingSource[] = ["whatsapp", "phone", "walk_in"];
+const SOURCES: OfflineBookingSource[] = ["whatsapp", "instagram", "facebook", "tiktok", "phone", "walk_in"];
 
 function todayValue(): string {
   const d = new Date();
@@ -26,7 +26,7 @@ function slotLabel(slot: string): string {
   return m === "00" ? `${Number(h)} h` : `${Number(h)} h ${m}`;
 }
 
-// Saisie d'un rendez-vous pris hors de Nadcel (WhatsApp, téléphone, sur place).
+// Saisie d'un rendez-vous pris hors de Nadcel (WhatsApp, réseaux sociaux, téléphone, sur place).
 // Les créneaux proposés sont les mêmes que pour une réservation en ligne.
 export default function OfflineAppointmentForm({
   onCreated,
@@ -137,7 +137,7 @@ export default function OfflineAppointmentForm({
           Nouveau rendez-vous
         </h2>
         <p className="mt-1 text-sm text-anthracite/75">
-          Pour une réservation reçue par WhatsApp, par téléphone ou au salon. Le créneau est bloqué pour les réservations en ligne.
+          Pour une réservation reçue par WhatsApp, sur un réseau social, par téléphone ou au salon. Le créneau est bloqué pour les réservations en ligne.
         </p>
       </div>
 

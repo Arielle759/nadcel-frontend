@@ -12,6 +12,9 @@ import { ui } from "@/lib/ui";
 const CHANNELS: { source: BookingSource; color: string; hint: string }[] = [
   { source: "online", color: "var(--color-brand)", hint: "Réservés par les clients sur Nadcel" },
   { source: "whatsapp", color: "var(--color-accent)", hint: "Saisis par le salon" },
+  { source: "instagram", color: "var(--color-champagne-light)", hint: "Messages reçus par le salon" },
+  { source: "facebook", color: "var(--color-brand-soft)", hint: "Messages reçus par le salon" },
+  { source: "tiktok", color: "var(--color-cacao)", hint: "Messages reçus par le salon" },
   { source: "phone", color: "var(--color-champagne)", hint: "Saisis par le salon" },
   { source: "walk_in", color: "var(--color-sable)", hint: "Clients venus sans rendez-vous" },
 ];
@@ -65,7 +68,11 @@ export default function BookingChannels({ appointments }: { appointments: AdminS
     length: Math.max(0, fractions[index] - (used.length > 1 ? GAP : 0)),
   }));
 
-  const summary = CHANNELS.map((c) => `${BOOKING_SOURCE_LABELS[c.source]} ${formatShare(counts.get(c.source)?.share ?? 0)}`).join(", ");
+  // Les canaux sans rendez-vous sur la période ne prennent pas de place
+  // (« en ligne » reste toujours affiché, c'est la référence).
+  const cards = CHANNELS.filter((c) => c.source === "online" || (counts.get(c.source)?.count ?? 0) > 0);
+
+  const summary = cards.map((c) => `${BOOKING_SOURCE_LABELS[c.source]} ${formatShare(counts.get(c.source)?.share ?? 0)}`).join(", ");
 
   return (
     <section aria-labelledby="channels-title" className={`${ui.surface} p-6 sm:p-7`}>
@@ -108,7 +115,7 @@ export default function BookingChannels({ appointments }: { appointments: AdminS
         </div>
 
         <dl className="grid w-full flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-          {CHANNELS.map((channel) => {
+          {cards.map((channel) => {
             const data = counts.get(channel.source);
             return (
               <div key={channel.source} className="flex items-center gap-4 rounded-xl bg-beige/60 px-4 py-3.5">

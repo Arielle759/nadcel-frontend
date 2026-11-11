@@ -1,3 +1,4 @@
+import type { BookingSource } from "@/hooks/useManagerAppointments";
 import { useEffect, useState } from "react";
 import { api, toErrorMessage } from "@/lib/api";
 
@@ -77,7 +78,7 @@ export interface ManagerActivity {
   top_clients?: ActivityTopClient[];
   payment_methods: ActivityPaymentMethod[];
   // Prestations réalisées par canal de réservation (absent des anciennes réponses de l'API).
-  sources?: { source: "online" | "whatsapp" | "phone" | "walk_in"; count: number; share: number }[];
+  sources?: { source: BookingSource; count: number; share: number }[];
   forecast: ActivityForecast;
 }
 

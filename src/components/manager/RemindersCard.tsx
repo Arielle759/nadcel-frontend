@@ -9,6 +9,9 @@ import { ui } from "@/lib/ui";
 // « réservé par whatsapp » ou « réservé par sur place » se lisaient mal.
 const BOOKED_VIA: Partial<Record<string, string>> = {
   whatsapp: "réservé par WhatsApp",
+  instagram: "réservé sur Instagram",
+  facebook: "réservé sur Facebook",
+  tiktok: "réservé sur TikTok",
   phone: "réservé par téléphone",
   walk_in: "réservé au salon",
 };
