@@ -16,7 +16,8 @@ export interface ServiceFormValues {
 // Catégories proposées (la saisie reste libre) : ce sont aussi les termes que
 // la recherche publique et les vignettes de l'accueil savent retrouver.
 const CATEGORY_SUGGESTIONS = ["Coiffure", "Coloration", "Soin", "Manucure", "Massage", "Épilation", "Maquillage"];
-const DURATIONS = [15, 30, 45, 60, 90, 120, 180];
+// Jusqu'à 10 h : certaines coiffures (tresses, nattes, locks) prennent une journée.
+const DURATIONS = [15, 30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600];
 
 function durationLabel(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;
@@ -118,13 +119,24 @@ export default function ServiceForm({
           <label htmlFor="duration" className={ui.label}>
             Durée
           </label>
-          <select id="duration" value={duration} onChange={(e) => setDuration(e.target.value)} className={ui.input}>
+          <select
+            id="duration"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            aria-describedby={Number(duration) >= 300 ? "duration-hint" : undefined}
+            className={ui.input}
+          >
             {durationOptions.map((d) => (
               <option key={d} value={d}>
                 {durationLabel(d)}
               </option>
             ))}
           </select>
+          {Number(duration) >= 300 && (
+            <p id="duration-hint" className="text-xs text-anthracite/70">
+              Les clientes ne verront que les heures de début qui permettent de finir avant la fermeture du salon.
+            </p>
+          )}
         </div>
       </div>
 
