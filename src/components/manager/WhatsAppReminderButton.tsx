@@ -26,7 +26,7 @@ export default function WhatsAppReminderButton({
     reminderMessage({
       clientName: appointmentClientName(appointment),
       salonName: salonName ?? appointment.salon?.name ?? "notre salon",
-      serviceName: appointment.service?.name ?? "votre prestation",
+      serviceName: appointment.service?.name ?? "votre rendez-vous",
       scheduledAt: appointment.scheduled_at,
     })
   );

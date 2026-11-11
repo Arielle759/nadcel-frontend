@@ -61,7 +61,7 @@ export default function ServiceForm({
         category: category.trim(),
         image,
       });
-      setMessage({ ok: true, text: "Prestation enregistrée." });
+      setMessage({ ok: true, text: "Service enregistré." });
     } catch (err) {
       setMessage({ ok: false, text: err instanceof Error ? err.message : "Enregistrement impossible." });
     } finally {
@@ -73,7 +73,7 @@ export default function ServiceForm({
     <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
       <div className="flex flex-col gap-2">
         <label htmlFor="name" className={ui.label}>
-          Nom de la prestation
+          Nom du service
         </label>
         <input id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Tresses box braids" className={ui.input} />
       </div>
@@ -149,7 +149,7 @@ export default function ServiceForm({
           required
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Ce que comprend la prestation, les produits utilisés..."
+          placeholder="Ce que comprend le service, les produits utilisés..."
           className={ui.textarea}
         />
       </div>

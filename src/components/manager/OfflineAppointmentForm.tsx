@@ -198,7 +198,7 @@ export default function OfflineAppointmentForm({
         )}
         <div className="flex flex-col gap-2">
           <label htmlFor="service" className={ui.label}>
-            Prestation
+            Service
           </label>
           <select id="service" required value={serviceId ?? ""} onChange={(e) => setServiceId(Number(e.target.value))} className={ui.input}>
             {services.map((s) => (
@@ -220,7 +220,7 @@ export default function OfflineAppointmentForm({
         <span className={ui.label}>Heure</span>
         {slotsLoading && <p className="text-sm text-anthracite/70">Recherche des créneaux libres...</p>}
         {!slotsLoading && slots?.length === 0 && (
-          <p className="text-sm text-anthracite/70">Aucun créneau libre ce jour-là pour cette prestation.</p>
+          <p className="text-sm text-anthracite/70">Aucun créneau libre ce jour-là pour ce service.</p>
         )}
         {!slotsLoading && slots && slots.length > 0 && (
           <div className="flex flex-wrap gap-2">

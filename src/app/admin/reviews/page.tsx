@@ -69,7 +69,7 @@ function ReviewsContent() {
   return (
     <ManagerPage
       title="Avis"
-      description="Les avis sont laissés uniquement par des clients venus au salon, après une prestation terminée. Ils sont publiés tels quels : la plateforme ne retire aucun avis, pour rester impartiale envers les clients comme envers les salons."
+      description="Les avis sont laissés uniquement par des clients venus au salon, après un rendez-vous terminé. Ils sont publiés tels quels : la plateforme ne retire aucun avis, pour rester impartiale envers les clients comme envers les salons."
     >
       <div role="tablist" aria-label="Filtrer les avis" className="mb-6 inline-flex gap-1 rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
         {[

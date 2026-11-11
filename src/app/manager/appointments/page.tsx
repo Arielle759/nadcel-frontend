@@ -190,7 +190,7 @@ export default function ManagerAppointmentsPage() {
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Rendez-vous</h1>
           <p className="mt-1 text-sm text-anthracite/70">
-            Après chaque prestation, clôturez le rendez-vous en notant le paiement reçu sur place.
+            Après chaque rendez-vous, clôturez le rendez-vous en notant le paiement reçu sur place.
           </p>
         </div>
         {!creating && (
@@ -242,13 +242,13 @@ export default function ManagerAppointmentsPage() {
         </div>
 
         <label className="relative w-full lg:w-72">
-          <span className="sr-only">Rechercher un client ou une prestation</span>
+          <span className="sr-only">Rechercher un client ou un service</span>
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-anthracite/45" aria-hidden="true" />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Client ou prestation"
+            placeholder="Client ou service"
             className="h-11 w-full rounded-full bg-white pl-9 pr-4 text-sm outline-none shadow-[0_1px_2px_rgba(90,50,35,0.06),0_0_0_1px_rgba(90,50,35,0.10)] focus:shadow-[0_0_0_2px_var(--color-brand)]"
           />
         </label>
@@ -409,7 +409,7 @@ function AppointmentRow({
             )}
           </p>
           <p className="truncate text-sm text-anthracite/65">
-            {a.service?.name ?? "Prestation"}
+            {a.service?.name ?? "Service"}
             {!a.client && a.client_phone && (
               <>
                 {", "}

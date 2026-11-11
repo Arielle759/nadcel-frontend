@@ -75,7 +75,7 @@ export default function ReviewsShowcase() {
           <SectionHeading
             id="reviews-title"
             title="Les avis après rendez-vous"
-            description="Seules les personnes venues au salon peuvent laisser un avis, une fois la prestation terminée."
+            description="Seules les personnes venues au salon peuvent laisser un avis, une fois leur rendez-vous terminé."
           />
         </Reveal>
 

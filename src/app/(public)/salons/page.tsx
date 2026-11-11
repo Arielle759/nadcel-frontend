@@ -24,7 +24,7 @@ function SalonsContent() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Trouver un salon</h1>
-          <p className="text-anthracite/75">Cherchez par prestation, nom de salon, quartier ou ville.</p>
+          <p className="text-anthracite/75">Cherchez par service, nom de salon, quartier ou ville.</p>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -38,7 +38,7 @@ function SalonsContent() {
           salons={salons}
           loading={loading}
           error={error}
-          emptyMessage="Aucun salon ne correspond à votre recherche. Essayez un quartier ou une prestation plus large."
+          emptyMessage="Aucun salon ne correspond à votre recherche. Essayez un quartier ou un service plus large."
         />
       </div>
     </main>

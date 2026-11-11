@@ -35,7 +35,7 @@ export default function TermsPage() {
           <p className="text-anthracite/75">
             Une réservation effectuée sur NADCEL constitue une demande de rendez-vous
             transmise au salon choisi. Aucun paiement n&apos;est collecté en ligne par
-            NADCEL : le règlement de la prestation s&apos;effectue directement auprès du
+            NADCEL : le règlement du service s&apos;effectue directement auprès du
             salon, en espèces ou par carte.
           </p>
         </div>

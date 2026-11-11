@@ -49,7 +49,7 @@ export default function ManagerEmployeesPage() {
   return (
     <ManagerPage
       title="Équipe"
-      description="Chaque rendez-vous est attribué à un membre de l'équipe qui réalise la prestation et qui est libre à ce moment-là."
+      description="Chaque rendez-vous est attribué à un membre de l'équipe qui réalise le service et qui est libre à ce moment-là."
       back={{ href: "/manager/salons", label: "Mes salons" }}
       actions={
         <Link href={`/manager/salons/${id}/employees/new`} className={ui.buttonPrimary}>
@@ -109,7 +109,7 @@ export default function ManagerEmployeesPage() {
                 </p>
               ) : (
                 <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  Aucune prestation associée : ce membre ne reçoit pas encore de rendez-vous.
+                  Aucun service associé : ce membre ne reçoit pas encore de rendez-vous.
                 </p>
               )}
               <div className="flex flex-wrap items-center gap-1">

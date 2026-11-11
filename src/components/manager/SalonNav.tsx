@@ -6,7 +6,7 @@ type Section = "details" | "services" | "employees";
 export default function SalonNav({ salonId, current }: { salonId: string | number; current: Section }) {
   const items: { key: Section; label: string; href: string }[] = [
     { key: "details", label: "Fiche et horaires", href: `/manager/salons/${salonId}` },
-    { key: "services", label: "Prestations", href: `/manager/salons/${salonId}/services` },
+    { key: "services", label: "Services", href: `/manager/salons/${salonId}/services` },
     { key: "employees", label: "Équipe", href: `/manager/salons/${salonId}/employees` },
   ];
 

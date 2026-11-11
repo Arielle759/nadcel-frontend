@@ -48,7 +48,7 @@ export default async function AppointmentsPage({
         </div>
 
         {salon.services.length === 0 ? (
-          <p className="text-anthracite/75">Ce salon n&apos;a pas encore publié de prestation réservable.</p>
+          <p className="text-anthracite/75">Ce salon n&apos;a pas encore publié de service réservable.</p>
         ) : (
           <AppointmentForm
             salonId={salon.id}

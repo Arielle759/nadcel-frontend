@@ -281,7 +281,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
           <dd className="font-medium text-anthracite">{salonName}</dd>
         </div>
         <div>
-          <dt className="text-anthracite/70">Prestation</dt>
+          <dt className="text-anthracite/70">Service</dt>
           <dd className="font-medium text-anthracite">
             {selectedService ? `${selectedService.name}, ${formatDuration(selectedService.duration)}` : "À choisir"}
           </dd>
@@ -342,7 +342,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         )}
 
         <fieldset className="min-w-0">
-          <legend className="font-heading text-2xl font-semibold text-brand">1. Prestation</legend>
+          <legend className="font-heading text-2xl font-semibold text-brand">1. Service</legend>
           <div className="mt-4 flex flex-col gap-3">
             {services.map((service) => {
               const checked = service.id === serviceId;
@@ -374,8 +374,8 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
           <legend className="font-heading text-2xl font-semibold text-brand">2. Jour</legend>
           {noStaffForService ? (
             <div className="mt-4 rounded-2xl bg-sable/20 px-5 py-4 text-sm leading-6 text-anthracite/85">
-              <p className="font-semibold text-brand">Cette prestation n&apos;est pas encore réservable en ligne.</p>
-              <p className="mt-1">Choisissez une autre prestation ci-dessus, ou contactez directement le salon.</p>
+              <p className="font-semibold text-brand">Ce service n&apos;est pas encore réservable en ligne.</p>
+              <p className="mt-1">Choisissez un autre service ci-dessus, ou contactez directement le salon.</p>
             </div>
           ) : (
             <>

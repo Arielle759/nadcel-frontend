@@ -189,7 +189,7 @@ export default function ManagerSalonDetailPage() {
             </h2>
             <p className="text-sm leading-6 text-anthracite/75">
               {salon.deactivated_at
-                ? "Le salon n'apparaît plus sur Nadcel et ne reçoit plus de réservations. Ses prestations, son équipe, ses rendez-vous et ses avis sont conservés : vous pouvez le remettre en ligne à tout moment."
+                ? "Le salon n'apparaît plus sur Nadcel et ne reçoit plus de réservations. Ses services, son équipe, ses rendez-vous et ses avis sont conservés : vous pouvez le remettre en ligne à tout moment."
                 : "Le salon disparaît des recherches et ne reçoit plus de réservations. Rien n'est supprimé : vous pourrez le remettre en ligne à tout moment. Les rendez-vous déjà pris restent dans votre agenda."}
             </p>
             <div>

@@ -12,13 +12,13 @@ export default function NewServicePage() {
 
   return (
     <ManagerPage
-      title="Nouvelle prestation"
+      title="Nouveau service"
       description="Elle sera réservable dès qu'au moins un membre de l'équipe la réalise."
-      back={{ href: `/manager/salons/${id}/services`, label: "Prestations" }}
+      back={{ href: `/manager/salons/${id}/services`, label: "Services" }}
       width="narrow"
     >
       <ServiceForm
-        submitLabel="Ajouter la prestation"
+        submitLabel="Ajouter le service"
         onSubmit={async (values) => {
           await createService({ salon_id: Number(id), ...values });
           router.push(`/manager/salons/${id}/services`);

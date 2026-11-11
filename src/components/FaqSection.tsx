@@ -19,7 +19,7 @@ const FAQ_ITEMS = [
   {
     question: "Dois-je payer en ligne ?",
     answer:
-      "Non. NADCEL ne collecte aucun paiement en ligne : le règlement se fait directement au salon, en espèces, par Wave ou par Orange Money, une fois la prestation faite.",
+      "Non. NADCEL ne collecte aucun paiement en ligne : le règlement se fait directement au salon, en espèces, par Wave ou par Orange Money, une fois le service réalisé.",
   },
   {
     question: "Comment annuler ou modifier une réservation ?",

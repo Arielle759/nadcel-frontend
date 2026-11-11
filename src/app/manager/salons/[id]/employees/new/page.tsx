@@ -28,7 +28,7 @@ export default function NewEmployeePage() {
   return (
     <ManagerPage
       title="Nouveau membre de l'équipe"
-      description="Vous choisirez ensuite les prestations qu'il ou elle réalise."
+      description="Vous choisirez ensuite les services qu'il ou elle réalise."
       back={{ href: `/manager/salons/${id}/employees`, label: "Équipe" }}
       width="narrow"
     >

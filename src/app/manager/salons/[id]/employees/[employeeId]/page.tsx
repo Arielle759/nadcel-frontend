@@ -86,7 +86,7 @@ function EditEmployeeContent() {
     <ManagerPage title={name || "Membre de l'équipe"} back={back} width="narrow">
       {justCreated && (
         <p className="mb-6 rounded-2xl bg-sable/20 px-5 py-4 text-sm leading-6 text-brand">
-          {name} fait maintenant partie de l&apos;équipe. Cochez les prestations qu&apos;il ou elle réalise, puis enregistrez.
+          {name} fait maintenant partie de l&apos;équipe. Cochez les services qu&apos;il ou elle réalise, puis enregistrez.
         </p>
       )}
 
@@ -108,15 +108,15 @@ function EditEmployeeContent() {
         </section>
 
         <fieldset className={`${ui.surface} flex flex-col gap-4 p-6 sm:p-8`}>
-          <legend className="sr-only">Prestations réalisées</legend>
+          <legend className="sr-only">Services réalisés</legend>
           <div>
-            <p className="font-heading text-2xl font-semibold text-brand">Prestations réalisées</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Services réalisés</p>
             <p className="mt-1 text-sm text-anthracite/75">
-              Les clientes ne peuvent réserver avec ce membre que les prestations cochées.
+              Les clientes ne peuvent réserver avec ce membre que les services cochés.
             </p>
           </div>
           {services.length === 0 ? (
-            <p className="text-sm text-anthracite/75">Ce salon n&apos;a pas encore de prestation.</p>
+            <p className="text-sm text-anthracite/75">Ce salon n&apos;a pas encore de service.</p>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
               {services.map((service) => {

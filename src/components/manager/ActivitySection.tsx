@@ -131,7 +131,7 @@ function KpiRow({
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
       <Kpi
-        label="Prestations réalisées"
+        label="Rendez-vous réalisés"
         value={data ? <CountUp value={data.totals.completed} /> : placeholder}
         trend={data ? <TrendBadge trend={data.totals.trend} /> : null}
       />
@@ -263,13 +263,13 @@ function TrendBadge({ trend }: { trend: number | null }) {
 function TopServices({ data }: { data: ManagerActivity }) {
   return (
     <div className={CARD}>
-      <p className="text-base font-semibold text-anthracite">Prestations préférées des clients</p>
+      <p className="text-base font-semibold text-anthracite">Services préférés des clients</p>
       <p className="mb-4 text-sm text-anthracite/60">
-        {data.totals.completed} prestation{data.totals.completed > 1 ? "s" : ""} réalisée{data.totals.completed > 1 ? "s" : ""}, soit{" "}
+        {data.totals.completed} rendez-vous réalisé{data.totals.completed > 1 ? "s" : ""}, soit{" "}
         {formatCurrency(data.totals.revenue)}
       </p>
       {data.top_services.length === 0 ? (
-        <p className="text-sm text-anthracite/60">Aucune prestation réalisée sur cette période.</p>
+        <p className="text-sm text-anthracite/60">Aucun rendez-vous réalisé sur cette période.</p>
       ) : (
         <ol className="flex flex-col gap-5">
           {data.top_services.map((service, index) => (
@@ -283,7 +283,7 @@ function TopServices({ data }: { data: ManagerActivity }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-anthracite">{service.name}</p>
                 <p className="mt-0.5 text-xs text-anthracite/55">
-                  {service.count} fois, {service.share.toLocaleString("fr-FR")} % des prestations,{" "}
+                  {service.count} fois, {service.share.toLocaleString("fr-FR")} % des rendez-vous,{" "}
                   {formatCurrency(service.revenue)}
                 </p>
               </div>
@@ -312,7 +312,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
         <>
           <p className="text-4xl font-semibold tracking-tight text-brand">
             ≈ {forecast.expected}
-            <span className="ml-2 text-base font-medium text-anthracite/60">prestations attendues</span>
+            <span className="ml-2 text-base font-medium text-anthracite/60">rendez-vous attendus</span>
           </p>
           <p className="text-sm text-anthracite/65">
             {forecast.method === "seasonal"
@@ -323,7 +323,7 @@ function Forecast({ data }: { data: ManagerActivity }) {
           {forecast.peak_month && (
             <p className="rounded-xl bg-sable/10 px-3 py-2 text-sm text-anthracite/75">
               Mois le plus chargé de l&apos;année écoulée : <strong>{formatMonthLong(forecast.peak_month.month)}</strong> (
-              {forecast.peak_month.total} prestations).
+              {forecast.peak_month.total} rendez-vous).
             </p>
           )}
         </>
@@ -339,9 +339,9 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
   return (
     <div className={CARD}>
       <p className="text-base font-semibold text-anthracite">Jours et moments les plus chargés</p>
-      <p className="mb-4 text-sm text-anthracite/60">Plus la case est foncée, plus il y a eu de prestations.</p>
+      <p className="mb-4 text-sm text-anthracite/60">Plus la case est foncée, plus il y a eu de rendez-vous.</p>
       <table className="w-full table-fixed border-separate border-spacing-1 text-center text-xs">
-        <caption className="sr-only">Nombre de prestations par jour de la semaine et moment de la journée</caption>
+        <caption className="sr-only">Nombre de rendez-vous par jour de la semaine et moment de la journée</caption>
         <thead>
           <tr>
             <th scope="col" className="w-24" />
@@ -369,7 +369,7 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
                       backgroundColor:
                         count === 0 ? "rgba(220, 198, 180, 0.22)" : `rgba(74, 51, 40, ${0.15 + intensity * 0.85})`,
                     }}
-                    title={`${DAY_LABELS[index]} ${PART_LABELS[part]} : ${count} prestation${count > 1 ? "s" : ""}`}
+                    title={`${DAY_LABELS[index]} ${PART_LABELS[part]} : ${count} rendez-vous`}
                   >
                     {count > 0 ? count : ""}
                   </td>
@@ -389,13 +389,13 @@ function Employees({ data }: { data: ManagerActivity }) {
     <div className={CARD}>
       <p className={`${LABEL} mb-3`}>Activité par employé</p>
       {data.employees.length === 0 ? (
-        <p className="text-sm text-anthracite/60">Aucune prestation attribuée sur cette période.</p>
+        <p className="text-sm text-anthracite/60">Aucun rendez-vous attribué sur cette période.</p>
       ) : (
         <dl className="text-sm">
           {data.employees.map((employee) => (
             <div key={employee.employee_id} className="flex items-baseline justify-between gap-3 py-1.5">
               <dt className="text-anthracite/60">
-                {employee.name}, {employee.count} prestation{employee.count > 1 ? "s" : ""}
+                {employee.name}, {employee.count} rendez-vous
               </dt>
               <dd className="font-medium tabular-nums text-anthracite">{formatCurrency(employee.revenue)}</dd>
             </div>
@@ -430,7 +430,7 @@ function Insights({ data }: { data: ManagerActivity }) {
   const busiest = [...data.busy_slots].sort((a, b) => b.count - a.count)[0];
   if (busiest && busiest.count >= 3) {
     insights.push(
-      `Votre moment le plus chargé est le ${DAY_LABELS[busiest.day - 1]} ${PART_LABELS[busiest.part]} (${busiest.count} prestations) : prévoyez assez de personnel sur ce créneau.`
+      `Votre moment le plus chargé est le ${DAY_LABELS[busiest.day - 1]} ${PART_LABELS[busiest.part]} (${busiest.count} rendez-vous) : prévoyez assez de personnel sur ce créneau.`
     );
   }
 

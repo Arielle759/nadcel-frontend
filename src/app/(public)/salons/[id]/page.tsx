@@ -30,7 +30,7 @@ function todayLabel(hours: OpeningHours | null, todayKey: DayKey): string | null
 function groupByCategory(services: Service[]): { category: string; services: Service[] }[] {
   const groups = new Map<string, Service[]>();
   for (const service of services) {
-    const key = service.category?.trim() || "Autres prestations";
+    const key = service.category?.trim() || "Autres services";
     groups.set(key, [...(groups.get(key) ?? []), service]);
   }
   return Array.from(groups, ([category, items]) => ({
@@ -109,11 +109,11 @@ export default async function SalonDetailPage({
 
             <section aria-labelledby="services-title" className="mt-14">
               <h2 id="services-title" className="text-2xl font-semibold tracking-tight text-brand sm:text-3xl">
-                Prestations
+                Services
               </h2>
 
               {groups.length === 0 ? (
-                <p className="mt-4 text-anthracite/75">Ce salon n&apos;a pas encore publié ses prestations.</p>
+                <p className="mt-4 text-anthracite/75">Ce salon n&apos;a pas encore publié ses services.</p>
               ) : (
                 groups.map(({ category, services }) => (
                   <div key={category} className="mt-8">
@@ -205,7 +205,7 @@ export default async function SalonDetailPage({
               <p className="font-heading text-2xl font-semibold text-brand">Réserver</p>
               {minPrice !== null && maxPrice !== null && (
                 <p className="mt-2 text-sm text-anthracite/80">
-                  {salon.services.length} {salon.services.length > 1 ? "prestations" : "prestation"},{" "}
+                  {salon.services.length} {salon.services.length > 1 ? "services" : "service"},{" "}
                   {minPrice === maxPrice
                     ? formatCurrency(minPrice)
                     : `de ${formatCurrency(minPrice)} à ${formatCurrency(maxPrice)}`}

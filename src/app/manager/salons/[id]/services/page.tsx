@@ -25,7 +25,7 @@ export default function ManagerServicesPage() {
     try {
       setServices(await getServices(id));
     } catch {
-      setError("Impossible de charger les prestations.");
+      setError("Impossible de charger les services.");
     } finally {
       setLoading(false);
     }
@@ -39,12 +39,12 @@ export default function ManagerServicesPage() {
 
   return (
     <ManagerPage
-      title="Prestations"
+      title="Services"
       description="Ce que vos clientes peuvent réserver, avec le prix et la durée affichés sur votre page."
       back={{ href: "/manager/salons", label: "Mes salons" }}
       actions={
         <Link href={`/manager/salons/${id}/services/new`} className={ui.buttonPrimary}>
-          Ajouter une prestation
+          Ajouter un service
         </Link>
       }
     >
@@ -56,8 +56,8 @@ export default function ManagerServicesPage() {
 
         {!loading && !error && services.length === 0 && (
           <div className={`${ui.surface} px-6 py-12 text-center`}>
-            <p className="font-heading text-2xl font-semibold text-brand">Aucune prestation</p>
-            <p className="mt-2 text-sm text-anthracite/75">Ajoutez votre première prestation pour pouvoir recevoir des réservations.</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Aucun service</p>
+            <p className="mt-2 text-sm text-anthracite/75">Ajoutez votre premier service pour pouvoir recevoir des réservations.</p>
           </div>
         )}
 
@@ -89,7 +89,7 @@ export default function ManagerServicesPage() {
                     Modifier
                   </Link>
                   <ConfirmDelete
-                    question="Supprimer cette prestation ?"
+                    question="Supprimer ce service ?"
                     onConfirm={async () => {
                       await deleteService(service.id);
                       await fetchServices();

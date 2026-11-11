@@ -43,7 +43,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-semibold text-beige">Prestations</span>
+          <span className="text-sm font-semibold text-beige">Services</span>
           <nav className="flex flex-col gap-2.5 text-sm text-beige/75">
             {SERVICE_CATEGORIES.map((category) => (
               <Link

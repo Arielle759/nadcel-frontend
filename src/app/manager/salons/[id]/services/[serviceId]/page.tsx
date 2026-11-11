@@ -21,10 +21,10 @@ export default function EditServicePage() {
         if (!isMounted) return;
         const found = services.find((s) => String(s.id) === serviceId);
         if (found) setService(found);
-        else setFetchError("Prestation introuvable.");
+        else setFetchError("Service introuvable.");
       })
       .catch(() => {
-        if (isMounted) setFetchError("Impossible de charger la prestation.");
+        if (isMounted) setFetchError("Impossible de charger le service.");
       })
       .finally(() => {
         if (isMounted) setFetching(false);
@@ -34,11 +34,11 @@ export default function EditServicePage() {
     };
   }, [getServices, id, serviceId]);
 
-  const back = { href: `/manager/salons/${id}/services`, label: "Prestations" };
+  const back = { href: `/manager/salons/${id}/services`, label: "Services" };
 
   if (fetching || !service) {
     return (
-      <ManagerPage title={fetching ? "Chargement..." : "Prestation introuvable"} back={back} width="narrow">
+      <ManagerPage title={fetching ? "Chargement..." : "Service introuvable"} back={back} width="narrow">
         {fetching ? <div className="h-96 animate-pulse rounded-2xl bg-sable/15" /> : <p className="text-sm text-red-700">{fetchError}</p>}
       </ManagerPage>
     );

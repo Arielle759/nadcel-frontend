@@ -14,7 +14,7 @@ const BENEFITS = [
   },
   {
     title: "Votre activité en clair",
-    description: "Chiffre d'affaires encaissé, prestations les plus demandées et prévisions du mois prochain.",
+    description: "Chiffre d'affaires encaissé, services les plus demandés et prévisions du mois prochain.",
   },
 ];
 

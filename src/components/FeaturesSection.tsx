@@ -5,7 +5,7 @@ import { ui } from "@/lib/ui";
 const STEPS = [
   {
     number: "01",
-    title: "Choisissez une prestation",
+    title: "Choisissez un service",
     description: "Prix et durée sont affichés avant de réserver. Pas de surprise une fois au salon.",
   },
   {
@@ -16,7 +16,7 @@ const STEPS = [
   {
     number: "03",
     title: "Réglez sur place",
-    description: "En espèces, par Wave ou Orange Money, une fois la prestation faite. Un rappel vous est envoyé la veille.",
+    description: "En espèces, par Wave ou Orange Money, une fois le service réalisé. Un rappel vous est envoyé la veille.",
   },
 ];
 

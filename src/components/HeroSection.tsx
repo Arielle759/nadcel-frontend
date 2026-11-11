@@ -76,7 +76,7 @@ export default function HeroSection() {
             className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(40,25,18,0.25)] sm:flex-row sm:items-center"
           >
             <label htmlFor="hero-search" className="sr-only">
-              Prestation, salon, quartier ou ville
+              Service, salon, quartier ou ville
             </label>
             <div className="flex flex-1 items-center gap-3 px-4">
               <Search size={18} className="shrink-0 text-anthracite/50" aria-hidden="true" />
@@ -86,7 +86,7 @@ export default function HeroSection() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Prestation, salon, quartier ou ville"
+                placeholder="Service, salon, quartier ou ville"
                 autoComplete="off"
                 className="h-12 w-full bg-transparent text-base text-anthracite outline-none placeholder:text-anthracite/50"
               />

@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           <p className="text-anthracite/75">
             Ces informations servent uniquement à faire fonctionner la plateforme : créer et
             afficher vos réservations, permettre aux salons de les traiter, et vous permettre
-            de laisser un avis après une prestation terminée. NADCEL ne vend aucune donnée
+            de laisser un avis après un rendez-vous terminé. NADCEL ne vend aucune donnée
             personnelle à des tiers.
           </p>
         </div>
