@@ -34,7 +34,7 @@ export default function ManagerEmployeesPage() {
       // Les membres actifs d'abord, les désactivés à la fin.
       setEmployees([...list].sort((a, b) => Number(b.is_active !== false) - Number(a.is_active !== false)));
     } catch {
-      setError("Impossible de charger l'équipe.");
+      setError("Impossible de charger les employés.");
     } finally {
       setLoading(false);
     }
@@ -48,12 +48,12 @@ export default function ManagerEmployeesPage() {
 
   return (
     <ManagerPage
-      title="Équipe"
-      description="Chaque rendez-vous est attribué à un membre de l'équipe qui réalise le service et qui est libre à ce moment-là."
+      title="Employés"
+      description="Chaque rendez-vous est attribué à un employé qui réalise le service et qui est libre à ce moment-là."
       back={{ href: "/manager/salons", label: "Mes salons" }}
       actions={
         <Link href={`/manager/salons/${id}/employees/new`} className={ui.buttonPrimary}>
-          Ajouter un membre
+          Ajouter un employé
         </Link>
       }
     >
@@ -70,9 +70,9 @@ export default function ManagerEmployeesPage() {
 
         {!loading && !error && employees.length === 0 && (
           <div className={`${ui.surface} px-6 py-12 text-center`}>
-            <p className="font-heading text-2xl font-semibold text-brand">Personne dans l&apos;équipe</p>
+            <p className="font-heading text-2xl font-semibold text-brand">Aucun employé</p>
             <p className="mt-2 text-sm text-anthracite/75">
-              Sans membre de l&apos;équipe, aucun créneau ne peut être proposé aux clientes.
+              Sans employé, aucun créneau ne peut être proposé aux clientes.
             </p>
           </div>
         )}
@@ -100,7 +100,7 @@ export default function ManagerEmployeesPage() {
               </div>
               {!active ? (
                 <p className="rounded-xl bg-beige/60 px-3 py-2 text-sm text-anthracite/80">
-                  Ce membre ne reçoit plus de rendez-vous. Son historique est conservé.
+                  Cet employé ne reçoit plus de rendez-vous. Son historique est conservé.
                 </p>
               ) : employee.services.length > 0 ? (
                 <p className="text-sm text-anthracite/80">
@@ -109,7 +109,7 @@ export default function ManagerEmployeesPage() {
                 </p>
               ) : (
                 <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  Aucun service associé : ce membre ne reçoit pas encore de rendez-vous.
+                  Aucun service associé : cet employé ne reçoit pas encore de rendez-vous.
                 </p>
               )}
               <div className="flex flex-wrap items-center gap-1">
@@ -119,7 +119,7 @@ export default function ManagerEmployeesPage() {
                 {active ? (
                   <ConfirmDelete
                     label="Désactiver"
-                    question="Désactiver ce membre ? Il ne recevra plus de rendez-vous."
+                    question="Désactiver cet employé ? Il ne recevra plus de rendez-vous."
                     confirmLabel="Oui, désactiver"
                     busyLabel="Désactivation..."
                     onConfirm={async () => {
@@ -145,7 +145,7 @@ export default function ManagerEmployeesPage() {
                         setNotice(`${employee.name} peut de nouveau recevoir des rendez-vous.`);
                         await fetchEmployees();
                       } catch (err) {
-                        setError(err instanceof Error ? err.message : "Impossible de réactiver ce membre.");
+                        setError(err instanceof Error ? err.message : "Impossible de réactiver cet employé.");
                       } finally {
                         setReactivating(null);
                       }

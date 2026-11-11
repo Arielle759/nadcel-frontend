@@ -27,9 +27,9 @@ export default function NewEmployeePage() {
 
   return (
     <ManagerPage
-      title="Nouveau membre de l'équipe"
+      title="Nouvel employé"
       description="Vous choisirez ensuite les services qu'il ou elle réalise."
-      back={{ href: `/manager/salons/${id}/employees`, label: "Équipe" }}
+      back={{ href: `/manager/salons/${id}/employees`, label: "Employés" }}
       width="narrow"
     >
       <form onSubmit={handleSubmit} className={`${ui.surface} flex flex-col gap-5 p-6 sm:p-8`}>
@@ -44,7 +44,7 @@ export default function NewEmployeePage() {
             Téléphone
           </label>
           <input id="phone" type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="77 123 45 67" className={ui.input} />
-          <p className="text-sm text-anthracite/70">Les membres de l&apos;équipe n&apos;ont pas de compte : c&apos;est vous qui organisez leur planning.</p>
+          <p className="text-sm text-anthracite/70">Les employés n&apos;ont pas de compte : c&apos;est vous qui organisez leur planning.</p>
         </div>
 
         {error && (

@@ -33,7 +33,7 @@ function EditEmployeeContent() {
         setServices(salonServices);
         const employee = employees.find((e) => String(e.id) === employeeId);
         if (!employee) {
-          setFetchError("Membre de l'équipe introuvable.");
+          setFetchError("Employé introuvable.");
           return;
         }
         setName(employee.name);
@@ -41,7 +41,7 @@ function EditEmployeeContent() {
         setServiceIds(employee.services.map((service) => service.id));
       })
       .catch(() => {
-        if (isMounted) setFetchError("Impossible de charger ce membre de l'équipe.");
+        if (isMounted) setFetchError("Impossible de charger cet employé.");
       })
       .finally(() => {
         if (isMounted) setFetching(false);
@@ -72,7 +72,7 @@ function EditEmployeeContent() {
     }
   }
 
-  const back = { href: `/manager/salons/${id}/employees`, label: "Équipe" };
+  const back = { href: `/manager/salons/${id}/employees`, label: "Employés" };
 
   if (fetching || fetchError) {
     return (
@@ -83,10 +83,10 @@ function EditEmployeeContent() {
   }
 
   return (
-    <ManagerPage title={name || "Membre de l'équipe"} back={back} width="narrow">
+    <ManagerPage title={name || "Employé"} back={back} width="narrow">
       {justCreated && (
         <p className="mb-6 rounded-2xl bg-sable/20 px-5 py-4 text-sm leading-6 text-brand">
-          {name} fait maintenant partie de l&apos;équipe. Cochez les services qu&apos;il ou elle réalise, puis enregistrez.
+          {name} fait maintenant partie de vos employés. Cochez les services qu&apos;il ou elle réalise, puis enregistrez.
         </p>
       )}
 
@@ -112,7 +112,7 @@ function EditEmployeeContent() {
           <div>
             <p className="font-heading text-2xl font-semibold text-brand">Services réalisés</p>
             <p className="mt-1 text-sm text-anthracite/75">
-              Les clientes ne peuvent réserver avec ce membre que les services cochés.
+              Les clientes ne peuvent réserver avec cet employé que les services cochés.
             </p>
           </div>
           {services.length === 0 ? (

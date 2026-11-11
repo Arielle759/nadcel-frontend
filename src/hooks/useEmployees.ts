@@ -123,7 +123,7 @@ export function useEmployees(): UseEmployeesResult {
       } catch (err) {
         const message = toErrorMessage(
           err,
-          active ? "Impossible de réactiver ce membre." : "Impossible de désactiver ce membre."
+          active ? "Impossible de réactiver cet employé." : "Impossible de désactiver cet employé."
         );
         setError(message);
         throw new Error(message);

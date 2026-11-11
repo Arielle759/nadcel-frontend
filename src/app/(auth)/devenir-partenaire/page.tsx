@@ -17,7 +17,7 @@ const PASSWORD_MIN_LENGTH = 12;
 const STEPS = [
   { title: "Vous envoyez votre demande", description: "Votre compte et les informations de votre salon, en quelques minutes." },
   { title: "Notre équipe la vérifie", description: "Sous 48 heures ouvrées. Nous pouvons vous appeler pour confirmer." },
-  { title: "Vous ouvrez votre espace gérant", description: "Services, équipe, horaires : votre salon devient réservable." },
+  { title: "Vous ouvrez votre espace gérant", description: "Services, employés, horaires : votre salon devient réservable." },
 ];
 
 function formatDate(value: string): string {

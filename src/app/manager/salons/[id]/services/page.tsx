@@ -76,9 +76,9 @@ export default function ManagerServicesPage() {
                   </p>
                   {service.employees_count === 0 && (
                     <p className="mt-1 text-sm font-medium text-alert">
-                      Personne dans l&apos;équipe ne la réalise : elle n&apos;est pas réservable.{" "}
+                      Aucun employé ne le réalise : il n&apos;est pas réservable.{" "}
                       <Link href={`/manager/salons/${id}/employees`} className={ui.textLink}>
-                        Ouvrir l&apos;équipe
+                        Voir les employés
                       </Link>
                     </p>
                   )}

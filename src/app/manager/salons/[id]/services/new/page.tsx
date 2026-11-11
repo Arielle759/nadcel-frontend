@@ -13,7 +13,7 @@ export default function NewServicePage() {
   return (
     <ManagerPage
       title="Nouveau service"
-      description="Elle sera réservable dès qu'au moins un membre de l'équipe la réalise."
+      description="Il sera réservable dès qu'au moins un employé le réalise."
       back={{ href: `/manager/salons/${id}/services`, label: "Services" }}
       width="narrow"
     >

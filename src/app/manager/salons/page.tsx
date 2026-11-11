@@ -22,7 +22,7 @@ export default function ManagerSalonsPage() {
   return (
     <ManagerPage
       title="Mes salons"
-      description="La fiche, les services et l'équipe de chaque salon."
+      description="La fiche, les services et les employés de chaque salon."
       actions={
         <Link href="/devenir-partenaire" className={ui.buttonSecondary}>
           Ajouter un salon

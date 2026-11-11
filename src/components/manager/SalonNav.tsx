@@ -7,7 +7,7 @@ export default function SalonNav({ salonId, current }: { salonId: string | numbe
   const items: { key: Section; label: string; href: string }[] = [
     { key: "details", label: "Fiche et horaires", href: `/manager/salons/${salonId}` },
     { key: "services", label: "Services", href: `/manager/salons/${salonId}/services` },
-    { key: "employees", label: "Équipe", href: `/manager/salons/${salonId}/employees` },
+    { key: "employees", label: "Employés", href: `/manager/salons/${salonId}/employees` },
   ];
 
   return (
