@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getSalon } from "@/lib/salons";
 import type { Service } from "@/hooks/useServices";
 import SalonRating from "@/components/SalonRating";
+import SalonReviews from "@/components/SalonReviews";
 import { assetUrl } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
@@ -163,6 +164,8 @@ export default async function SalonDetailPage({
                 ))
               )}
             </section>
+
+            <SalonReviews salonId={salon.id} average={salon.reviews_avg_rating} count={salon.reviews_count} />
 
             <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2">
               <section aria-labelledby="hours-title">
