@@ -16,6 +16,8 @@ export interface Employee {
   salon_id: number;
   name: string;
   phone: string;
+  // Désactivé : ne reçoit plus de rendez-vous, mais son historique est gardé.
+  is_active: boolean;
   user?: EmployeeUser | null;
   services: Service[];
 }
@@ -32,6 +34,12 @@ export interface UpdateEmployeeData {
   service_ids?: number[];
 }
 
+export interface EmployeeStatusResult {
+  employee: Employee;
+  // Rendez-vous à venir encore attribués au membre désactivé.
+  upcoming_appointments?: number;
+}
+
 interface PaginatedResponse<T> {
   data: T[];
   current_page: number;
@@ -41,7 +49,7 @@ interface UseEmployeesResult {
   getEmployees: (salonId: number | string) => Promise<Employee[]>;
   createEmployee: (data: CreateEmployeeData) => Promise<Employee>;
   updateEmployee: (id: number | string, data: UpdateEmployeeData) => Promise<Employee>;
-  deleteEmployee: (id: number | string) => Promise<void>;
+  setEmployeeActive: (id: number | string, active: boolean) => Promise<EmployeeStatusResult>;
   loading: boolean;
   error: string | null;
 }
@@ -103,19 +111,28 @@ export function useEmployees(): UseEmployeesResult {
     []
   );
 
-  const deleteEmployee = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/employees/${id}`);
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de supprimer l'employé.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const setEmployeeActive = useCallback(
+    async (id: number | string, active: boolean): Promise<EmployeeStatusResult> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.patch<EmployeeStatusResult>(
+          `/employees/${id}/${active ? "activate" : "deactivate"}`
+        );
+        return data;
+      } catch (err) {
+        const message = toErrorMessage(
+          err,
+          active ? "Impossible de réactiver ce membre." : "Impossible de désactiver ce membre."
+        );
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  return { getEmployees, createEmployee, updateEmployee, deleteEmployee, loading, error };
+  return { getEmployees, createEmployee, updateEmployee, setEmployeeActive, loading, error };
 }
