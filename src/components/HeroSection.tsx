@@ -44,7 +44,7 @@ export default function HeroSection() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="relative z-20 flex min-h-[620px] px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
+      className="relative flex min-h-[620px] px-6 py-24 sm:px-10 lg:min-h-[680px] lg:px-16"
     >
       {/* Le fond est découpé à part : la liste de suggestions peut ainsi
           déborder sous la section sans être coupée. */}
