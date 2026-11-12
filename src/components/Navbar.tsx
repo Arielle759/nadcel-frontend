@@ -54,7 +54,9 @@ export default function Navbar() {
         {/* Hiérarchie : « Inscrire mon salon » est l'action mise en avant (doré),
             la recherche et le compte restent des liens discrets. */}
         <div className="hidden items-center gap-1 text-sm font-medium lg:flex">
-          {showPublicSalonLinks && (
+          {/* Connecté, la barre porte déjà « Mes rendez-vous », le compte et la
+              déconnexion : les services n'y tiendraient plus (ils restent dans le menu mobile). */}
+          {showPublicSalonLinks && !authed && (
             <ul aria-label="Services" className="mr-1 flex items-center border-r border-sable/30 pr-2">
               {UNIVERSES.map(({ label, query }, index) => (
                 <li key={label} className={index >= 5 ? "hidden" : index >= 3 ? "hidden xl:block" : undefined}>
@@ -78,11 +80,11 @@ export default function Navbar() {
           )}
           {authed ? (
             <>
-              <span className="ml-2 inline-flex items-center gap-2 px-2 text-anthracite/75">
+              <span className="ml-2 inline-flex items-center gap-2 whitespace-nowrap px-2 text-anthracite/75" title={user?.name}>
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-beige" aria-hidden="true">
                   <UserRound size={15} />
                 </span>
-                {user?.name ?? "Mon compte"}
+                <span className="max-w-[9rem] truncate">{user?.name?.split(" ")[0] || "Mon compte"}</span>
               </span>
               <button type="button" onClick={handleLogout} className={`${navLink} inline-flex items-center gap-2`}>
                 <LogOut size={16} aria-hidden="true" />
