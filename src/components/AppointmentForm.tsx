@@ -25,6 +25,8 @@ interface AppointmentFormProps {
 }
 
 const STRIP_DAYS = 14;
+// Réservation en ligne possible jusqu'à 3 mois à l'avance (même limite côté API).
+const MAX_ADVANCE_DAYS = 90;
 const CANCELLATION_HOURS = 24;
 
 function toDateInputValue(date: Date): string {
@@ -122,6 +124,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
   const summaryRef = useRef<HTMLElement>(null);
 
   const today = useMemo(() => startOfToday(), []);
+  const lastBookableDay = useMemo(() => addDays(today, MAX_ADVANCE_DAYS), [today]);
   const stripDays = useMemo(() => Array.from({ length: STRIP_DAYS }, (_, index) => addDays(today, index)), [today]);
 
   // Mois à interroger : ceux couverts par la bande de jours, plus le mois affiché dans le calendrier.
@@ -140,7 +143,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
       clearBookingDraft();
       if (services.some((s) => s.id === draft.serviceId)) setServiceId(draft.serviceId);
       const draftDate = parseDateInputValue(draft.date);
-      if (draftDate >= startOfToday()) {
+      if (draftDate >= startOfToday() && draftDate <= addDays(startOfToday(), MAX_ADVANCE_DAYS)) {
         pendingHeure.current = draft.heure;
         setSelectedDate(draftDate);
         if (!stripDays.some((day) => sameDay(draftDate, day))) {
@@ -459,10 +462,17 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                   onSelect={chooseDate}
                   month={calendarMonth}
                   onMonthChange={setCalendarMonth}
-                  disabled={[{ before: today }, isDayUnavailable]}
+                  startMonth={today}
+                  endMonth={lastBookableDay}
+                  disabled={[{ before: today }, { after: lastBookableDay }, isDayUnavailable]}
                   locale={fr}
                   className={`appointment-calendar ${ui.surface} mt-4 w-fit p-4`}
                 />
+              )}
+              {showCalendar && (
+                <p className="mt-2 text-sm text-anthracite/75">
+                  Les réservations en ligne sont ouvertes jusqu&apos;à 3 mois à l&apos;avance.
+                </p>
               )}
               {noDayInStrip && !showCalendar && (
                 <p className="mt-3 text-sm text-anthracite/75" role="status">

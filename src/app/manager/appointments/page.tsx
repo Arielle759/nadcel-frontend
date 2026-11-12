@@ -94,11 +94,11 @@ export default function ManagerAppointmentsPage() {
   useEffect(() => {
     let isMounted = true;
 
-    // Agenda de travail : un mois passé (à clôturer, terminés) et six semaines à venir.
+    // Agenda de travail : un mois passé (à clôturer, terminés) et tout ce qui est
+    // à venir, pour qu'aucune demande lointaine n'échappe au gérant.
     const today = new Date();
     const from = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 30);
-    const to = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 45);
-    getAppointments({ from, to })
+    getAppointments({ from })
       .then((data) => {
         if (isMounted) {
           setAppointments(data);
