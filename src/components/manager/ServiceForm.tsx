@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import ImageUploadInput from "@/components/ImageUploadInput";
 import { ui } from "@/lib/ui";
+import { SERVICE_CATEGORIES, SERVICE_CATEGORY_GROUPS } from "@/lib/serviceCategories";
 
 export interface ServiceFormValues {
   name: string;
@@ -13,9 +14,8 @@ export interface ServiceFormValues {
   image: File | null;
 }
 
-// Catégories proposées (la saisie reste libre) : ce sont aussi les termes que
-// la recherche publique et les vignettes de l'accueil savent retrouver.
-const CATEGORY_SUGGESTIONS = ["Coiffure", "Coloration", "Soin", "Manucure", "Massage", "Épilation", "Maquillage"];
+// Valeur technique de l'option « Autre catégorie » (saisie libre).
+const OTHER = "__autre__";
 // Jusqu'à 10 h : certaines coiffures (tresses, nattes, locks) prennent une journée.
 const DURATIONS = [15, 30, 45, 60, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600];
 
@@ -42,6 +42,11 @@ export default function ServiceForm({
   const [price, setPrice] = useState(initial?.price !== undefined ? String(initial.price) : "");
   const [duration, setDuration] = useState(String(initial?.duration ?? 30));
   const [category, setCategory] = useState(initial?.category ?? "");
+  // Catégorie d'un service existant qui n'est pas dans la liste : on la garde
+  // comme option, pour ne pas obliger le gérant à la changer.
+  const initialCategory = initial?.category?.trim() ?? "";
+  const legacyCategory = initialCategory && !SERVICE_CATEGORIES.includes(initialCategory) ? initialCategory : "";
+  const [customMode, setCustomMode] = useState(false);
   const [image, setImage] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
@@ -78,25 +83,57 @@ export default function ServiceForm({
         <input id="name" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Tresses box braids" className={ui.input} />
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-3">
-        <div className="flex flex-col gap-2">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-2 sm:col-span-2">
           <label htmlFor="category" className={ui.label}>
             Catégorie
           </label>
-          <input
+          <select
             id="category"
             required
-            list="category-suggestions"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="Coiffure"
+            value={customMode ? OTHER : category}
+            onChange={(e) => {
+              if (e.target.value === OTHER) {
+                setCustomMode(true);
+                setCategory("");
+              } else {
+                setCustomMode(false);
+                setCategory(e.target.value);
+              }
+            }}
             className={ui.input}
-          />
-          <datalist id="category-suggestions">
-            {CATEGORY_SUGGESTIONS.map((c) => (
-              <option key={c} value={c} />
+          >
+            <option value="" disabled>
+              Choisir une catégorie
+            </option>
+            {legacyCategory && (
+              <optgroup label="Catégorie actuelle">
+                <option value={legacyCategory}>{legacyCategory}</option>
+              </optgroup>
+            )}
+            {SERVICE_CATEGORY_GROUPS.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.categories.map((c) => (
+                  <option key={c.name} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
-          </datalist>
+            <option value={OTHER}>Autre catégorie…</option>
+          </select>
+          {customMode && (
+            <input
+              id="category-other"
+              required
+              autoFocus
+              aria-label="Nom de la catégorie"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Nom de la catégorie"
+              className={ui.input}
+            />
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="price" className={ui.label}>

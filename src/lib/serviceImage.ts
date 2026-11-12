@@ -1,5 +1,6 @@
 import { assetUrl } from "@/lib/api";
 import type { Service } from "@/hooks/useServices";
+import { SERVICE_CATEGORY_GROUPS } from "@/lib/serviceCategories";
 
 // Exact service names that need a more specific photo than their category's
 // default (e.g. "Coupe Homme" shouldn't share coiffure.jpg's braids photo).
@@ -29,8 +30,18 @@ function serviceNameImage(name: string): string | undefined {
   return SERVICE_NAME_IMAGES[normalizeText(name)];
 }
 
+// Photo par défaut des catégories proposées dans le formulaire (correspondance exacte).
+const LISTED_CATEGORY_IMAGES = new Map(
+  SERVICE_CATEGORY_GROUPS.flatMap((g) => g.categories)
+    .filter((c) => c.image)
+    .map((c) => [normalizeText(c.name), c.image] as const)
+);
+
 function categoryFallbackImage(category: string): string | undefined {
   const normalized = normalizeText(category);
+  const listed = LISTED_CATEGORY_IMAGES.get(normalized);
+  if (listed) return listed;
+  // Anciennes catégories courtes (« Coiffure », « Soin »…) ou saisie libre.
   const key = Object.keys(CATEGORY_IMAGES).find((candidate) => normalized.startsWith(candidate));
   return key ? CATEGORY_IMAGES[key] : undefined;
 }
