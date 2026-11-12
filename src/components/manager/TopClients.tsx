@@ -15,7 +15,7 @@ const TITLE_BY_PERIOD: Record<ActivityPeriod, string> = {
 
 function thankYouMessage(name: string): string {
   const firstName = name.trim().split(/\s+/)[0] || name;
-  return `Bonjour ${firstName}, merci pour votre fidélité ! Pour vous remercier, une petite attention vous attend lors de votre prochain passage au salon. À très bientôt !`;
+  return `Bonjour ${firstName}, merci pour votre fidélité ! Pour vous remercier, une petite attention vous attend lors de votre prochain passage au salon. À très bientôt !`;
 }
 
 function visitsLabel(visits: number): string {
@@ -42,7 +42,7 @@ export default function TopClients({ clients, period }: { clients: ActivityTopCl
         <h3 id="top-clients-title" className="font-sans text-base font-semibold text-anthracite">
           Clients fidèles
         </h3>
-        <p className="text-sm text-anthracite/60">Une réduction ou une petite attention les fera revenir.</p>
+        <p className="text-sm text-anthracite/75">Une réduction ou une petite attention les fera revenir.</p>
       </div>
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
@@ -79,7 +79,7 @@ export default function TopClients({ clients, period }: { clients: ActivityTopCl
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-anthracite">{client.name}</p>
-                    <p className="mt-0.5 text-xs text-anthracite/55">
+                    <p className="mt-0.5 text-xs text-anthracite/75">
                       {visitsLabel(client.visits)}, {formatCurrency(client.spent)}, dernière le {lastVisit(client.last_visit)}
                     </p>
                   </div>

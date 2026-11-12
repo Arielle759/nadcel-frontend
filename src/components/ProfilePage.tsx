@@ -141,7 +141,7 @@ export default function ProfilePage() {
                 <p className="flex h-12 items-center px-1 text-anthracite/75">{email}</p>
               </div>
             </div>
-            <p className="-mt-2 text-sm text-anthracite/65">
+            <p className="-mt-2 text-sm text-anthracite/75">
               L&apos;e-mail sert à vous connecter : il ne se modifie pas ici. Écrivez à contact@nadcel.sn si besoin.
             </p>
             <div className="flex flex-wrap items-center gap-4">

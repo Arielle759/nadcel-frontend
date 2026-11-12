@@ -32,7 +32,9 @@ export default function CountUp({ value, format = defaultFormat, durationMs = 11
     const text = element?.firstChild;
     if (!element || !text) return;
 
-    const from = shownRef.current ?? 0;
+    // Premier affichage : la valeur finale tout de suite (jamais « 0 » sur une
+    // capture ou une connexion lente). L'animation ne sert qu'aux changements.
+    const from = shownRef.current ?? value;
     const write = (n: number) => {
       text.nodeValue = formatRef.current(n);
     };

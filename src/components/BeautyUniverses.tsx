@@ -20,7 +20,7 @@ export default function BeautyUniverses() {
     <section aria-labelledby="universes-title" className="px-6 pt-28 sm:px-10">
       <div className="mx-auto max-w-6xl">
         <Reveal className="flex flex-wrap items-end justify-between gap-6">
-          <SectionHeading id="universes-title" title="Que souhaitez-vous faire ?" />
+          <SectionHeading id="universes-title" title="Que souhaitez-vous faire ?" />
           <Link href="/salons" className={ui.buttonSecondary}>
             Tous les salons
           </Link>

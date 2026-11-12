@@ -78,13 +78,13 @@ export default function HeroSection() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             onSubmit={handleSubmit}
             role="search"
-            className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(40,25,18,0.25)] sm:flex-row sm:items-center"
+            className="mt-9 flex flex-col gap-2 rounded-2xl bg-beige p-2 shadow-[0_18px_50px_rgba(40,25,18,0.25)] ring-brand-soft focus-within:ring-2 sm:flex-row sm:items-center"
           >
             <label htmlFor="hero-search" className="sr-only">
               Service, salon, quartier ou ville
             </label>
             <div className="flex flex-1 items-center gap-3 px-4">
-              <Search size={18} className="shrink-0 text-anthracite/50" aria-hidden="true" />
+              <Search size={18} className="shrink-0 text-anthracite/75" aria-hidden="true" />
               <SearchSuggest
                 inputRef={inputRef}
                 id="hero-search"
@@ -92,7 +92,7 @@ export default function HeroSection() {
                 onChange={setQuery}
                 onPickTerm={(term) => router.push(`/salons?q=${encodeURIComponent(term)}`)}
                 placeholder="Service, salon, quartier ou ville"
-                className="h-12 w-full bg-transparent text-base text-anthracite outline-none placeholder:text-anthracite/50 [&::-webkit-search-cancel-button]:hidden"
+                className="h-12 w-full bg-transparent text-base text-anthracite outline-none focus-visible:outline-none placeholder:text-anthracite/75 [&::-webkit-search-cancel-button]:hidden"
               />
             </div>
             <button type="submit" className={`${ui.buttonPrimary} h-12 px-7`}>
@@ -101,7 +101,7 @@ export default function HeroSection() {
           </motion.form>
 
           <motion.div variants={itemVariants} className="mt-5 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-beige/70">Par exemple :</span>
+            <span className="text-beige/70">Par exemple :</span>
             {SUGGESTIONS.map((term) => {
               const selected = query.trim().toLowerCase() === term.toLowerCase();
               return (
@@ -123,7 +123,7 @@ export default function HeroSection() {
           </motion.div>
 
           <motion.div variants={itemVariants} className="mt-10 flex flex-wrap items-center gap-3 text-sm text-beige/75">
-            <span>Vous avez un salon ?</span>
+            <span>Vous avez un salon ?</span>
             <Link href="/devenir-partenaire" className={`${ui.buttonGhostOnDark} min-h-9 px-4`}>
               Inscrivez-le gratuitement
             </Link>

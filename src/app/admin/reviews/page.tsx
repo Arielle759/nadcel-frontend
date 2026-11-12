@@ -108,7 +108,7 @@ function ReviewsContent() {
         </div>
       ) : (
         <>
-          <p className="mb-3 text-sm text-anthracite/65">
+          <p className="mb-3 text-sm text-anthracite/75">
             {`${total.toLocaleString("fr-FR")} avis, les plus récents d'abord.`}
           </p>
           <ul className="flex flex-col gap-3">
@@ -133,7 +133,7 @@ function ReviewsContent() {
                 {review.comment ? (
                   <p className="mt-3 leading-7 text-anthracite/90">{review.comment}</p>
                 ) : (
-                  <p className="mt-3 text-sm italic text-anthracite/55">Note sans commentaire.</p>
+                  <p className="mt-3 text-sm italic text-anthracite/75">Note sans commentaire.</p>
                 )}
                 {review.manager_response && (
                   <div className="mt-4 rounded-xl bg-beige px-4 py-3">

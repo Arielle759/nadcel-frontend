@@ -58,7 +58,7 @@ export default function ImageUploadInput({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={displayUrl} alt="Aperçu de la photo" className="h-full w-full object-cover" />
           ) : (
-            <span className="px-3 text-center text-xs text-anthracite/60">Aucune photo</span>
+            <span className="px-3 text-center text-xs text-anthracite/75">Aucune photo</span>
           )}
         </div>
         <div className="flex flex-col items-start gap-1">
@@ -70,7 +70,7 @@ export default function ImageUploadInput({
               Retirer
             </button>
           )}
-          <span className="px-2 text-xs text-anthracite/60">JPG ou PNG, format paysage de préférence. Les photos du téléphone sont acceptées.</span>
+          <span className="px-2 text-xs text-anthracite/75">JPG ou PNG, format paysage de préférence. Les photos du téléphone sont acceptées.</span>
         </div>
       </div>
     </div>

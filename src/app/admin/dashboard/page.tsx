@@ -186,7 +186,7 @@ function ToReview({
           <p className="font-semibold text-anthracite">
             {pending} demande{pending > 1 ? "s" : ""} de partenariat
           </p>
-          <p className="mt-0.5 text-sm text-anthracite/65">Les plus anciennes d&apos;abord. Délai annoncé aux gérants : 48 h ouvrées.</p>
+          <p className="mt-0.5 text-sm text-anthracite/75">Les plus anciennes d&apos;abord. Délai annoncé aux gérants : 48 h ouvrées.</p>
           <ul className="mt-3 flex flex-col gap-2">
             {requests.slice(0, PREVIEW_REQUESTS).map((salon) => (
               <PartnerRequestCard
@@ -210,7 +210,7 @@ function ToReview({
             <p className="font-semibold text-anthracite">
               {lowReviews} avis noté{lowReviews > 1 ? "s" : ""} 1 ou 2 sur 5
             </p>
-            <p className="text-sm text-anthracite/65">
+            <p className="text-sm text-anthracite/75">
               Publiés ces 30 derniers jours. Des plaintes répétées sur un même salon peuvent justifier sa suspension.
             </p>
           </div>
@@ -239,13 +239,13 @@ function Kpi({
 }) {
   const body = (
     <>
-      <p className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${highlight ? "text-beige/65" : "text-anthracite/55"}`}>
+      <p className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${highlight ? "text-beige/65" : "text-anthracite/75"}`}>
         {label}
       </p>
       <p className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${highlight ? "text-beige" : "text-brand"}`}>
         {value}
       </p>
-      <p className={`mt-2 min-h-4 text-xs ${highlight ? "text-beige/70" : "text-anthracite/60"}`}>{hint}</p>
+      <p className={`mt-2 min-h-4 text-xs ${highlight ? "text-beige/70" : "text-anthracite/75"}`}>{hint}</p>
     </>
   );
   const card = highlight

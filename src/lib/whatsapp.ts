@@ -42,7 +42,7 @@ export function reminderMessage({
     : `le ${date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })} à ${formatTime(date)}`;
   const firstName = clientName.trim().split(/\s+/)[0] ?? clientName;
 
-  return `Bonjour ${firstName}, nous vous rappelons votre rendez-vous ${when} chez ${salonName} pour : ${serviceName}. En cas d'empêchement, merci de nous prévenir par retour de message. À bientôt !`;
+  return `Bonjour ${firstName}, nous vous rappelons votre rendez-vous ${when} chez ${salonName} pour : ${serviceName}. En cas d'empêchement, merci de nous prévenir par retour de message. À bientôt !`;
 }
 
 export function whatsAppLink(phone: string | null | undefined, message: string): string | null {

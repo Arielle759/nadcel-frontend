@@ -234,7 +234,7 @@ export default function ClientAppointmentsPage() {
                 tab === key ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
               }`}
             >
-              {label} {!loading && <span className={tab === key ? "text-beige/70" : "text-anthracite/50"}>({count})</span>}
+              {label} {!loading && <span className={tab === key ? "text-beige/70" : "text-anthracite/75"}>({count})</span>}
             </button>
           ))}
         </div>
@@ -383,7 +383,7 @@ export default function ClientAppointmentsPage() {
 
                       {isReviewing && (
                         <div className="mt-4 rounded-2xl bg-beige p-4">
-                          <p className="text-sm font-semibold text-brand">Comment s&apos;est passé votre rendez-vous ?</p>
+                          <p className="text-sm font-semibold text-brand">Comment s&apos;est passé votre rendez-vous ?</p>
                           <div className="mt-2">
                             <StarRating value={reviewNote} onChange={setReviewNote} />
                           </div>

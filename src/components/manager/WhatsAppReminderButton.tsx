@@ -32,7 +32,7 @@ export default function WhatsAppReminderButton({
   );
 
   if (!link) {
-    return <span className="text-xs text-anthracite/60">Numéro non reconnu pour WhatsApp</span>;
+    return <span className="text-xs text-anthracite/75">Numéro non reconnu pour WhatsApp</span>;
   }
 
   const sent = Boolean(appointment.reminder_sent_at);

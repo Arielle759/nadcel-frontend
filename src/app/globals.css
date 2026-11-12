@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f1e8;
+  --background: #f3f2ef;
   --foreground: #374151;
 }
 
@@ -9,7 +9,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   /* Identité Nadcel : chocolat et beige, touche de terracotta, doré pour les avis.
-     Contrastes mesurés sur l'ivoire (#f5f1e8), seuil WCAG AA = 4,5:1. */
+     Contrastes mesurés sur le fond gris clair (#f3f2ef), seuil WCAG AA = 4,5:1. */
   /* Chocolat : titres, barre latérale, bandeaux et graphiques (10,4:1). */
   --color-brand: #4a3328;
   /* Chocolat au lait : survols et éléments secondaires (6,8:1). */
@@ -25,7 +25,7 @@
   --color-accent-soft: #a65a3f;
   /* Sable : uniquement en fond léger (bg-sable/15, /20...). */
   --color-sable: #dcc6b4;
-  --color-beige: #f5f1e8;
+  --color-beige: #f3f2ef;
   --color-anthracite: #374151;
   /* Doré : étoiles des avis, éléments « en attente ». */
   --color-champagne: #9c7635;
@@ -33,7 +33,16 @@
   /* Couleurs de sens, distinctes de la marque : baisse / alerte, hausse. */
   --color-alert: #b3261e;
   --color-success: #2f6b47;
-  --font-sans: var(--font-geist-sans);
+  /* Graphiques : couleurs bien distinctes entre elles, accordées à la charte.
+     Toujours utilisées dans cet ordre pour qu'une série garde sa couleur. */
+  --color-chart-1: #4a3328; /* chocolat */
+  --color-chart-2: #b0603f; /* terracotta clair */
+  --color-chart-3: #c49a45; /* doré */
+  --color-chart-4: #6f8f72; /* vert sauge */
+  --color-chart-5: #5b6f86; /* bleu ardoise */
+  --color-chart-6: #a98fb0; /* lilas */
+  --color-chart-7: #d8c4b2; /* sable */
+  --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-display);
 }
@@ -41,24 +50,36 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
 }
 
-/* Focus clavier visible et identique partout (WCAG 2.4.7). */
-:focus-visible {
-  outline: 2px solid var(--color-brand-soft);
-  outline-offset: 2px;
+/* Focus clavier visible et identique partout (WCAG 2.4.7). Dans la couche
+   « base » : un composant peut le remplacer par son propre anneau (ex. la barre
+   de recherche, qui entoure tout le champ plutôt que le seul texte). */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-brand-soft);
+    outline-offset: 2px;
+  }
 }
 
+/* Young Serif est réservée aux grands titres. Les petits titres (h3, h2 de
+   carte) sont en Figtree semi-gras. Young Serif n'a qu'une graisse : on interdit
+   au navigateur d'en fabriquer une version grasse (rendu baveux). */
 h1,
 h2,
-h3,
 .font-heading {
+  font-synthesis: none;
   font-family: var(--font-display), Georgia, serif;
-  /* Playfair dessine par défaut des chiffres « elzéviriens » (01 qui ressemble
-     à « o1 ») : on force des chiffres alignés, plus lisibles. */
+  /* Chiffres alignés (et non « elzéviriens ») : plus lisibles dans les titres. */
   font-variant-numeric: lining-nums;
+}
+
+h3,
+h2:is(.text-sm, .text-base, .text-lg, .text-xl) {
+  font-family: var(--font-body), system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
 .appointment-calendar.rdp-root {

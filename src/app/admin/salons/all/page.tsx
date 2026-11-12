@@ -97,7 +97,7 @@ export default function AdminAllSalonsPage() {
               }`}
             >
               {label}
-              {salons && <span className={`ml-1.5 font-normal ${filter === key ? "text-beige/75" : "text-anthracite/50"}`}>{counts[key]}</span>}
+              {salons && <span className={`ml-1.5 font-normal ${filter === key ? "text-beige/75" : "text-anthracite/75"}`}>{counts[key]}</span>}
             </button>
           ))}
         </div>
@@ -135,7 +135,7 @@ export default function AdminAllSalonsPage() {
       )}
 
       {salons && total > salons.length && (
-        <p className="mt-4 text-sm text-anthracite/65">
+        <p className="mt-4 text-sm text-anthracite/75">
           {salons.length} salons affichés sur {total}, les plus récents d&apos;abord.
         </p>
       )}

@@ -128,7 +128,7 @@ export default function ReviewsShowcase() {
 
           {count > 1 && (
             <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm tabular-nums text-anthracite/60">
+              <p className="text-sm tabular-nums text-anthracite/75">
                 Avis {index + 1} sur {count}
               </p>
               <div className="flex gap-2">

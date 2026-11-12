@@ -75,7 +75,7 @@ export function NextAppointmentCard({
         </div>
         <div className="flex flex-col gap-4 p-6 sm:p-8">
           <div>
-            <p className={`${LABEL} text-anthracite/55`}>Votre prochain moment beauté</p>
+            <p className={`${LABEL} text-anthracite/75`}>Votre prochain moment beauté</p>
             <h2 id="next-appointment-title" className="mt-2 text-2xl font-semibold tracking-tight text-brand sm:text-3xl">
               {service.name}
             </h2>
@@ -87,18 +87,18 @@ export function NextAppointmentCard({
 
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div className="rounded-xl bg-beige/70 px-4 py-3">
-              <dt className={`${LABEL} text-anthracite/50`}>Quand</dt>
+              <dt className={`${LABEL} text-anthracite/75`}>Quand</dt>
               <dd className="mt-1 font-semibold text-anthracite">
                 <span className="first-letter:uppercase">{day}</span>, {formatTime(date)}
               </dd>
             </div>
             <div className="rounded-xl bg-beige/70 px-4 py-3">
-              <dt className={`${LABEL} text-anthracite/50`}>À régler au salon</dt>
+              <dt className={`${LABEL} text-anthracite/75`}>À régler au salon</dt>
               <dd className="mt-1 font-semibold tabular-nums text-anthracite">{formatCurrency(Number(appointment.price))}</dd>
             </div>
           </dl>
 
-          {address && <p className="text-sm text-anthracite/65">{address}</p>}
+          {address && <p className="text-sm text-anthracite/75">{address}</p>}
 
           <div className="flex flex-wrap items-center gap-2">
             {calendarEvent && (
@@ -170,11 +170,11 @@ export function BeautyJourney({ appointments }: { appointments: ClientAppointmen
                 : ui.surface
             }`}
           >
-            <p className={`${LABEL} ${index === 0 ? "text-beige/65" : "text-anthracite/55"}`}>{tile.label}</p>
+            <p className={`${LABEL} ${index === 0 ? "text-beige/65" : "text-anthracite/75"}`}>{tile.label}</p>
             <p className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${index === 0 ? "text-beige" : "text-brand"}`}>
               {tile.value}
             </p>
-            <p className={`mt-2 text-xs ${index === 0 ? "text-beige/70" : "text-anthracite/60"}`}>{tile.hint}</p>
+            <p className={`mt-2 text-xs ${index === 0 ? "text-beige/70" : "text-anthracite/75"}`}>{tile.hint}</p>
           </Reveal>
         ))}
       </div>

@@ -65,7 +65,7 @@ export default function SalonGrid({
               <h3 className="text-xl font-semibold text-brand transition-colors group-hover:text-brand-soft">{salon.name}</h3>
               <p className="mt-1 text-sm text-anthracite/75">
                 {salonArea(salon.address, salon.city)}
-                {categories && <span className="text-anthracite/60">, {categories.toLowerCase()}</span>}
+                {categories && <span className="text-anthracite/75">, {categories.toLowerCase()}</span>}
               </p>
             </div>
           </Link>

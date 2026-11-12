@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 import type { LucideIcon } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { useCurrentUser } from "@/hooks/useAuthState";
@@ -29,6 +30,16 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
   const pathname = usePathname();
   const router = useRouter();
   const user = useCurrentUser();
+  const navRef = useRef<HTMLElement>(null);
+
+  // Sur mobile, la navigation défile horizontalement : on amène la rubrique
+  // active dans la zone visible pour qu'elle ne soit jamais coupée.
+  useEffect(() => {
+    const nav = navRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
+    nav.scrollTo({ left: active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2, behavior: "smooth" });
+  }, [pathname]);
 
   function handleLogout() {
     logout();
@@ -49,8 +60,8 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
         </div>
 
         <div className="md:flex md:flex-1 md:flex-col">
-          <p className="mb-3 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/45 md:block">{title}</p>
-          <nav aria-label={title} className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
+          <p className="mb-3 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75 md:block">{title}</p>
+          <nav ref={navRef} aria-label={title} className="flex gap-1 overflow-x-auto pr-10 md:pr-0 [mask-image:linear-gradient(to_right,black_85%,transparent)] md:flex-col md:overflow-visible md:[mask-image:none]">
             {navItems.map(({ href, label, icon: Icon, matchSubpaths }) => {
               const active = pathname === href || (matchSubpaths === true && pathname.startsWith(`${href}/`));
               return (
@@ -80,7 +91,7 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
 
           <div className="mt-auto hidden flex-col gap-1 pt-6 md:flex">
             <p className="truncate px-3 text-sm font-semibold text-anthracite">{user?.name ?? "Mon compte"}</p>
-            <p className="truncate px-3 pb-2 text-xs text-anthracite/55">{user?.email}</p>
+            <p className="truncate px-3 pb-2 text-xs text-anthracite/75">{user?.email}</p>
             <Link href="/" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-medium text-anthracite/70 transition-colors hover:bg-beige hover:text-brand">
               Voir le site
             </Link>

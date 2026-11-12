@@ -7,27 +7,27 @@ import { ui } from "@/lib/ui";
 
 const FAQ_ITEMS = [
   {
-    question: "Qu'est-ce que NADCEL ?",
+    question: "Qu'est-ce que NADCEL ?",
     answer:
       "NADCEL est une plateforme multi-salons qui connecte les clientes et clients aux salons de beauté et spas au Sénégal. Elle réunit plusieurs salons partenaires au même endroit : vous parcourez leurs services et réservez un rendez-vous en quelques clics, sans avoir à appeler chaque salon individuellement.",
   },
   {
-    question: "Comment réserver un rendez-vous ?",
+    question: "Comment réserver un rendez-vous ?",
     answer:
       "Parcourez les salons partenaires, choisissez un service, puis sélectionnez une date et un créneau disponibles dans le calendrier du salon. Votre demande de rendez-vous est alors envoyée au salon, qui la confirme de son côté. Il vous suffit d'un compte NADCEL pour finaliser la réservation.",
   },
   {
-    question: "Dois-je payer en ligne ?",
+    question: "Dois-je payer en ligne ?",
     answer:
       "Non. NADCEL ne collecte aucun paiement en ligne : le règlement se fait directement au salon, en espèces, par Wave ou par Orange Money, une fois le service réalisé.",
   },
   {
-    question: "Comment annuler ou modifier une réservation ?",
+    question: "Comment annuler ou modifier une réservation ?",
     answer:
       "Vous pouvez annuler une réservation en attente ou confirmée depuis votre espace « Mes rendez-vous », tant qu'il reste plus de 24h avant le rendez-vous. Pour changer de service, de date ou d'horaire, annulez la réservation existante puis reprenez rendez-vous, ou contactez directement le salon.",
   },
   {
-    question: "Comment devenir salon partenaire sur NADCEL ?",
+    question: "Comment devenir salon partenaire sur NADCEL ?",
     answer:
       "Rendez-vous sur la page « Inscrire mon salon » et renseignez les informations de votre établissement (nom, adresse, ville, description) ainsi que votre compte gérant. Votre fiche est ensuite examinée par notre équipe avant d'être visible par les clients.",
   },

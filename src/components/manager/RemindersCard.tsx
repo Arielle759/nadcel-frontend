@@ -38,6 +38,7 @@ export default function RemindersCard() {
   const { getAppointments } = useManagerAppointments();
   const [appointments, setAppointments] = useState<ManagerAppointment[]>([]);
   const [now, setNow] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -75,6 +76,10 @@ export default function RemindersCard() {
   if (toRemind.length === 0) return null;
 
   const pending = toRemind.filter((a) => !a.reminder_sent_at).length;
+  // La carte reste courte : les 3 premiers rappels à envoyer, le reste sur demande.
+  // Quand tout est envoyé, seule la ligne de titre reste visible.
+  const ordered = [...toRemind.filter((a) => !a.reminder_sent_at), ...toRemind.filter((a) => a.reminder_sent_at)];
+  const visible = expanded ? ordered : pending === 0 ? [] : ordered.slice(0, 3);
 
   return (
     <section aria-labelledby="reminders-title" className={`${ui.surface} mb-6 p-5 sm:p-6`}>
@@ -86,11 +91,11 @@ export default function RemindersCard() {
           {pending === 0 ? "Tous les rappels sont envoyés." : `${pending} sur ${toRemind.length} à envoyer`}
         </p>
       </div>
-      <p className="mt-1 text-sm text-anthracite/70">
+      {(expanded || pending > 0) && <p className="mt-1 text-sm text-anthracite/75">
         Ces clientes ont réservé par WhatsApp, téléphone ou au salon : elles ne reçoivent pas l&apos;e-mail automatique.
-      </p>
-      <ul className="mt-5 flex flex-col gap-4">
-        {toRemind.map((a) => (
+      </p>}
+      {visible.length > 0 && <ul className="mt-5 flex flex-col gap-4">
+        {visible.map((a) => (
           <li key={a.id} className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-4">
               <span
@@ -103,7 +108,7 @@ export default function RemindersCard() {
                 <p className="text-sm font-medium text-anthracite">
                   {timeLabel(a.scheduled_at)}, {appointmentClientName(a)}
                 </p>
-                <p className="mt-0.5 text-xs text-anthracite/55">
+                <p className="mt-0.5 text-[13px] text-anthracite/75">
                   {a.service?.name}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
                 </p>
               </div>
@@ -117,7 +122,17 @@ export default function RemindersCard() {
             />
           </li>
         ))}
-      </ul>
+      </ul>}
+      {visible.length < toRemind.length && (
+        <button type="button" onClick={() => setExpanded(true)} className={`${ui.textLink} mt-4 text-sm`}>
+          Voir les {toRemind.length} rappels
+        </button>
+      )}
+      {expanded && (
+        <button type="button" onClick={() => setExpanded(false)} className={`${ui.textLink} mt-4 text-sm`}>
+          Réduire la liste
+        </button>
+      )}
     </section>
   );
 }

@@ -89,7 +89,7 @@ export default function ManagerServicesPage() {
                     Modifier
                   </Link>
                   <ConfirmDelete
-                    question="Supprimer ce service ?"
+                    question="Supprimer ce service ?"
                     onConfirm={async () => {
                       await deleteService(service.id);
                       await fetchServices();

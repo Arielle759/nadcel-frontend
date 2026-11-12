@@ -109,7 +109,7 @@ export default function SalonReviews({
             <li key={review.id} className={`${ui.surface} p-5`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Stars rating={review.rating} />
-                <span className="text-xs text-anthracite/60">{formatMonth(review.created_at)}</span>
+                <span className="text-xs text-anthracite/75">{formatMonth(review.created_at)}</span>
               </div>
               {review.comment && <p className="mt-3 leading-7 text-anthracite/90">{review.comment}</p>}
               <p className="mt-3 text-sm text-anthracite/70">

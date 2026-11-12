@@ -53,7 +53,7 @@ function MonthlyBars({
   return (
     <div className={`${ui.surface} p-5 sm:p-6`}>
       <p className="font-semibold text-brand">{title}</p>
-      <p className="mb-4 text-sm text-anthracite/65">{description} Le dernier mois est en cours.</p>
+      <p className="mb-4 text-sm text-anthracite/75">{description} Le dernier mois est en cours.</p>
       <ResponsiveContainer width="100%" height={240}>
         <BarChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--color-anthracite)" strokeOpacity={0.1} vertical={false} />

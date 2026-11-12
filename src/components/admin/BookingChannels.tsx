@@ -10,13 +10,13 @@ import { ui } from "@/lib/ui";
 // Une couleur par canal, du plus « Nadcel » (en ligne, chocolat) au plus hors
 // ligne. La couleur n'est jamais seule : chaque canal est aussi écrit en toutes lettres.
 const CHANNELS: { source: BookingSource; color: string; hint: string }[] = [
-  { source: "online", color: "var(--color-brand)", hint: "Réservés par les clients sur Nadcel" },
-  { source: "whatsapp", color: "var(--color-accent)", hint: "Saisis par le salon" },
-  { source: "instagram", color: "var(--color-champagne-light)", hint: "Messages reçus par le salon" },
-  { source: "facebook", color: "var(--color-brand-soft)", hint: "Messages reçus par le salon" },
-  { source: "tiktok", color: "var(--color-cacao)", hint: "Messages reçus par le salon" },
-  { source: "phone", color: "var(--color-champagne)", hint: "Saisis par le salon" },
-  { source: "walk_in", color: "var(--color-sable)", hint: "Clients venus sans rendez-vous" },
+  { source: "online", color: "var(--color-chart-1)", hint: "Réservés par les clients sur Nadcel" },
+  { source: "whatsapp", color: "var(--color-chart-2)", hint: "Saisis par le salon" },
+  { source: "instagram", color: "var(--color-chart-3)", hint: "Messages reçus par le salon" },
+  { source: "facebook", color: "var(--color-chart-4)", hint: "Messages reçus par le salon" },
+  { source: "tiktok", color: "var(--color-chart-5)", hint: "Messages reçus par le salon" },
+  { source: "phone", color: "var(--color-chart-6)", hint: "Saisis par le salon" },
+  { source: "walk_in", color: "var(--color-chart-7)", hint: "Clients venus sans rendez-vous" },
 ];
 
 const SIZE = 184;
@@ -80,7 +80,7 @@ export default function BookingChannels({ appointments }: { appointments: AdminS
         <h3 id="channels-title" className="font-sans text-base font-semibold text-anthracite">
           Canaux de réservation
         </h3>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/55">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75">
           30 derniers jours, {total.toLocaleString("fr-FR")} rendez-vous
         </p>
       </div>
@@ -110,7 +110,7 @@ export default function BookingChannels({ appointments }: { appointments: AdminS
             <span className="text-3xl font-semibold tabular-nums tracking-tight text-brand">
               <CountUp value={onlineShare} format={formatShare} />
             </span>
-            <span className="mt-0.5 text-xs text-anthracite/60">en ligne</span>
+            <span className="mt-0.5 text-xs text-anthracite/75">en ligne</span>
           </div>
         </div>
 
@@ -123,11 +123,11 @@ export default function BookingChannels({ appointments }: { appointments: AdminS
                 <div className="min-w-0 flex-1">
                   <dt className="flex items-baseline justify-between gap-2">
                     <span className="text-sm font-semibold text-anthracite">{BOOKING_SOURCE_LABELS[channel.source]}</span>
-                    <span className="text-sm tabular-nums text-anthracite/60">{formatShare(data?.share ?? 0)}</span>
+                    <span className="text-sm tabular-nums text-anthracite/75">{formatShare(data?.share ?? 0)}</span>
                   </dt>
                   <dd className="mt-0.5">
                     <span className="text-xl font-semibold tabular-nums text-brand">{(data?.count ?? 0).toLocaleString("fr-FR")}</span>
-                    <span className="ml-1.5 text-xs text-anthracite/55">{channel.hint}</span>
+                    <span className="ml-1.5 text-xs text-anthracite/75">{channel.hint}</span>
                   </dd>
                 </div>
               </div>

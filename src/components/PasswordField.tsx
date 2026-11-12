@@ -48,7 +48,7 @@ export default function PasswordField({
           onClick={() => setIsVisible((visible) => !visible)}
           aria-label={actionLabel}
           title={actionLabel}
-          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-anthracite/60 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-soft"
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-anthracite/75 transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-soft"
         >
           {isVisible ? <EyeOff aria-hidden="true" size={18} /> : <Eye aria-hidden="true" size={18} />}
         </button>

@@ -68,7 +68,7 @@ export default function CloseAppointmentForm({
               onChange={(e) => setAmount(e.target.value)}
               className="w-28 rounded-lg bg-transparent px-3 py-1.5 text-sm outline-none"
             />
-            <span className="pr-3 text-xs text-anthracite/55">F CFA</span>
+            <span className="pr-3 text-xs text-anthracite/75">F CFA</span>
           </div>
         </div>
 
@@ -96,7 +96,7 @@ export default function CloseAppointmentForm({
         </fieldset>
 
         <div className="ml-auto flex items-center gap-2">
-          <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-xs font-medium text-anthracite/65 hover:bg-sable/10">
+          <button type="button" onClick={onCancel} className="rounded-lg px-3 py-1.5 text-xs font-medium text-anthracite/75 hover:bg-sable/10">
             Annuler
           </button>
           <button

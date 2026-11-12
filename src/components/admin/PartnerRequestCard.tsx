@@ -51,7 +51,7 @@ export default function PartnerRequestCard({
           <p className="mt-0.5 text-sm text-anthracite/75">
             {salon.address}, {salon.city}
           </p>
-          <p className={`mt-1 text-xs font-medium ${late ? "text-alert" : "text-anthracite/60"}`}>
+          <p className={`mt-1 text-xs font-medium ${late ? "text-alert" : "text-anthracite/75"}`}>
             {sentLabel(salon.created_at, now)}
             {late ? ", délai de 48 h dépassé" : ""}
           </p>
@@ -73,12 +73,12 @@ export default function PartnerRequestCard({
       {!compact && (
         <dl className="mt-5 grid gap-4 rounded-xl bg-beige px-4 py-4 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-anthracite/60">Demandeur</dt>
+            <dt className="text-anthracite/75">Demandeur</dt>
             <dd className="mt-0.5 font-medium text-anthracite">{salon.manager?.name ?? "Compte supprimé"}</dd>
             {salon.manager?.email && <dd className="text-anthracite/75">{salon.manager.email}</dd>}
           </div>
           <div>
-            <dt className="text-anthracite/60">Téléphone du salon</dt>
+            <dt className="text-anthracite/75">Téléphone du salon</dt>
             <dd className="mt-0.5 font-medium text-anthracite">
               {salon.phone ? (
                 <a href={`tel:${salon.phone.replace(/\s/g, "")}`} className={ui.textLink}>
@@ -91,7 +91,7 @@ export default function PartnerRequestCard({
           </div>
           {salon.description && (
             <div className="sm:col-span-2">
-              <dt className="text-anthracite/60">Présentation</dt>
+              <dt className="text-anthracite/75">Présentation</dt>
               <dd className="mt-0.5 leading-6 text-anthracite/85">{salon.description}</dd>
             </div>
           )}

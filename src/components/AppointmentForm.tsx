@@ -90,6 +90,19 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
   const [serviceId, setServiceId] = useState(() =>
     services.some((s) => s.id === initialServiceId) ? (initialServiceId as number) : (services[0]?.id ?? 0)
   );
+  // Service déjà choisi sur la page du salon : on l'affiche replié pour passer
+  // directement au jour. La liste complète s'ouvre avec « Changer ».
+  const [pickingService, setPickingService] = useState(
+    () => !services.some((s) => s.id === initialServiceId) && services.length > 1
+  );
+  const serviceGroups = useMemo(() => {
+    const map = new Map<string, Service[]>();
+    for (const service of services) {
+      const key = service.category?.trim() || "Autres services";
+      map.set(key, [...(map.get(key) ?? []), service]);
+    }
+    return [...map.entries()];
+  }, [services]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [heure, setHeure] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
@@ -204,6 +217,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
   const ready = Boolean(selectedService && selectedDate && heure);
 
   function chooseService(id: number) {
+    setPickingService(false);
     if (id === serviceId) return;
     setServiceId(id);
     setSelectedDate(undefined);
@@ -343,11 +357,28 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
 
         <fieldset className="min-w-0">
           <legend className="font-heading text-2xl font-semibold text-brand">1. Service</legend>
-          <div className="mt-4 flex flex-col gap-3">
-            {services.map((service) => {
-              const checked = service.id === serviceId;
-              return (
-                <label
+          {!pickingService && selectedService ? (
+            <div className="mt-4 flex items-center gap-4 rounded-2xl bg-white p-4 shadow-[0_0_0_2px_var(--color-brand),0_10px_26px_rgba(90,50,35,0.12)]">
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-brand">{selectedService.name}</span>
+                <span className="block text-sm text-anthracite/75">
+                  {formatDuration(selectedService.duration)}, {formatCurrency(Number(selectedService.price))}
+                </span>
+              </span>
+              <button type="button" onClick={() => setPickingService(true)} className={`${ui.textLink} shrink-0 text-sm`}>
+                Changer
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 flex flex-col gap-6">
+              {serviceGroups.map(([category, items]) => (
+                <div key={category}>
+                  <p className="mb-2 text-sm font-semibold text-anthracite/75">{category}</p>
+                  <div className="flex flex-col gap-3">
+                    {items.map((service) => {
+                      const checked = service.id === serviceId;
+                      return (
+                        <label
                   key={service.id}
                   className={`flex cursor-pointer items-center gap-4 rounded-2xl bg-white p-4 transition-all duration-200 ${checked ? "shadow-[0_0_0_2px_var(--color-brand),0_10px_26px_rgba(90,50,35,0.12)]" : "shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_14px_32px_rgba(90,50,35,0.11)]"}`}
                 >
@@ -365,9 +396,13 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                   </span>
                   <span className="shrink-0 font-semibold text-anthracite">{formatCurrency(Number(service.price))}</span>
                 </label>
-              );
-            })}
-          </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </fieldset>
 
         <fieldset className="min-w-0">

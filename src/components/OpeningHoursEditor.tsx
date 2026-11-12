@@ -62,7 +62,7 @@ export default function OpeningHoursEditor({ value, onChange }: OpeningHoursEdit
                     />
                   </div>
                 ) : (
-                  <span className="text-sm text-anthracite/60">Fermé</span>
+                  <span className="text-sm text-anthracite/75">Fermé</span>
                 )}
               </li>
             );

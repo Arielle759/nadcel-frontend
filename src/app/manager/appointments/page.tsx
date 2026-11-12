@@ -152,6 +152,24 @@ export default function ManagerAppointmentsPage() {
     return [...byDay.values()];
   }, [appointments, activeTab, query, now]);
 
+  // On affiche les rendez-vous par paquets de 30 : une longue liste reste légère à parcourir.
+  const PAGE = 30;
+  // Le compteur repart à 30 dès qu'on change d'onglet ou de recherche.
+  const listKey = `${activeTab}|${query}`;
+  const [more, setMore] = useState({ key: listKey, limit: PAGE });
+  const limit = more.key === listKey ? more.limit : PAGE;
+  const total = groups.reduce((n, g) => n + g.length, 0);
+  const shownGroups = useMemo(() => {
+    const out: ManagerAppointment[][] = [];
+    let left = limit;
+    for (const g of groups) {
+      if (left <= 0) break;
+      out.push(g.slice(0, left));
+      left -= g.length;
+    }
+    return out;
+  }, [groups, limit]);
+
   function replace(updated: ManagerAppointment) {
     setAppointments((prev) => prev.map((a) => (a.id === updated.id ? { ...a, ...updated } : a)));
   }
@@ -231,7 +249,7 @@ export default function ManagerAppointmentsPage() {
                 {label}
                 <span
                   className={`min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold ${
-                    active ? "bg-beige/20 text-beige" : alert ? "bg-champagne/20 text-champagne" : "bg-sable/15 text-anthracite/60"
+                    active ? "bg-beige/20 text-beige" : alert ? "bg-champagne/20 text-champagne" : "bg-sable/15 text-anthracite/75"
                   }`}
                 >
                   {loading ? "…" : counts[key]}
@@ -243,7 +261,7 @@ export default function ManagerAppointmentsPage() {
 
         <label className="relative w-full lg:w-72">
           <span className="sr-only">Rechercher un client ou un service</span>
-          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-anthracite/45" aria-hidden="true" />
+          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-anthracite/75" aria-hidden="true" />
           <input
             type="search"
             value={query}
@@ -273,11 +291,11 @@ export default function ManagerAppointmentsPage() {
       )}
 
       <div className="flex flex-col gap-5">
-        {groups.map((group) => (
+        {shownGroups.map((group) => (
           <section key={dayKey(group[0].scheduled_at)} aria-label={dayLabel(group[0].scheduled_at, now)}>
             <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold text-anthracite/80">
               <span className="first-letter:uppercase">{dayLabel(group[0].scheduled_at, now)}</span>
-              <span className="font-normal text-anthracite/55">
+              <span className="font-normal text-anthracite/75">
                 ({group.length})
               </span>
             </h2>
@@ -311,8 +329,17 @@ export default function ManagerAppointmentsPage() {
         ))}
       </div>
 
+      {total > limit && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-sm text-anthracite/75">{limit} rendez-vous affichés sur {total}</p>
+          <button type="button" onClick={() => setMore({ key: listKey, limit: limit + PAGE })} className={ui.buttonSecondary}>
+            Afficher {Math.min(PAGE, total - limit)} de plus
+          </button>
+        </div>
+      )}
+
       {appointments.length >= 100 && (
-        <p className="text-xs text-anthracite/50">Affichage des 100 rendez-vous les plus récents.</p>
+        <p className="text-xs text-anthracite/75">Affichage des 100 rendez-vous les plus récents.</p>
       )}
 
       <Toast message={toastMessage} />
@@ -396,7 +423,7 @@ function AppointmentRow({
       <div className="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 gap-y-2 md:grid-cols-[4.5rem_minmax(0,1fr)_10rem_8rem_auto]">
         <div className="leading-tight">
           <p className={`text-base font-semibold text-brand ${cancelled ? "line-through" : ""}`}>{timeLabel(a.scheduled_at)}</p>
-          {a.duration > 0 && <p className="text-xs text-anthracite/50">{formatDuration(a.duration)}</p>}
+          {a.duration > 0 && <p className="text-xs text-anthracite/75">{formatDuration(a.duration)}</p>}
         </div>
 
         <div className="min-w-0">
@@ -408,7 +435,7 @@ function AppointmentRow({
               </span>
             )}
           </p>
-          <p className="truncate text-sm text-anthracite/65">
+          <p className="truncate text-sm text-anthracite/75">
             {a.service?.name ?? "Service"}
             {!a.client && a.client_phone && (
               <>
@@ -421,7 +448,7 @@ function AppointmentRow({
           </p>
         </div>
 
-        <p className="col-start-2 truncate text-sm text-anthracite/65 md:col-start-auto">
+        <p className="col-start-2 truncate text-sm text-anthracite/75 md:col-start-auto">
           <span className="md:hidden">Avec </span>
           {a.employee?.name ?? "Non attribué"}
         </p>
@@ -434,7 +461,7 @@ function AppointmentRow({
           {a.status === "completed" && (
             <span className="text-sm font-medium text-anthracite/75">
               {formatCurrency(Number(a.amount_paid ?? a.price))}
-              {a.payment_method && <span className="text-anthracite/50"> par {PAYMENT_METHOD_LABELS[a.payment_method]}</span>}
+              {a.payment_method && <span className="text-anthracite/75"> par {PAYMENT_METHOD_LABELS[a.payment_method]}</span>}
             </span>
           )}
 
@@ -468,7 +495,7 @@ function AppointmentRow({
                 type="button"
                 disabled={busy}
                 onClick={onAskCancel}
-                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-alert transition-colors hover:bg-alert/10 disabled:opacity-50"
+                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-anthracite/75 transition-colors hover:bg-alert/10 hover:text-alert disabled:opacity-50"
               >
                 Annuler
               </button>
@@ -477,7 +504,7 @@ function AppointmentRow({
 
           {canceling && (
             <span className="flex items-center gap-2 text-xs">
-              <span className="text-anthracite/70">Annuler ce rendez-vous ?</span>
+              <span className="text-anthracite/70">Annuler ce rendez-vous ?</span>
               <button
                 type="button"
                 disabled={busy}
@@ -486,7 +513,7 @@ function AppointmentRow({
               >
                 Oui, annuler
               </button>
-              <button type="button" onClick={onKeep} className="rounded-lg px-2.5 py-1.5 font-medium text-anthracite/65 hover:bg-sable/10">
+              <button type="button" onClick={onKeep} className="rounded-lg px-2.5 py-1.5 font-medium text-anthracite/75 hover:bg-sable/10">
                 Non
               </button>
             </span>

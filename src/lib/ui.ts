@@ -13,7 +13,8 @@ const shadowHover =
   "hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_18px_40px_rgba(90,50,35,0.13)]";
 
 export const ui = {
-  buttonPrimary: `${buttonBase} bg-cacao text-beige shadow-[0_6px_16px_rgba(59,42,36,0.22)] hover:bg-cacao-soft hover:shadow-[0_10px_22px_rgba(90,50,35,0.28)]`,
+  // Action principale de la page (Rechercher, Réserver, Confirmer) : la seule en terracotta.
+  buttonPrimary: `${buttonBase} bg-accent text-beige shadow-[0_6px_16px_rgba(143,74,50,0.25)] hover:bg-cacao hover:shadow-[0_10px_22px_rgba(90,50,35,0.28)]`,
   buttonSecondary: `${buttonBase} bg-white text-brand ${shadow} hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_12px_28px_rgba(90,50,35,0.12)]`,
   // Action posée sur une photo ou un fond chocolat : touche terracotta.
   buttonOnDark: `${buttonBase} bg-accent text-beige shadow-[0_6px_16px_rgba(40,25,18,0.30)] hover:bg-accent-soft`,

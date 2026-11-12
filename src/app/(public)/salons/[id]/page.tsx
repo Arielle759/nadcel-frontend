@@ -8,7 +8,6 @@ import SalonReviews from "@/components/SalonReviews";
 import { assetUrl } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
-import { resolveServiceImage } from "@/lib/serviceImage";
 import { salonArea } from "@/lib/salonArea";
 import { DAYS, DEFAULT_DAY_HOURS, type DayKey, type OpeningHours } from "@/lib/openingHours";
 import { ui } from "@/lib/ui";
@@ -118,17 +117,14 @@ export default async function SalonDetailPage({
               ) : (
                 groups.map(({ category, services }) => (
                   <div key={category} className="mt-8">
-                    <h3 className="text-sm font-semibold text-anthracite/75" style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}>
+                    <h3 className="text-sm font-semibold text-anthracite/75" style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
                       {category} ({services.length})
                     </h3>
                     <ul className="mt-3 flex flex-col gap-3">
                       {services.map((service) => {
-                        const imageSrc = resolveServiceImage(service);
+                        // Pas de vignette : la même photo se répétait sur tous les services d'une catégorie.
                         return (
-                          <li key={service.id} className={`${ui.surface} flex items-center gap-4 p-3 pr-4 sm:p-4`}>
-                            <div className="relative hidden h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-sable/20 sm:block">
-                              {imageSrc && <Image src={imageSrc} alt="" fill sizes="56px" className="object-cover" />}
-                            </div>
+                          <li key={service.id} className={`${ui.surface} flex items-center gap-4 p-3 pl-5 pr-4 sm:p-4 sm:pl-6`}>
                             <div className="min-w-0 flex-1">
                               <p className="font-semibold text-brand">{service.name}</p>
                               {service.description && (
@@ -146,7 +142,7 @@ export default async function SalonDetailPage({
                             </span>
                             {service.employees_count === 0 ? (
                               // Personne ne la réalise encore : pas de faux bouton menant à un calendrier vide.
-                              <span className="w-24 shrink-0 text-right text-xs font-medium text-anthracite/60">Sur place uniquement</span>
+                              <span className="w-24 shrink-0 text-right text-xs font-medium text-anthracite/75">Sur place uniquement</span>
                             ) : (
                               <Link
                                 href={`${bookingHref}?service=${service.id}`}

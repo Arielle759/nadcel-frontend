@@ -161,14 +161,14 @@ export default function SearchSuggest({
           className="absolute left-0 right-0 top-full z-50 mt-3 max-h-80 overflow-y-auto rounded-2xl bg-white p-2 text-left shadow-[0_18px_50px_rgba(40,25,18,0.22)]"
         >
           {options.length === 0 ? (
-            <p className="px-3 py-3 text-sm text-anthracite/65">Aucune suggestion. Lancez la recherche pour voir tous les résultats.</p>
+            <p className="px-3 py-3 text-sm text-anthracite/75">Aucune suggestion. Lancez la recherche pour voir tous les résultats.</p>
           ) : (
             GROUPS.map(({ kind, title, Icon }) => {
               const items = options.filter((o) => o.kind === kind);
               if (items.length === 0) return null;
               return (
                 <div key={kind} role="group" aria-label={title} className="py-1">
-                  <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/50" aria-hidden="true">
+                  <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75" aria-hidden="true">
                     {title}
                   </p>
                   {items.map((option) => {
@@ -188,10 +188,10 @@ export default function SearchSuggest({
                           selected ? "bg-beige text-brand" : "text-anthracite"
                         }`}
                       >
-                        <Icon size={16} className="shrink-0 text-anthracite/45" aria-hidden="true" />
+                        <Icon size={16} className="shrink-0 text-anthracite/75" aria-hidden="true" />
                         <span className="min-w-0 truncate font-medium">{option.label}</span>
                         {option.kind === "salon" && (
-                          <span className="ml-auto shrink-0 truncate text-xs text-anthracite/55">{option.hint}</span>
+                          <span className="ml-auto shrink-0 truncate text-xs text-anthracite/75">{option.hint}</span>
                         )}
                       </div>
                     );
