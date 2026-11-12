@@ -3,17 +3,8 @@ import Reveal from "@/components/motion/Reveal";
 import Image from "next/image";
 import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
+import { UNIVERSES, universeHref } from "@/lib/universes";
 
-// Chaque prestation ouvre la recherche de salons sur un terme que l'API sait
-// retrouver (catégorie ou nom de prestation).
-const UNIVERSES = [
-  { label: "Coiffure", query: "Coiffure", image: "/images/services/coiffure.jpg" },
-  { label: "Barbier", query: "Coupe homme", image: "/images/services/coupe-homme.jpg" },
-  { label: "Onglerie", query: "Manucure", image: "/images/services/manicure.jpg" },
-  { label: "Soin du visage", query: "Soin", image: "/images/services/soin.jpg" },
-  { label: "Massage", query: "Massage", image: "/images/services/massage.jpg" },
-  { label: "Épilation", query: "Épilation", image: "/images/services/epilation.jpg" },
-];
 
 export default function BeautyUniverses() {
   return (
@@ -30,7 +21,7 @@ export default function BeautyUniverses() {
           {UNIVERSES.map(({ label, query, image }, index) => (
             <Reveal as="li" key={label} delay={index * 70}>
               <Link
-                href={`/salons?q=${encodeURIComponent(query)}`}
+                href={universeHref(query)}
                 className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_22px_44px_rgba(90,50,35,0.2)]"
               >
                 <Image
