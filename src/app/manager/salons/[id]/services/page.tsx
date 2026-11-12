@@ -5,8 +5,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Service, useServices } from "@/hooks/useServices";
-import { formatCurrency } from "@/lib/currency";
-import { formatDuration } from "@/lib/duration";
+import { hasOptions, serviceDurationLabel, servicePriceLabel } from "@/lib/serviceOptions";
 import { resolveServiceImage } from "@/lib/serviceImage";
 import ManagerPage from "@/components/manager/ManagerPage";
 import SalonNav from "@/components/manager/SalonNav";
@@ -72,7 +71,8 @@ export default function ManagerServicesPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-brand">{service.name}</p>
                   <p className="text-sm text-anthracite/75">
-                    {service.category}, {formatDuration(service.duration)}
+                    {service.category}, {serviceDurationLabel(service)}
+                    {hasOptions(service) && `, ${service.options!.length} choix de ${(service.option_label || "longueur").toLowerCase()}`}
                   </p>
                   {service.employees_count === 0 && (
                     <p className="mt-1 text-sm font-medium text-alert">
@@ -83,7 +83,7 @@ export default function ManagerServicesPage() {
                     </p>
                   )}
                 </div>
-                <p className="w-28 text-right font-semibold text-anthracite">{formatCurrency(Number(service.price))}</p>
+                <p className="w-32 text-right font-semibold text-anthracite">{servicePriceLabel(service)}</p>
                 <div className="flex flex-wrap items-center gap-1">
                   <Link href={`/manager/salons/${id}/services/${service.id}`} className={ui.buttonSecondary}>
                     Modifier

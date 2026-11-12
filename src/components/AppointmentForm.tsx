@@ -15,6 +15,7 @@ import { formatDuration } from "@/lib/duration";
 import { isAuthenticated } from "@/lib/auth";
 import { clearBookingDraft, readBookingDraft, saveBookingDraft } from "@/lib/bookingDraft";
 import { ui } from "@/lib/ui";
+import { hasOptions, serviceDurationLabel, servicePriceLabel, serviceWithOption } from "@/lib/serviceOptions";
 
 interface AppointmentFormProps {
   salonId: number;
@@ -105,6 +106,8 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     }
     return [...map.entries()];
   }, [services]);
+  // Option choisie (ex. longueur des tresses) quand le service en propose.
+  const [optionId, setOptionId] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [heure, setHeure] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
@@ -142,6 +145,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
       if (!draft || draft.salonId !== salonId) return;
       clearBookingDraft();
       if (services.some((s) => s.id === draft.serviceId)) setServiceId(draft.serviceId);
+      if (draft.optionId) setOptionId(draft.optionId);
       const draftDate = parseDateInputValue(draft.date);
       if (draftDate >= startOfToday() && draftDate <= addDays(startOfToday(), MAX_ADVANCE_DAYS)) {
         pendingHeure.current = draft.heure;
@@ -164,7 +168,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     queueMicrotask(async () => {
       setAvailabilityLoading(true);
       try {
-        const results = await Promise.all(months.map((month) => getMonthAvailability(salonId, serviceId, month)));
+        const results = await Promise.all(months.map((month) => getMonthAvailability(salonId, serviceId, month, optionId)));
         if (!cancelled) setAvailability(Object.assign({}, ...results));
       } catch {
         if (!cancelled) setAvailability({});
@@ -176,13 +180,14 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     return () => {
       cancelled = true;
     };
-  }, [salonId, serviceId, monthsKey, getMonthAvailability]);
+  }, [salonId, serviceId, optionId, monthsKey, getMonthAvailability]);
 
   useEffect(() => {
     let cancelled = false;
 
     queueMicrotask(async () => {
-      if (!selectedDate || !serviceId) {
+      const service = services.find((s) => s.id === serviceId);
+      if (!selectedDate || !serviceId || (service && hasOptions(service) && !optionId)) {
         setAvailableSlots(null);
         return;
       }
@@ -190,7 +195,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
       setSlotsError(null);
       setHeure("");
       try {
-        const slots = await getDayAvailability(salonId, toDateInputValue(selectedDate), serviceId);
+        const slots = await getDayAvailability(salonId, toDateInputValue(selectedDate), serviceId, optionId);
         if (cancelled) return;
         setAvailableSlots(slots);
         if (pendingHeure.current && slots.includes(pendingHeure.current)) setHeure(pendingHeure.current);
@@ -208,22 +213,37 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     return () => {
       cancelled = true;
     };
-  }, [salonId, serviceId, selectedDate, getDayAvailability]);
+  }, [salonId, serviceId, optionId, selectedDate, getDayAvailability, services]);
 
   const selectedService = services.find((s) => s.id === serviceId);
+  const needsOption = Boolean(selectedService && hasOptions(selectedService));
+  const selectedOption = needsOption ? selectedService?.options?.find((o) => o.id === optionId) : undefined;
+  const optionName = (selectedService?.option_label || "Longueur").toLowerCase();
+  // Prix et durée réels : ceux de l'option choisie, sinon ceux du service.
+  const bookedPrice = selectedOption ? Number(selectedOption.price) : Number(selectedService?.price ?? 0);
+  const bookedDuration = selectedOption ? selectedOption.duration : (selectedService?.duration ?? 0);
   const isDayUnavailable = (date: Date) => availability[toDateInputValue(date)] === false;
   // Personne ne réalise cette prestation : aucun créneau ne pourra s'ouvrir.
   const noStaffForService = selectedService?.employees_count === 0;
   // Disponibilités chargées et aucun des prochains jours n'est libre.
   const noDayInStrip =
     !availabilityLoading && Object.keys(availability).length > 0 && stripDays.every((day) => isDayUnavailable(day));
-  const ready = Boolean(selectedService && selectedDate && heure);
+  const ready = Boolean(selectedService && (!needsOption || selectedOption) && selectedDate && heure);
 
   function chooseService(id: number) {
     setPickingService(false);
     if (id === serviceId) return;
     setServiceId(id);
+    setOptionId(null);
     setSelectedDate(undefined);
+    setHeure("");
+    setAvailableSlots(null);
+    setAuthRequired(false);
+  }
+
+  function chooseOption(id: number) {
+    if (id === optionId) return;
+    setOptionId(id);
     setHeure("");
     setAvailableSlots(null);
     setAuthRequired(false);
@@ -240,7 +260,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
     setAuthRequired(false);
     if (!selectedDate || !heure) return;
     if (!isAuthenticated()) {
-      saveBookingDraft({ salonId, serviceId, date: toDateInputValue(selectedDate), heure });
+      saveBookingDraft({ salonId, serviceId, optionId, date: toDateInputValue(selectedDate), heure });
       setAuthRequired(true);
       summaryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
@@ -249,6 +269,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
       await createAppointment({
         salon_id: salonId,
         service_id: serviceId,
+        service_option_id: selectedOption?.id ?? null,
         scheduled_at: `${toDateInputValue(selectedDate)}T${heure}:00`,
       });
       setSuccess(true);
@@ -272,7 +293,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         </div>
         <p className="font-heading text-3xl font-semibold text-brand">Demande envoyée</p>
         <p className="mt-4 leading-7 text-anthracite/85">
-          {selectedService.name} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
+          {serviceWithOption(selectedService.name, selectedOption?.label)} chez {salonName}, {formatLongDate(selectedDate).toLowerCase()} à {formatSlot(heure)}.
         </p>
         <p className="mt-2 text-sm leading-6 text-anthracite/75">
           Le salon va confirmer votre rendez-vous. Vous recevrez un e-mail, et vous pouvez suivre son état dans votre espace.
@@ -300,7 +321,11 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         <div>
           <dt className="text-anthracite/70">Service</dt>
           <dd className="font-medium text-anthracite">
-            {selectedService ? `${selectedService.name}, ${formatDuration(selectedService.duration)}` : "À choisir"}
+            {selectedService
+              ? needsOption && !selectedOption
+                ? `${selectedService.name}, ${optionName} à choisir`
+                : `${serviceWithOption(selectedService.name, selectedOption?.label)}, ${formatDuration(bookedDuration)}`
+              : "À choisir"}
           </dd>
         </div>
         <div>
@@ -313,7 +338,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         <div className="flex items-baseline justify-between rounded-2xl bg-beige px-4 py-3">
           <dt className="text-anthracite/70">À régler au salon</dt>
           <dd className="text-lg font-semibold text-brand">
-            {selectedService ? formatCurrency(Number(selectedService.price)) : "-"}
+            {!selectedService ? "-" : needsOption && !selectedOption ? servicePriceLabel(selectedService) : formatCurrency(bookedPrice)}
           </dd>
         </div>
       </dl>
@@ -365,7 +390,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
               <span className="min-w-0 flex-1">
                 <span className="block font-semibold text-brand">{selectedService.name}</span>
                 <span className="block text-sm text-anthracite/75">
-                  {formatDuration(selectedService.duration)}, {formatCurrency(Number(selectedService.price))}
+                  {serviceDurationLabel(selectedService)}, {servicePriceLabel(selectedService)}
                 </span>
               </span>
               <button type="button" onClick={() => setPickingService(true)} className={`${ui.textLink} shrink-0 text-sm`}>
@@ -395,15 +420,45 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                   />
                   <span className="min-w-0 flex-1">
                     <span className="block font-semibold text-brand">{service.name}</span>
-                    <span className="block text-sm text-anthracite/75">{formatDuration(service.duration)}</span>
+                    <span className="block text-sm text-anthracite/75">{serviceDurationLabel(service)}</span>
                   </span>
-                  <span className="shrink-0 font-semibold text-anthracite">{formatCurrency(Number(service.price))}</span>
+                  <span className="shrink-0 font-semibold text-anthracite">{servicePriceLabel(service)}</span>
                 </label>
                       );
                     })}
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+          {!pickingService && selectedService && needsOption && (
+            <div className="mt-6" role="radiogroup" aria-label={selectedService.option_label || "Longueur"}>
+              <p className="text-sm font-semibold text-anthracite/75">{selectedService.option_label || "Longueur"}</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {selectedService.options!.map((option) => {
+                  const checked = option.id === optionId;
+                  return (
+                    <label
+                      key={option.id}
+                      className={`flex cursor-pointer items-center gap-3 rounded-2xl bg-white px-4 py-3 transition-all duration-200 ${checked ? "shadow-[0_0_0_2px_var(--color-brand),0_10px_26px_rgba(90,50,35,0.12)]" : "shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_14px_32px_rgba(90,50,35,0.11)]"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="service-option"
+                        value={option.id}
+                        checked={checked}
+                        onChange={() => chooseOption(option.id!)}
+                        className="h-4 w-4 shrink-0 accent-[var(--color-brand)]"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-semibold text-brand">{option.label}</span>
+                        <span className="block text-sm text-anthracite/75">{formatDuration(option.duration)}</span>
+                      </span>
+                      <span className="shrink-0 font-semibold text-anthracite">{formatCurrency(Number(option.price))}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
           )}
         </fieldset>
@@ -486,7 +541,12 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         <fieldset className="min-w-0">
           <legend className="font-heading text-2xl font-semibold text-brand">3. Heure</legend>
           <div className="mt-4" aria-live="polite">
-            {!selectedDate && <p className="text-sm text-anthracite/75">Choisissez d&apos;abord un jour.</p>}
+            {needsOption && !selectedOption && (
+              <p className="text-sm text-anthracite/75">Choisissez d&apos;abord la {optionName} pour voir les heures libres.</p>
+            )}
+            {!selectedDate && (!needsOption || selectedOption) && (
+              <p className="text-sm text-anthracite/75">Choisissez d&apos;abord un jour.</p>
+            )}
             {selectedDate && slotsLoading && <p className="text-sm text-anthracite/75">Recherche des créneaux libres...</p>}
             {selectedDate && !slotsLoading && availableSlots?.length === 0 && !slotsError && (
               <p className="text-sm text-anthracite/75">Plus aucun créneau libre ce jour-là. Essayez un autre jour.</p>
@@ -540,7 +600,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                   {formatLongDate(selectedDate)}
                 </>
               ) : (
-                "Choisissez un jour et une heure"
+                needsOption && !selectedOption ? `Choisissez la ${optionName}` : "Choisissez un jour et une heure"
               )}
             </p>
             <button type="submit" form="booking-form" disabled={!ready || loading} className={`${ui.buttonPrimary} shrink-0`}>

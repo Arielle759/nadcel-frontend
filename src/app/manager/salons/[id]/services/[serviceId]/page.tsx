@@ -53,6 +53,8 @@ export default function EditServicePage() {
           price: Number(service.price),
           duration: service.duration,
           category: service.category,
+          option_label: service.option_label ?? null,
+          options: service.options ?? [],
         }}
         currentImageUrl={resolveServiceImage(service)}
         submitLabel="Enregistrer les modifications"

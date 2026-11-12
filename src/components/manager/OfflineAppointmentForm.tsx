@@ -12,6 +12,7 @@ import {
 import { BOOKING_SOURCE_LABELS } from "@/lib/bookingSources";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
+import { hasOptions, serviceDurationLabel, servicePriceLabel } from "@/lib/serviceOptions";
 import { ui } from "@/lib/ui";
 
 const SOURCES: OfflineBookingSource[] = ["whatsapp", "instagram", "facebook", "tiktok", "phone", "walk_in"];
@@ -46,6 +47,7 @@ export default function OfflineAppointmentForm({
 
   const [services, setServices] = useState<Service[]>([]);
   const [serviceId, setServiceId] = useState<number | null>(null);
+  const [optionId, setOptionId] = useState<number | null>(null);
   const [date, setDate] = useState(todayValue);
   const [slots, setSlots] = useState<string[] | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(false);
@@ -77,13 +79,17 @@ export default function OfflineAppointmentForm({
   }, [salonId, getServices]);
 
   useEffect(() => {
-    if (!salonId || !serviceId || !date) return;
+    const current = services.find((s) => s.id === serviceId);
+    if (!salonId || !serviceId || !date || (current && hasOptions(current) && !optionId)) {
+      queueMicrotask(() => setSlots([]));
+      return;
+    }
     let active = true;
     queueMicrotask(async () => {
       setSlotsLoading(true);
       setTime("");
       try {
-        const data = await getDayAvailability(salonId, date, serviceId);
+        const data = await getDayAvailability(salonId, date, serviceId, optionId);
         if (active) setSlots(data);
       } catch {
         if (active) setSlots([]);
@@ -94,10 +100,11 @@ export default function OfflineAppointmentForm({
     return () => {
       active = false;
     };
-  }, [salonId, serviceId, date, getDayAvailability]);
+  }, [salonId, serviceId, optionId, date, getDayAvailability, services]);
 
   const service = services.find((s) => s.id === serviceId);
-  const ready = Boolean(salonId && serviceId && time && clientName.trim() && clientPhone.trim());
+  const needsOption = Boolean(service && hasOptions(service));
+  const ready = Boolean(salonId && serviceId && (!needsOption || optionId) && time && clientName.trim() && clientPhone.trim());
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -108,6 +115,7 @@ export default function OfflineAppointmentForm({
       const created = await createOfflineAppointment({
         salon_id: salonId,
         service_id: serviceId,
+        service_option_id: needsOption ? optionId : null,
         scheduled_at: `${date}T${time}:00`,
         client_name: clientName.trim(),
         client_phone: clientPhone.trim(),
@@ -200,14 +208,46 @@ export default function OfflineAppointmentForm({
           <label htmlFor="service" className={ui.label}>
             Service
           </label>
-          <select id="service" required value={serviceId ?? ""} onChange={(e) => setServiceId(Number(e.target.value))} className={ui.input}>
+          <select
+            id="service"
+            required
+            value={serviceId ?? ""}
+            onChange={(e) => {
+              setServiceId(Number(e.target.value));
+              setOptionId(null);
+            }}
+            className={ui.input}
+          >
             {services.map((s) => (
               <option key={s.id} value={s.id}>
-                {s.name} ({formatDuration(s.duration)}, {formatCurrency(Number(s.price))})
+                {s.name} ({serviceDurationLabel(s)}, {servicePriceLabel(s)})
               </option>
             ))}
           </select>
         </div>
+        {service && needsOption && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="service-option" className={ui.label}>
+              {service.option_label || "Longueur"}
+            </label>
+            <select
+              id="service-option"
+              required
+              value={optionId ?? ""}
+              onChange={(e) => setOptionId(Number(e.target.value) || null)}
+              className={ui.input}
+            >
+              <option value="" disabled>
+                Choisir
+              </option>
+              {service.options!.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.label} ({formatDuration(o.duration)}, {formatCurrency(Number(o.price))})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           <label htmlFor="date" className={ui.label}>
             Jour

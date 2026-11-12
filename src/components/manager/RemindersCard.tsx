@@ -5,6 +5,7 @@ import { ManagerAppointment, useManagerAppointments } from "@/hooks/useManagerAp
 import { BOOKING_SOURCE_LABELS, appointmentClientName } from "@/lib/bookingSources";
 import WhatsAppReminderButton from "@/components/manager/WhatsAppReminderButton";
 import { ui } from "@/lib/ui";
+import { serviceWithOption } from "@/lib/serviceOptions";
 
 // « réservé par whatsapp » ou « réservé par sur place » se lisaient mal.
 const BOOKED_VIA: Partial<Record<string, string>> = {
@@ -109,7 +110,7 @@ export default function RemindersCard() {
                   {timeLabel(a.scheduled_at)}, {appointmentClientName(a)}
                 </p>
                 <p className="mt-0.5 text-[13px] text-anthracite/75">
-                  {a.service?.name}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
+                  {serviceWithOption(a.service?.name ?? "Service", a.option_label)}, {BOOKED_VIA[a.source] ?? BOOKING_SOURCE_LABELS[a.source]}
                 </p>
               </div>
             </div>

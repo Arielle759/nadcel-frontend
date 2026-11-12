@@ -9,6 +9,7 @@ import { assetUrl } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
 import { resolveServiceImage } from "@/lib/serviceImage";
 import { ui } from "@/lib/ui";
+import { serviceWithOption } from "@/lib/serviceOptions";
 
 const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em]";
 
@@ -77,7 +78,7 @@ export function NextAppointmentCard({
           <div>
             <p className={`${LABEL} text-anthracite/75`}>Votre prochain moment beauté</p>
             <h2 id="next-appointment-title" className="mt-2 text-2xl font-semibold tracking-tight text-brand sm:text-3xl">
-              {service.name}
+              {serviceWithOption(service.name, appointment.option_label)}
             </h2>
             <p className="mt-1 text-anthracite/75">
               chez <span className="font-semibold text-anthracite">{salon.name}</span>

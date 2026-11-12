@@ -7,7 +7,7 @@ import SalonRating from "@/components/SalonRating";
 import SalonReviews from "@/components/SalonReviews";
 import { assetUrl } from "@/lib/api";
 import { formatCurrency } from "@/lib/currency";
-import { formatDuration } from "@/lib/duration";
+import { serviceDurationLabel, serviceMaxPrice, servicePriceLabel } from "@/lib/serviceOptions";
 import { salonArea } from "@/lib/salonArea";
 import { DAYS, DEFAULT_DAY_HOURS, type DayKey, type OpeningHours } from "@/lib/openingHours";
 import { ui } from "@/lib/ui";
@@ -58,9 +58,9 @@ export default async function SalonDetailPage({
   const hours: OpeningHours = salon.opening_hours ?? Object.fromEntries(DAYS.map((d) => [d.key, DEFAULT_DAY_HOURS]));
   const today = todayLabel(hours, todayKey);
   const groups = groupByCategory(salon.services);
-  const prices = salon.services.map((service) => service.price);
+  const prices = salon.services.map((service) => Number(service.price));
   const minPrice = prices.length > 0 ? Math.min(...prices) : null;
-  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+  const maxPrice = prices.length > 0 ? Math.max(...salon.services.map(serviceMaxPrice)) : null;
   const fullAddress = `${salon.address}, ${salon.city}`;
   const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${salon.name}, ${fullAddress}`)}`;
 
@@ -131,14 +131,14 @@ export default async function SalonDetailPage({
                                 <p className="mt-0.5 line-clamp-1 text-sm text-anthracite/75">{service.description}</p>
                               )}
                               <p className="mt-1 text-sm text-anthracite/75 sm:hidden">
-                                {formatDuration(service.duration)}, {formatCurrency(service.price)}
+                                {serviceDurationLabel(service)}, {servicePriceLabel(service)}
                               </p>
                             </div>
-                            <span className="hidden w-20 shrink-0 text-right text-sm text-anthracite/75 sm:block">
-                              {formatDuration(service.duration)}
+                            <span className="hidden w-28 shrink-0 text-right text-sm text-anthracite/75 sm:block">
+                              {serviceDurationLabel(service)}
                             </span>
-                            <span className="hidden w-28 shrink-0 text-right font-semibold text-anthracite sm:block">
-                              {formatCurrency(service.price)}
+                            <span className="hidden w-32 shrink-0 text-right font-semibold text-anthracite sm:block">
+                              {servicePriceLabel(service)}
                             </span>
                             {service.employees_count === 0 ? (
                               // Personne ne la réalise encore : pas de faux bouton menant à un calendrier vide.

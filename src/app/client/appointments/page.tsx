@@ -12,6 +12,7 @@ import { ui } from "@/lib/ui";
 import DashboardBanner from "@/components/DashboardBanner";
 import { BeautyJourney, NextAppointmentCard } from "@/components/client/ClientHighlights";
 import { useCurrentUser } from "@/hooks/useAuthState";
+import { serviceWithOption } from "@/lib/serviceOptions";
 
 const CANCELLATION_HOURS = 24;
 
@@ -56,7 +57,7 @@ function calendarEventFor(appointment: ClientAppointment): CalendarEvent {
   const { salon } = appointment;
   const location = [salon.name, salon.address, salon.city].filter(Boolean).join(", ");
   const details = [
-    `${appointment.service.name}${appointment.employee?.name ? ` avec ${appointment.employee.name}` : ""}.`,
+    `${serviceWithOption(appointment.service.name, appointment.option_label)}${appointment.employee?.name ? ` avec ${appointment.employee.name}` : ""}.`,
     `Prix : ${formatCurrency(Number(appointment.price))}, à régler au salon.`,
     salon.phone ? `Salon : ${salon.phone}` : null,
     "Réservé sur Nadcel.",
@@ -65,7 +66,7 @@ function calendarEventFor(appointment: ClientAppointment): CalendarEvent {
     .join("\n");
   return {
     uid: `rdv-${appointment.id}@nadcel.sn`,
-    title: `${appointment.service.name} chez ${salon.name}`,
+    title: `${serviceWithOption(appointment.service.name, appointment.option_label)} chez ${salon.name}`,
     start,
     end: new Date(start.getTime() + minutes * 60_000),
     location,
@@ -297,7 +298,7 @@ export default function ClientAppointmentsPage() {
                             {appointment.salon.name}
                           </Link>
                           <p className="mt-0.5 text-sm text-anthracite/80">
-                            {appointment.service.name}, {formatDuration(appointment.duration ?? appointment.service.duration)}
+                            {serviceWithOption(appointment.service.name, appointment.option_label)}, {formatDuration(appointment.duration ?? appointment.service.duration)}
                           </p>
                         </div>
                         <AppointmentStatusBadge status={appointment.status} />

@@ -51,6 +51,7 @@ export interface Appointment {
   client_id: number;
   salon_id: number;
   service_id: number;
+  option_label?: string | null;
   employee_id: number | null;
   scheduled_at: string;
   duration: number;
@@ -69,6 +70,7 @@ export interface Appointment {
 export interface CreateAppointmentData {
   salon_id: number;
   service_id: number;
+  service_option_id?: number | null;
   scheduled_at: string;
 }
 

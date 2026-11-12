@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ManagerAppointment, useManagerAppointments } from "@/hooks/useManagerAppointments";
 import { appointmentClientName } from "@/lib/bookingSources";
 import { reminderMessage, whatsAppLink } from "@/lib/whatsapp";
+import { serviceWithOption } from "@/lib/serviceOptions";
 
 // Ouvre WhatsApp avec le message de rappel déjà rédigé ; le rendez-vous est noté
 // « rappel envoyé » au moment du clic (le gérant n'a plus qu'à appuyer sur Envoyer).
@@ -26,7 +27,7 @@ export default function WhatsAppReminderButton({
     reminderMessage({
       clientName: appointmentClientName(appointment),
       salonName: salonName ?? appointment.salon?.name ?? "notre salon",
-      serviceName: appointment.service?.name ?? "votre rendez-vous",
+      serviceName: appointment.service?.name ? serviceWithOption(appointment.service.name, appointment.option_label) : "votre rendez-vous",
       scheduledAt: appointment.scheduled_at,
     })
   );
