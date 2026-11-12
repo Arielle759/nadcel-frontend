@@ -10,10 +10,9 @@ import { useCurrentUser, useIsAuthenticated } from "@/hooks/useAuthState";
 
 const navLink =
   "rounded-full px-4 py-2 text-anthracite/85 transition-colors hover:bg-sable/10 hover:text-brand";
-// « Inscrire mon salon » s'adresse aux gérants : bouton secondaire, pour laisser
-// la couleur terracotta à l'action principale des clientes (Rechercher, Réserver).
+// « Inscrire mon salon » doit rester bien visible pour les gérants : terracotta plein.
 const partnerButton =
-  "inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 font-semibold text-brand ring-1 ring-inset ring-sable/60 transition-colors hover:bg-sable/20";
+  "inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-5 font-semibold text-beige shadow-sm transition-colors hover:bg-cacao";
 
 export default function Navbar() {
   const router = useRouter();
