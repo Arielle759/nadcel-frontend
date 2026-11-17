@@ -76,6 +76,13 @@ h2,
   font-variant-numeric: lining-nums;
 }
 
+/* Titres des tableaux de bord : Figtree grasse, comme le modèle de référence. */
+h1.font-sans,
+h2.font-sans {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-synthesis: weight;
+}
+
 h3,
 h2:is(.text-sm, .text-base, .text-lg, .text-xl) {
   font-family: var(--font-body), system-ui, sans-serif;

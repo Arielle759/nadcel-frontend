@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, Calendar, Clock3, XCircle } from "lucide-react";
+import { LayoutDashboard, Building2, Calendar, Clock3, XCircle, UserRound, UsersRound, ChartColumn, Settings } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { useManagerSalons } from "@/hooks/useManagerSalons";
@@ -33,8 +33,12 @@ function useIsAdmin(): boolean {
 
 const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/manager/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
-  { href: "/manager/salons", label: "Mes salons", icon: Building2, matchSubpaths: true },
   { href: "/manager/appointments", label: "Rendez-vous", icon: Calendar, matchSubpaths: true },
+  { href: "/manager/salons", label: "Mes salons", icon: Building2, matchSubpaths: true },
+  { href: "/manager/employees", label: "Employés", icon: UserRound },
+  { href: "/manager/clients", label: "Clients", icon: UsersRound },
+  { href: "/manager/statistiques", label: "Statistiques", icon: ChartColumn },
+  { href: "/manager/parametres", label: "Paramètres", icon: Settings },
 ];
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {

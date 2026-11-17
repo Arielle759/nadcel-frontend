@@ -29,7 +29,7 @@ export default function ActivityMonthlyChart({
   });
 
   return (
-    <div className="rounded-xl border border-sable/40 bg-[#faf8f5] p-5 sm:p-6">
+    <div className="rounded-xl border border-[#ebe4dd] bg-[#faf8f6] p-5 shadow-[0_1px_3px_rgba(60,40,30,0.06)] sm:p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-base font-semibold text-anthracite">Évolution sur 12 mois</p>

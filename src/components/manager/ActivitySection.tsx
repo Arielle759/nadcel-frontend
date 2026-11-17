@@ -28,9 +28,9 @@ export const PERIODS: { key: ActivityPeriod; label: string }[] = [
 const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
 // Cartes du tableau de bord : fond très légèrement teinté, fine bordure.
-export const CARD = "rounded-xl border border-sable/40 bg-[#faf8f5] p-5 sm:p-6";
+export const CARD = "rounded-xl border border-[#ebe4dd] bg-[#faf8f6] p-5 shadow-[0_1px_3px_rgba(60,40,30,0.06)] sm:p-6";
 // Petit libellé en capitales au-dessus des chiffres.
-const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75";
+const LABEL = "text-base font-semibold text-anthracite";
 
 export const PERIOD_SHORT: Record<ActivityPeriod, string> = {
   month: "30 derniers jours",
@@ -57,13 +57,10 @@ export default function ActivitySection({
   return (
     <section className="flex flex-col gap-4" aria-busy={loading} aria-labelledby="analysis-title">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 id="analysis-title" className="font-sans text-lg font-semibold text-anthracite">
-            Analyse de l&apos;activité
-          </h2>
-          <p className="text-sm text-anthracite/70">Rendez-vous réalisés et encaissements sur la période choisie.</p>
-        </div>
-        <div role="group" aria-label="Période analysée" className="flex rounded-lg border border-sable/40 bg-white p-1">
+        <h2 id="analysis-title" className="sr-only">
+          Analyse de l&apos;activité
+        </h2>
+        <div role="group" aria-label="Période analysée" className="flex rounded-lg border border-[#ebe4dd] bg-white p-1">
           {PERIODS.map(({ key, label }) => (
             <button
               key={key}
@@ -71,7 +68,7 @@ export default function ActivitySection({
               onClick={() => onPeriodChange(key)}
               aria-pressed={period === key}
               className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
-                period === key ? "bg-brand text-beige" : "text-anthracite/70 hover:bg-beige"
+                period === key ? "bg-accent text-white" : "text-anthracite/70 hover:bg-[#f1ece6]"
               }`}
             >
               {label}
