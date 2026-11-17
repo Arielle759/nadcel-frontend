@@ -19,19 +19,11 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const SUGGESTIONS = ["Coiffure", "Manucure", "Massage", "Plateau", "Almadies"];
 
 export default function HeroSection() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Une suggestion remplit seulement le champ : la redirection n'a lieu
-  // qu'au clic sur « Rechercher » (ou Entrée). Un second clic la retire.
-  function pickSuggestion(term: string) {
-    setQuery((current) => (current.trim().toLowerCase() === term.toLowerCase() ? "" : term));
-    inputRef.current?.focus();
-  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -99,28 +91,6 @@ export default function HeroSection() {
               Rechercher
             </button>
           </motion.form>
-
-          <motion.div variants={itemVariants} className="mt-5 flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-beige/70">Par exemple :</span>
-            {SUGGESTIONS.map((term) => {
-              const selected = query.trim().toLowerCase() === term.toLowerCase();
-              return (
-                <button
-                  key={term}
-                  type="button"
-                  onClick={() => pickSuggestion(term)}
-                  aria-pressed={selected}
-                  className={`rounded-full border px-3 py-1 transition-colors ${
-                    selected
-                      ? "border-beige bg-beige font-semibold text-brand"
-                      : "border-beige/25 text-beige/90 hover:border-beige/60 hover:text-beige"
-                  }`}
-                >
-                  {term}
-                </button>
-              );
-            })}
-          </motion.div>
 
           <motion.div variants={itemVariants} className="mt-10 flex flex-wrap items-center gap-3 text-sm text-beige/75">
             <span>Vous avez un salon ?</span>

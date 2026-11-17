@@ -33,14 +33,15 @@ const FAQ_ITEMS = [
   },
 ];
 
+// Questions fréquentes : page dédiée /faq, reliée depuis le pied de page.
 export default function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="px-6 pt-28 sm:px-10">
+    <section className="px-6 pb-20 pt-16 sm:px-10">
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
         <Reveal className="lg:sticky lg:top-28 lg:self-start">
-          <h2 className={ui.sectionTitle}>Questions fréquentes</h2>
+          <h1 className={ui.sectionTitle}>Questions fréquentes</h1>
           <p className="mt-4 max-w-md leading-7 text-anthracite/70">Tout ce qu&apos;il faut savoir pour réserver sereinement ou rejoindre Nadcel en tant que salon.</p>
           <a href="mailto:contact@nadcel.sn" className="mt-7 inline-flex items-center gap-2 min-h-11 rounded-full bg-white px-5 text-sm font-semibold text-brand shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] transition-shadow hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_12px_28px_rgba(90,50,35,0.12)]">Nous contacter</a>
         </Reveal>

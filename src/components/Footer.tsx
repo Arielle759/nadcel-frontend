@@ -38,6 +38,7 @@ export default function Footer() {
               Inscrire mon salon
             </Link>
             <Link href="/a-propos" className="hover:text-beige">Qui sommes-nous</Link>
+            <Link href="/faq" className="hover:text-beige">Questions fréquentes</Link>
             <Link href="/cgu" className="hover:text-beige">Conditions générales</Link>
           </nav>
         </div>

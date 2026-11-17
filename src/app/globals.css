@@ -191,3 +191,11 @@ h2:is(.text-sm, .text-base, .text-lg, .text-xl) {
     scroll-behavior: auto !important;
   }
 }
+
+/* Carrousel automatique des salons (accueil) : la liste est doublée, un
+   décalage de la moitié ramène exactement au point de départ. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}

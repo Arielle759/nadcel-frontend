@@ -1,9 +1,7 @@
 import HeroSection from "@/components/HeroSection";
 import TrustSection from "@/components/TrustSection";
-import BeautyUniverses from "@/components/BeautyUniverses";
 import FeaturesSection from "@/components/FeaturesSection";
 import PopularSalons from "@/components/PopularSalons";
-import FaqSection from "@/components/FaqSection";
 import PartnerBand from "@/components/PartnerBand";
 import ReviewsShowcase from "@/components/ReviewsShowcase";
 
@@ -15,11 +13,9 @@ export default function Home() {
     <main className="flex flex-1 flex-col">
       <HeroSection />
       <TrustSection />
-      <BeautyUniverses />
       <FeaturesSection />
       <PopularSalons />
       <ReviewsShowcase />
-      <FaqSection />
       <PartnerBand />
     </main>
   );
