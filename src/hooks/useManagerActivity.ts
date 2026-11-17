@@ -89,26 +89,28 @@ interface UseManagerActivityResult {
 }
 
 interface FetchState {
-  period: ActivityPeriod | null; // période à laquelle correspond la dernière réponse
+  key: string | null; // période (et salon) auxquels correspond la dernière réponse
   data: ManagerActivity | null;
   error: string | null;
 }
 
-export function useManagerActivity(period: ActivityPeriod): UseManagerActivityResult {
-  const [state, setState] = useState<FetchState>({ period: null, data: null, error: null });
+// salonId : un seul salon du gérant, ou null pour tous ses salons.
+export function useManagerActivity(period: ActivityPeriod, salonId: number | null = null): UseManagerActivityResult {
+  const [state, setState] = useState<FetchState>({ key: null, data: null, error: null });
+  const key = `${period}:${salonId ?? "all"}`;
 
   useEffect(() => {
     let active = true;
 
     api
-      .get<ManagerActivity>("/manager/stats/activity", { params: { period } })
+      .get<ManagerActivity>("/manager/stats/activity", { params: { period, ...(salonId ? { salon_id: salonId } : {}) } })
       .then(({ data }) => {
-        if (active) setState({ period, data, error: null });
+        if (active) setState({ key, data, error: null });
       })
       .catch((err) => {
         if (active) {
           setState((previous) => ({
-            period,
+            key,
             data: previous.data,
             error: toErrorMessage(err, "Impossible de charger l'activité du salon."),
           }));
@@ -118,8 +120,8 @@ export function useManagerActivity(period: ActivityPeriod): UseManagerActivityRe
     return () => {
       active = false;
     };
-  }, [period]);
+  }, [period, salonId, key]);
 
-  // Pendant le changement de période, les anciennes données restent affichées.
-  return { data: state.data, loading: state.period !== period, error: state.error };
+  // Pendant le changement de période ou de salon, les anciennes données restent affichées.
+  return { data: state.data, loading: state.key !== key, error: state.error };
 }

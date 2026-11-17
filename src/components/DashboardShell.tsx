@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import type { LucideIcon } from "lucide-react";
-import { logout } from "@/lib/auth";
-import { useCurrentUser } from "@/hooks/useAuthState";
+import { ArrowUpRight, type LucideIcon } from "lucide-react";
+import AccountMenu from "@/components/AccountMenu";
+import NotificationBell from "@/components/NotificationBell";
 
 export interface DashboardNavItem {
   href: string;
@@ -15,21 +15,28 @@ export interface DashboardNavItem {
   icon: LucideIcon;
   // Lien actif aussi sur les sous-pages (ex. /manager/salons/12/services).
   matchSubpaths?: boolean;
+  // Pastille de compteur (ex. demandes à traiter).
+  badge?: number | null;
 }
 
 interface DashboardShellProps {
   title: string; // « Espace gérant », « Administration »
   navItems: DashboardNavItem[];
+  // Menu de l'avatar (en haut à droite).
+  account: { roleLabel: string; dashboardHref: string; dashboardLabel?: string; profileHref: string };
+  // Cloche : nombre d'éléments qui attendent une action, et la liste où les traiter.
+  notifications?: { count: number | null; label: string; href: string };
+  // Bouton « Voir le site » en bas de la barre latérale.
+  showSiteLink?: boolean;
   children: React.ReactNode;
 }
 
-// Cadre commun des espaces privés : barre latérale blanche, rubrique active
-// en chocolat, navigation en haut et compte en bas. Sur mobile, la
+// Cadre commun des espaces privés : barre latérale blanche (rubriques de
+// l'espace uniquement), rubrique active en chocolat ; en haut à droite, la
+// cloche et l'avatar qui porte le profil et la déconnexion. Sur mobile, la
 // navigation passe en bandeau horizontal au-dessus du contenu.
-export default function DashboardShell({ title, navItems, children }: DashboardShellProps) {
+export default function DashboardShell({ title, navItems, account, notifications, showSiteLink = false, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const user = useCurrentUser();
   const navRef = useRef<HTMLElement>(null);
 
   // Sur mobile, la navigation défile horizontalement : on amène la rubrique
@@ -41,11 +48,6 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
     nav.scrollTo({ left: active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2, behavior: "smooth" });
   }, [pathname]);
 
-  function handleLogout() {
-    logout();
-    router.replace("/login");
-  }
-
   return (
     <div className="flex min-h-screen flex-1 flex-col bg-beige md:flex-row">
       <aside className="z-10 flex w-full flex-col gap-4 bg-white px-4 py-4 shadow-[0_8px_24px_rgba(90,50,35,0.06)] md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 md:gap-10 md:px-4 md:py-7 md:shadow-[8px_0_32px_rgba(90,50,35,0.05)]">
@@ -54,15 +56,12 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
             <Image src="/images/logo-icon.png" alt="" width={55} height={40} className="h-8 w-auto" />
             <span className="font-heading text-xl font-semibold tracking-tight text-brand">Nadcel</span>
           </Link>
-          <button type="button" onClick={handleLogout} className="text-sm font-semibold text-anthracite/70 hover:text-brand md:hidden">
-            Se déconnecter
-          </button>
         </div>
 
         <div className="md:flex md:flex-1 md:flex-col">
           <p className="mb-3 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75 md:block">{title}</p>
           <nav ref={navRef} aria-label={title} className="flex gap-1 overflow-x-auto pr-10 md:pr-0 [mask-image:linear-gradient(to_right,black_85%,transparent)] md:flex-col md:overflow-visible md:[mask-image:none]">
-            {navItems.map(({ href, label, icon: Icon, matchSubpaths }) => {
+            {navItems.map(({ href, label, icon: Icon, matchSubpaths, badge }) => {
               const active = pathname === href || (matchSubpaths === true && pathname.startsWith(`${href}/`));
               return (
                 <Link
@@ -84,39 +83,53 @@ export default function DashboardShell({ title, navItems, children }: DashboardS
                   )}
                   <Icon size={18} className="relative shrink-0" aria-hidden="true" />
                   <span className="relative">{label}</span>
+                  {badge ? (
+                    <span className="relative ml-auto flex min-w-5 items-center justify-center rounded-full bg-alert px-1.5 text-[11px] font-semibold leading-5 text-white">
+                      {badge > 99 ? "99+" : badge}
+                      <span className="sr-only"> à traiter</span>
+                    </span>
+                  ) : null}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="mt-auto hidden flex-col gap-1 pt-6 md:flex">
-            <p className="truncate px-3 text-sm font-semibold text-anthracite">{user?.name ?? "Mon compte"}</p>
-            <p className="truncate px-3 pb-2 text-xs text-anthracite/75">{user?.email}</p>
-            <Link href="/" className="flex min-h-10 items-center rounded-xl px-3 text-sm font-medium text-anthracite/70 transition-colors hover:bg-beige hover:text-brand">
-              Voir le site
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex min-h-10 items-center rounded-xl px-3 text-left text-sm font-medium text-anthracite/70 transition-colors hover:bg-beige hover:text-brand"
-            >
-              Se déconnecter
-            </button>
-          </div>
+          {showSiteLink && (
+            <div className="mt-auto hidden pt-6 md:block">
+              {/* Nouvel onglet : l'espace reste ouvert ici, la session (stockée
+                  dans le navigateur) est partagée, aucun jeton dans l'adresse. */}
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-beige px-4 text-sm font-semibold text-brand transition-colors hover:bg-sable/30"
+              >
+                Voir le site
+                <ArrowUpRight size={16} aria-hidden="true" />
+                <span className="sr-only">(nouvel onglet)</span>
+              </a>
+            </div>
+          )}
         </div>
       </aside>
 
       {/* Changement de rubrique : léger fondu montant. Pas d'animation de sortie
           (voir PageTransition : elle lancerait les appels de la page deux fois). */}
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="flex min-w-0 flex-1 flex-col"
-      >
-        {children}
-      </motion.div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative z-20 flex items-center justify-end gap-2 px-5 pt-5 sm:px-10">
+          {notifications && <NotificationBell {...notifications} />}
+          <AccountMenu {...account} />
+        </div>
+        <motion.div
+          key={pathname}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="flex min-w-0 flex-1 flex-col"
+        >
+          {children}
+        </motion.div>
+      </div>
     </div>
   );
 }

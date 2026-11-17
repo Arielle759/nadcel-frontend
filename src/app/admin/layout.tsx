@@ -2,11 +2,15 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Inbox, Store, MessageSquare, UserRound } from "lucide-react";
+import { LayoutDashboard, Inbox, Store, MessageSquare } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
 import PrivateSpaceMessage from "@/components/PrivateSpaceMessage";
+import { useAttentionCount } from "@/hooks/useAttentionCount";
+import type { AdminSalon, Page } from "@/hooks/useAdmin";
+
+const totalOf = (page: Page<AdminSalon>) => page.total;
 
 function isAdminUser(): boolean {
   return isAuthenticated() && hasRole("admin");
@@ -23,13 +27,13 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin/salons", label: "Demandes", icon: Inbox },
   { href: "/admin/salons/all", label: "Salons", icon: Store },
   { href: "/admin/reviews", label: "Avis", icon: MessageSquare },
-  { href: "/admin/profil", label: "Mon profil", icon: UserRound },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const mounted = useHasMounted();
   const isAdmin = useIsAdmin();
+  const pending = useAttentionCount<Page<AdminSalon>>(mounted && isAdmin ? "/admin/salons/pending" : null, totalOf);
 
   useEffect(() => {
     if (mounted && !isAdmin) {
@@ -42,7 +46,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <DashboardShell title="Administration" navItems={NAV_ITEMS}>
+    <DashboardShell
+      title="Administration"
+      navItems={NAV_ITEMS.map((item) => (item.href === "/admin/salons" ? { ...item, badge: pending } : item))}
+      account={{ roleLabel: "Administrateur", dashboardHref: "/admin/dashboard", profileHref: "/admin/profil" }}
+      notifications={{ count: pending, label: "demande(s) de partenariat à examiner", href: "/admin/salons" }}
+    >
       {children}
     </DashboardShell>
   );

@@ -17,6 +17,18 @@ export interface ManagerStats {
   revenue: { collected: number };
   to_close: number; // rendez-vous passés pas encore clôturés
   upcoming: number;
+  pending?: number; // demandes à venir encore en attente de confirmation
+  next_appointment?: NextAppointment | null;
+}
+
+export interface NextAppointment {
+  id: number;
+  scheduled_at: string;
+  status: "pending" | "confirmed";
+  client_name: string | null;
+  service: string | null;
+  option_label: string | null;
+  salon: string | null;
 }
 
 export interface UpdateSalonData {
@@ -52,7 +64,7 @@ export interface CreateSalonData {
 }
 
 interface UseManagerResult {
-  getSalonStats: () => Promise<ManagerStats>;
+  getSalonStats: (salonId?: number | null) => Promise<ManagerStats>;
   createSalon: (data: CreateSalonData) => Promise<SalonDetail>;
   updateSalon: (id: number | string, data: UpdateSalonData) => Promise<SalonDetail>;
   updateOpeningHours: (id: number | string, openingHours: OpeningHours | null) => Promise<SalonDetail>;
@@ -65,11 +77,11 @@ export function useManager(): UseManagerResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getSalonStats = useCallback(async (): Promise<ManagerStats> => {
+  const getSalonStats = useCallback(async (salonId?: number | null): Promise<ManagerStats> => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get<ManagerStats>("/manager/stats");
+      const { data } = await api.get<ManagerStats>("/manager/stats", { params: salonId ? { salon_id: salonId } : {} });
       return data;
     } catch (err) {
       const message = toErrorMessage(err, "Impossible de charger les statistiques.");

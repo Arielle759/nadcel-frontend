@@ -2,12 +2,16 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Building2, Calendar, Clock3, XCircle, UserRound } from "lucide-react";
+import { LayoutDashboard, Building2, Calendar, Clock3, XCircle } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { useManagerSalons } from "@/hooks/useManagerSalons";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
 import PrivateSpaceMessage from "@/components/PrivateSpaceMessage";
+import { useAttentionCount } from "@/hooks/useAttentionCount";
+import type { ManagerStats } from "@/hooks/useManager";
+
+const pendingOf = (stats: ManagerStats) => stats.pending ?? 0;
 
 function isManagerUser(): boolean {
   return isAuthenticated() && (hasRole("gerant") || hasRole("admin"));
@@ -31,7 +35,6 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/manager/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/manager/salons", label: "Mes salons", icon: Building2, matchSubpaths: true },
   { href: "/manager/appointments", label: "Rendez-vous", icon: Calendar, matchSubpaths: true },
-  { href: "/manager/profil", label: "Mon profil", icon: UserRound },
 ];
 
 export default function ManagerLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +43,8 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   const isManager = useIsManager();
   const isAdmin = useIsAdmin();
   const { salons, loading: salonsLoading } = useManagerSalons();
+  const hasVerified = isAdmin || salons.some((salon) => salon.is_verified);
+  const pending = useAttentionCount<ManagerStats>(mounted && isManager && hasVerified ? "/manager/stats" : null, pendingOf);
 
   useEffect(() => {
     if (mounted && !isManager) {
@@ -94,7 +99,13 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <DashboardShell title="Espace gérant" navItems={NAV_ITEMS}>
+    <DashboardShell
+      title="Espace gérant"
+      navItems={NAV_ITEMS.map((item) => (item.href === "/manager/appointments" ? { ...item, badge: pending } : item))}
+      account={{ roleLabel: isAdmin ? "Administrateur" : "Gérant", dashboardHref: "/manager/dashboard", profileHref: "/manager/profil" }}
+      notifications={{ count: pending, label: "demande(s) de rendez-vous à confirmer", href: "/manager/appointments" }}
+      showSiteLink
+    >
       {children}
     </DashboardShell>
   );

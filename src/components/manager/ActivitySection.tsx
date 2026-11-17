@@ -3,7 +3,11 @@
 import Link from "next/link";
 import CountUp from "@/components/motion/CountUp";
 import TopClients from "@/components/manager/TopClients";
-import { useState } from "react";
+import { ExternalLink } from "lucide-react";
+import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
+import type { ManagerStats } from "@/hooks/useManager";
+import { serviceWithOption } from "@/lib/serviceOptions";
+import { ui } from "@/lib/ui";
 
 import {
   useManagerActivity,
@@ -23,7 +27,7 @@ const METHOD_LABELS: Record<string, string> = {
   orange_money: "Orange Money",
 };
 
-const PERIODS: { key: ActivityPeriod; label: string }[] = [
+export const PERIODS: { key: ActivityPeriod; label: string }[] = [
   { key: "month", label: "30 derniers jours" },
   { key: "quarter", label: "3 derniers mois" },
   { key: "year", label: "12 derniers mois" },
@@ -35,54 +39,51 @@ const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8
 // Petit libellé en capitales au-dessus des chiffres.
 const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75";
 
+const MOIS_COURT = { day: "numeric", month: "short", year: "numeric" } as const;
+
 export default function ActivitySection({
-  upcoming,
-  toClose,
+  stats,
+  salonId,
+  period,
+  reminders,
 }: {
-  upcoming: number | null;
-  toClose: number | null;
+  stats: ManagerStats | null;
+  // Salon choisi dans le sélecteur, ou null pour tous les salons du gérant.
+  salonId: number | null;
+  period: ActivityPeriod;
+  // Carte des rappels du lendemain, glissée sous la première ligne.
+  reminders?: React.ReactNode;
 }) {
-  const [period, setPeriod] = useState<ActivityPeriod>("month");
-  const { data, loading, error } = useManagerActivity(period);
+  const { data, loading, error } = useManagerActivity(period, salonId);
+  const noActivity = data !== null && data.totals.completed === 0 && data.monthly.every((m) => m.total === 0);
 
   return (
-    <section className="flex flex-col gap-4" aria-busy={loading}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-anthracite">Activité du salon</h2>
-        <div role="group" aria-label="Période analysée" className="flex rounded-full bg-white p-1 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]">
-          {PERIODS.map(({ key, label }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setPeriod(key)}
-              aria-pressed={period === key}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
-                period === key ? "bg-brand text-beige" : "text-anthracite/70 hover:bg-sable/10"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <section className="flex flex-col gap-4" aria-busy={loading} aria-label="Activité du salon">
       {error && (
         <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <KpiRow data={data} upcoming={upcoming} toClose={toClose} />
+      <KpiRow data={data} stats={stats} />
+
+      <div className={`grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,0.85fr)] transition-opacity ${loading ? "opacity-60" : ""}`}>
+        <NextAppointmentCard stats={stats} />
+        {data ? <TopServices data={data} period={period} /> : <div className="h-56 animate-pulse rounded-2xl bg-sable/15" />}
+        <SiteCard salonId={salonId} />
+      </div>
+
+      {reminders}
 
       {!data && loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Chargement de l'activité">
-          {[0, 1, 2, 3].map((item) => (
+          {[0, 1].map((item) => (
             <div key={item} className="h-56 animate-pulse rounded-2xl bg-sable/15" />
           ))}
         </div>
       )}
 
-      {data && data.totals.completed === 0 && data.monthly.every((m) => m.total === 0) ? (
+      {noActivity ? (
         <div className={`${CARD} text-center`}>
           <p className="font-semibold text-brand">Pas encore d&apos;activité à analyser</p>
           <p className="mt-1 text-sm text-anthracite/75">
@@ -92,10 +93,9 @@ export default function ActivitySection({
       ) : (
         data && (
           <div className={`flex flex-col gap-4 transition-opacity ${loading ? "opacity-60" : ""}`}>
-            <Insights data={data} />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <TopServices data={data} />
               <Forecast data={data} />
+              <Insights data={data} />
             </div>
             <TopClients clients={data.top_clients ?? []} period={period} />
             <ActivityMonthlyChart months={data.monthly} services={data.top_services} />
@@ -116,24 +116,13 @@ export default function ActivitySection({
   );
 }
 
-// Quatre indicateurs compacts en tête : l'essentiel tient sur une seule ligne.
-function KpiRow({
-  data,
-  upcoming,
-  toClose,
-}: {
-  data: ManagerActivity | null;
-  upcoming: number | null;
-  toClose: number | null;
-}) {
+// Quatre indicateurs en tête : l'argent encaissé, ce qui arrive, ce qui reste
+// à clôturer et la fidélité des clients.
+function KpiRow({ data, stats }: { data: ManagerActivity | null; stats: ManagerStats | null }) {
   const placeholder = "—";
+  const toClose = stats?.to_close ?? null;
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <Kpi
-        label="Rendez-vous réalisés"
-        value={data ? <CountUp value={data.totals.completed} /> : placeholder}
-        trend={data ? <TrendBadge trend={data.totals.trend} /> : null}
-      />
       <Kpi
         label="Chiffre d'affaires encaissé"
         value={data ? <CountUp value={data.totals.revenue} /> : placeholder}
@@ -141,7 +130,12 @@ function KpiRow({
         hint="Payé sur place, noté à la clôture"
         tone="highlight"
       />
-      <Kpi label="Rendez-vous à venir" value={upcoming !== null ? <CountUp value={upcoming} /> : placeholder} />
+      <Kpi
+        label="Rendez-vous à venir"
+        value={stats ? <CountUp value={stats.upcoming} /> : placeholder}
+        hint={stats?.pending ? `dont ${stats.pending} à confirmer` : undefined}
+        href="/manager/appointments"
+      />
       <Kpi
         label="À clôturer"
         value={toClose !== null ? <CountUp value={toClose} /> : placeholder}
@@ -149,7 +143,78 @@ function KpiRow({
         hint={toClose ? "Rendez-vous passés sans paiement noté" : "Tout est à jour"}
         href={toClose ? "/manager/appointments" : undefined}
       />
+      <Kpi
+        label="Clients fidèles"
+        value={data ? <CountUp value={data.loyalty.rate} format={(n) => `${n.toLocaleString("fr-FR")} %`} /> : placeholder}
+        hint={
+          data
+            ? `${data.loyalty.returning} sur ${data.loyalty.clients} client${data.loyalty.clients > 1 ? "s" : ""} revenu${data.loyalty.returning > 1 ? "s" : ""}`
+            : undefined
+        }
+      />
     </div>
+  );
+}
+
+function NextAppointmentCard({ stats }: { stats: ManagerStats | null }) {
+  const next = stats?.next_appointment ?? null;
+  return (
+    <div className={`${CARD} flex flex-col`}>
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-base font-semibold text-anthracite">Prochain rendez-vous</p>
+        <Link href="/manager/appointments" className={`${ui.textLink} text-sm`}>
+          Voir tous <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+      {!stats ? (
+        <div className="mt-4 h-20 animate-pulse rounded-xl bg-sable/15" />
+      ) : !next ? (
+        <p className="mt-4 text-sm text-anthracite/75">Aucun rendez-vous à venir pour le moment.</p>
+      ) : (
+        <div className="mt-4 flex items-start gap-3">
+          <span
+            aria-hidden="true"
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-beige font-heading text-lg font-semibold text-accent"
+          >
+            {(next.client_name ?? "?").trim().charAt(0).toUpperCase()}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-anthracite">{next.client_name ?? "Client"}</p>
+            <p className="truncate text-sm text-anthracite/75">{serviceWithOption(next.service ?? "Service", next.option_label)}</p>
+            {next.salon && <p className="truncate text-xs text-anthracite/60">{next.salon}</p>}
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-anthracite/75">
+              <span>
+                {new Date(next.scheduled_at).toLocaleDateString("fr-FR", { weekday: "short", ...MOIS_COURT })} ·{" "}
+                {new Date(next.scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+              </span>
+              <AppointmentStatusBadge status={next.status} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Le site public s'ouvre dans un nouvel onglet : l'espace gérant reste ouvert
+// et la session, stockée dans le navigateur, est partagée entre les onglets.
+function SiteCard({ salonId }: { salonId: number | null }) {
+  const href = salonId ? `/salons/${salonId}` : "/salons";
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex min-h-44 flex-col justify-end overflow-hidden rounded-2xl bg-brand p-6 text-beige shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)] transition-transform hover:-translate-y-0.5"
+    >
+      <span aria-hidden="true" className="absolute -right-10 -top-10 size-40 rounded-full bg-accent/40" />
+      <ExternalLink size={22} aria-hidden="true" className="relative mb-auto text-beige/80" />
+      <span className="relative mt-6 font-heading text-xl font-semibold">Ouvrir le site</span>
+      <span className="relative mt-1 text-sm text-beige/75">
+        {salonId ? "Voir la fiche de ce salon telle que vos clients la voient." : "Voir vos salons tels que vos clients les voient."}
+      </span>
+      <span className="sr-only">(nouvel onglet)</span>
+    </a>
   );
 }
 
@@ -177,7 +242,7 @@ function Kpi({
     <>
       <p className={highlight ? `${LABEL} text-beige/65` : LABEL}>{label}</p>
       <p
-        className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${
+        className={`mt-3 text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl ${
           highlight ? "text-beige" : tone === "warning" ? "text-champagne" : "text-brand"
         }`}
       >
@@ -257,53 +322,35 @@ function BarList({ rows }: { rows: { key: string; label: string; share: number; 
   );
 }
 
-function TrendBadge({ trend }: { trend: number | null }) {
-  const label = formatTrend(trend);
-  if (label === null) {
-    return <span className="text-xs text-anthracite/75">Nouveau</span>;
-  }
-  const up = trend! >= 0;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 text-xs font-semibold ${up ? "text-success" : "text-alert"}`}
-      title="Par rapport à la période précédente de même durée"
-    >
-      {label}
-    </span>
-  );
-}
+const PERIOD_SHORT: Record<ActivityPeriod, string> = { month: "30 derniers jours", quarter: "3 derniers mois", year: "12 derniers mois" };
 
-function TopServices({ data }: { data: ManagerActivity }) {
+function TopServices({ data, period }: { data: ManagerActivity; period: ActivityPeriod }) {
   return (
     <div className={CARD}>
-      <p className="text-base font-semibold text-anthracite">Services préférés des clients</p>
-      <p className="mb-4 text-sm text-anthracite/75">
-        {data.totals.completed} rendez-vous réalisé{data.totals.completed > 1 ? "s" : ""}, soit{" "}
-        {formatCurrency(data.totals.revenue)}
-      </p>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <p className="text-base font-semibold text-anthracite">Services les plus demandés</p>
+        <p className="text-xs text-anthracite/70">{PERIOD_SHORT[period]}</p>
+      </div>
       {data.top_services.length === 0 ? (
-        <p className="text-sm text-anthracite/75">Aucun rendez-vous réalisé sur cette période.</p>
+        <p className="mt-4 text-sm text-anthracite/75">Aucun rendez-vous réalisé sur cette période.</p>
       ) : (
-        <ol className="flex flex-col gap-5">
-          {data.top_services.map((service, index) => (
-            <li key={service.service_id} className="flex items-center gap-4">
-              <span
-                aria-hidden="true"
-                className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-beige font-heading text-lg font-semibold text-accent"
-              >
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-anthracite">{service.name}</p>
-                <p className="mt-0.5 text-xs text-anthracite/75">
-                  {service.count} fois, {service.share.toLocaleString("fr-FR")} % des rendez-vous,{" "}
-                  {formatCurrency(service.revenue)}
-                </p>
+        <ul className="mt-4 flex flex-col gap-3.5 text-sm">
+          {data.top_services.slice(0, 5).map((service, _i, list) => (
+            <li key={service.service_id}>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="truncate font-medium text-anthracite">{service.name}</span>
+                <span className="shrink-0 tabular-nums font-semibold text-anthracite">{service.share.toLocaleString("fr-FR")} %</span>
               </div>
-              <TrendBadge trend={service.trend} />
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-beige">
+                {/* Barres à l'échelle du service le plus demandé : les écarts se lisent mieux. */}
+                <div className="h-full rounded-full bg-accent" style={{ width: `${Math.max(4, (service.share / Math.max(...list.map((x) => x.share), 1)) * 100)}%` }} />
+              </div>
+              <p className="mt-1 text-xs text-anthracite/70">
+                {service.count} rendez-vous · {formatCurrency(service.revenue)}
+              </p>
             </li>
           ))}
-        </ol>
+        </ul>
       )}
     </div>
   );

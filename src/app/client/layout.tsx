@@ -33,7 +33,11 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <DashboardShell title="Mon espace" navItems={NAV_ITEMS}>
+    <DashboardShell
+      title="Mon espace"
+      navItems={NAV_ITEMS}
+      account={{ roleLabel: "Cliente", dashboardHref: "/client/appointments", dashboardLabel: "Mes rendez-vous", profileHref: "/client/profil" }}
+    >
       {children}
     </DashboardShell>
   );
