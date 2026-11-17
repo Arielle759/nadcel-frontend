@@ -388,11 +388,11 @@ function AppointmentGrowth({ stats }: { stats: AdminStats }) {
 
 // Pastilles de statut pleines, comme le modèle (vert, lilas, rouge…).
 const STATUS: Record<string, { label: string; className: string }> = {
-  pending: { label: "En attente", className: "bg-[#e3d6fa] text-[#563691]" },
-  confirmed: { label: "Confirmé", className: "bg-sauge-soft text-sauge-ink" },
-  in_progress: { label: "En cours", className: "bg-[#fbdca6] text-[#7a4a0c]" },
-  completed: { label: "Terminé", className: "bg-sauge-soft text-sauge-ink" },
-  cancelled: { label: "Annulé", className: "bg-[#f8b4ab] text-[#8a1f16]" },
+  pending: { label: "En attente", className: "bg-vif-ambre-bg text-vif-ambre-ink" },
+  confirmed: { label: "Confirmé", className: "bg-vif-vert-bg text-vif-vert-ink" },
+  in_progress: { label: "En cours", className: "bg-vif-ciel-bg text-vif-ciel-ink" },
+  completed: { label: "Terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" },
+  cancelled: { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" },
 };
 
 const ROLE_LABELS: Record<AdminSignup["role"], string> = { client: "Cliente", gerant: "Gérant" };

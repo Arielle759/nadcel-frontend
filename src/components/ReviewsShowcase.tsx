@@ -108,7 +108,7 @@ export default function ReviewsShowcase() {
                         key={star}
                         size={18}
                         aria-hidden="true"
-                        className={star < review.rating ? "fill-champagne text-champagne" : "text-sable"}
+                        className={star < review.rating ? "fill-vif-ambre text-vif-ambre" : "text-sable"}
                       />
                     ))}
                   </div>

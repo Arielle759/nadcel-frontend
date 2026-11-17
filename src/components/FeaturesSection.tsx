@@ -20,6 +20,9 @@ const STEPS = [
   },
 ];
 
+// Chaque étape a sa couleur d'accent (vert, bleu ciel, ambre).
+const STEP_TONES = ["bg-vif-vert-bg text-vif-vert-ink", "bg-vif-ciel-bg text-vif-ciel-ink", "bg-vif-ambre-bg text-vif-ambre-ink"];
+
 export default function FeaturesSection() {
   return (
     <section aria-labelledby="how-it-works" className="px-6 pt-28 sm:px-10">
@@ -35,7 +38,10 @@ export default function FeaturesSection() {
         <ol className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {STEPS.map(({ number, title, description }, index) => (
             <Reveal as="li" key={number} delay={index * 120} className={`${ui.surface} p-7`}>
-              <span className="font-heading text-3xl font-semibold text-accent" aria-hidden="true">
+              <span
+                className={`inline-flex size-14 items-center justify-center rounded-2xl font-heading text-2xl font-semibold ${STEP_TONES[index]}`}
+                aria-hidden="true"
+              >
                 {number}
               </span>
               <h3 className="mt-5 text-xl font-semibold text-brand">{title}</h3>

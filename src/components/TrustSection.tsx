@@ -2,6 +2,7 @@
 
 import { useSalons } from "@/hooks/useSalons";
 import CountUp from "@/components/motion/CountUp";
+import { BadgeCheck, BellRing, Star, Wallet, type LucideIcon } from "lucide-react";
 
 function formatRating(value: number): string {
   return value.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -18,6 +19,14 @@ export default function TrustSection() {
     0
   );
   const averageRating = reviewCount > 0 ? weightedSum / reviewCount : null;
+
+  // Une pastille d'icône colorée par chiffre (accents vifs de l'application).
+  const icons: { icon: LucideIcon; tone: string }[] = [
+    { icon: BadgeCheck, tone: "bg-vif-vert-bg text-vif-vert-ink" },
+    { icon: Star, tone: "bg-vif-ambre-bg text-vif-ambre-ink" },
+    { icon: Wallet, tone: "bg-vif-ciel-bg text-vif-ciel-ink" },
+    { icon: BellRing, tone: "bg-vif-lilas-bg text-vif-lilas-ink" },
+  ];
 
   const items: { value: React.ReactNode; label: string }[] = [
     {
@@ -40,12 +49,18 @@ export default function TrustSection() {
       className="relative z-10 mx-4 -mt-10 rounded-3xl bg-white px-6 py-8 shadow-[0_2px_6px_rgba(90,50,35,0.06),0_24px_56px_rgba(90,50,35,0.14)] sm:mx-8 sm:px-10 lg:mx-auto lg:w-full lg:max-w-6xl"
     >
       <dl className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:divide-x md:divide-sable/20">
-        {items.map(({ value, label }) => (
-          <div key={label} className="flex flex-col gap-1 px-2 md:px-6">
-            <dt className="order-2 text-sm leading-5 text-anthracite/75">{label}</dt>
-            <dd className="order-1 text-3xl font-semibold tabular-nums tracking-tight text-brand">{value}</dd>
-          </div>
-        ))}
+        {items.map(({ value, label }, i) => {
+          const { icon: Icon, tone } = icons[i];
+          return (
+            <div key={label} className="flex flex-col gap-1 px-2 md:px-6">
+              <dt className="order-3 text-sm leading-5 text-anthracite/75">{label}</dt>
+              <dd className="order-2 text-3xl font-semibold tabular-nums tracking-tight text-brand">{value}</dd>
+              <span aria-hidden="true" className={`order-1 mb-2 flex size-9 items-center justify-center rounded-xl ${tone}`}>
+                <Icon size={18} strokeWidth={2} />
+              </span>
+            </div>
+          );
+        })}
       </dl>
     </section>
   );

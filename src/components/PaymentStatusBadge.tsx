@@ -3,7 +3,7 @@ import { formatCurrency } from "@/lib/currency";
 
 const PAYMENT_STYLES: Record<PaymentStatus, string> = {
   unpaid: "border-stone-200 bg-stone-50 text-stone-700",
-  paid: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  paid: "border-transparent bg-vif-vert-bg text-vif-vert-ink",
 };
 
 const PAYMENT_LABELS: Record<PaymentStatus, string> = {

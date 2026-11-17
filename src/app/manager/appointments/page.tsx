@@ -369,16 +369,16 @@ function emptyMessage(tab: Tab): string {
 function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now: number }) {
   const past = new Date(appointment.scheduled_at).getTime() <= now;
   const { label, className } = (() => {
-    if (isOpen(appointment) && past) return { label: "À clôturer", className: "bg-champagne/15 text-champagne" };
+    if (isOpen(appointment) && past) return { label: "À clôturer", className: "bg-vif-ciel-bg text-vif-ciel-ink" };
     switch (appointment.status) {
       case "pending":
-        return { label: "À confirmer", className: "bg-amber-100 text-amber-800" };
+        return { label: "À confirmer", className: "bg-vif-ambre-bg text-vif-ambre-ink" };
       case "completed":
-        return { label: "Terminé", className: "bg-success/10 text-success" };
+        return { label: "Terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" };
       case "cancelled":
-        return { label: "Annulé", className: "bg-alert/10 text-alert" };
+        return { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" };
       default:
-        return { label: "Confirmé", className: "bg-brand/10 text-brand" };
+        return { label: "Confirmé", className: "bg-vif-vert-bg text-vif-vert-ink" };
     }
   })();
 

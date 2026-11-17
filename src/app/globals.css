@@ -42,6 +42,23 @@
   --color-chart-5: #5b6f86; /* bleu ardoise */
   --color-chart-6: #a98fb0; /* lilas */
   --color-chart-7: #d8c4b2; /* sable */
+  /* Accents vifs, communs à toute l'application : une couleur = un sens.
+     Fond clair + texte foncé de la même teinte (contraste AA). */
+  --color-vif-vert: #4cb36e; /* positif, disponible, confirmé */
+  --color-vif-vert-bg: #d8f3de;
+  --color-vif-vert-ink: #165c34;
+  --color-vif-ambre: #f2a516; /* en attente, notes (étoiles) */
+  --color-vif-ambre-bg: #fdeab8;
+  --color-vif-ambre-ink: #7a4a0c;
+  --color-vif-ciel: #4a9be0; /* en cours, à clôturer */
+  --color-vif-ciel-bg: #d6e9fb;
+  --color-vif-ciel-ink: #1b4f80;
+  --color-vif-lilas: #8b6fd6; /* terminé */
+  --color-vif-lilas-bg: #e8defb;
+  --color-vif-lilas-ink: #563691;
+  --color-vif-corail: #e5574a; /* annulé, refusé, baisse */
+  --color-vif-corail-bg: #fbd3cd;
+  --color-vif-corail-ink: #8a1f16;
   /* Espace administrateur : accent vert sauge (le gérant garde le terracotta),
      pour distinguer les deux espaces d'un coup d'œil. */
   --color-sauge: #23794a; /* vert franc : barres et repères forts, texte blanc lisible */

@@ -13,7 +13,7 @@ export default function SalonRating({
 
   return (
     <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand">
-      <Star size={14} className="fill-champagne text-champagne" aria-hidden="true" />
+      <Star size={14} className="fill-vif-ambre text-vif-ambre" aria-hidden="true" />
       {Number(average).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
       <span className="font-normal text-anthracite/75">({count})</span>
     </span>

@@ -570,7 +570,7 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
                           className={`min-h-11 min-w-20 rounded-full border px-4 text-sm font-medium transition-colors ${
                             heure === slot
                               ? "border-brand bg-brand text-beige"
-                              : "border-transparent bg-white text-anthracite shadow-[0_1px_2px_rgba(90,50,35,0.05),0_6px_16px_rgba(90,50,35,0.06)] hover:shadow-[0_2px_6px_rgba(90,50,35,0.07),0_10px_22px_rgba(90,50,35,0.12)]"
+                              : "border-vif-vert/40 bg-vif-vert-bg text-vif-vert-ink hover:border-vif-vert hover:bg-[#c3ecce]"
                           }`}
                         >
                           {formatSlot(slot)}

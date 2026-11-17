@@ -70,7 +70,7 @@ export function NextAppointmentCard({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
           )}
-          <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-accent shadow-[0_4px_12px_rgba(59,42,36,0.15)]">
+          <span className="absolute left-4 top-4 rounded-full bg-vif-vert-bg px-3 py-1.5 text-xs font-semibold text-vif-vert-ink shadow-[0_4px_12px_rgba(59,42,36,0.15)]">
             {countdown(date, now)}
           </span>
         </div>

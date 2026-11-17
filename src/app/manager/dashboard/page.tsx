@@ -78,6 +78,7 @@ export default function ManagerDashboardPage() {
         <Kpi
           label="Rendez-vous du jour"
           icon={CalendarDays}
+          tone="ciel"
           value={current?.today ? <CountUp value={current.today.count} /> : null}
           note={
             current?.today ? (
@@ -94,18 +95,21 @@ export default function ManagerDashboardPage() {
         <Kpi
           label="Clients actifs"
           icon={UsersRound}
+          tone="lilas"
           value={data ? <CountUp value={data.loyalty.clients} /> : null}
           note="sur les 30 derniers jours"
         />
         <Kpi
           label="Chiffre d'affaires"
           icon={Wallet}
+          tone="vert"
           value={data ? <CountUp value={data.totals.revenue} format={(n) => formatCurrency(n)} /> : null}
           note="encaissé, 30 derniers jours"
         />
         <Kpi
           label="Note moyenne"
           icon={Star}
+          tone="ambre"
           value={current ? (current.rating?.average ?? "—") : null}
           note={current?.rating ? `${current.rating.count} avis` : null}
         />
@@ -121,12 +125,36 @@ export default function ManagerDashboardPage() {
   );
 }
 
-function Kpi({ label, icon: Icon, value, note }: { label: string; icon: LucideIcon; value: React.ReactNode; note: React.ReactNode }) {
+const AVATAR_TONES = ["bg-vif-vert-bg text-vif-vert-ink", "bg-vif-lilas-bg text-vif-lilas-ink", "bg-vif-ciel-bg text-vif-ciel-ink"];
+
+// Pastille d'icône colorée par indicateur (accents vifs de l'application).
+const KPI_TONES = {
+  vert: "bg-vif-vert-bg text-vif-vert-ink",
+  lilas: "bg-vif-lilas-bg text-vif-lilas-ink",
+  ciel: "bg-vif-ciel-bg text-vif-ciel-ink",
+  ambre: "bg-vif-ambre-bg text-vif-ambre-ink",
+} as const;
+
+function Kpi({
+  label,
+  icon: Icon,
+  value,
+  note,
+  tone,
+}: {
+  label: string;
+  icon: LucideIcon;
+  value: React.ReactNode;
+  note: React.ReactNode;
+  tone: keyof typeof KPI_TONES;
+}) {
   return (
     <div className={`${CARD} flex flex-col`}>
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium text-anthracite">{label}</p>
-        <Icon size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0 text-accent" />
+        <span className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${KPI_TONES[tone]}`}>
+          <Icon size={17} strokeWidth={1.9} aria-hidden="true" />
+        </span>
       </div>
       <p className="mt-7 text-[22px] font-bold leading-none tabular-nums tracking-tight text-anthracite">
         {value ?? <span className="inline-block h-6 w-16 animate-pulse rounded bg-sable/20" />}
@@ -137,11 +165,11 @@ function Kpi({ label, icon: Icon, value, note }: { label: string; icon: LucideIc
 }
 
 const STATUS: Record<TodayAppointment["status"], { label: string; className: string }> = {
-  pending: { label: "en attente", className: "border border-[#d9cfc5] bg-white text-anthracite/80" },
-  confirmed: { label: "confirmé", className: "bg-accent text-white" },
-  in_progress: { label: "en cours", className: "bg-[var(--color-chart-3)] text-brand" },
-  completed: { label: "terminé", className: "bg-[#e9dfd6] text-brand" },
-  cancelled: { label: "annulé", className: "bg-red-100 text-red-800" },
+  pending: { label: "en attente", className: "bg-vif-ambre-bg text-vif-ambre-ink" },
+  confirmed: { label: "confirmé", className: "bg-vif-vert-bg text-vif-vert-ink" },
+  in_progress: { label: "en cours", className: "bg-vif-ciel-bg text-vif-ciel-ink" },
+  completed: { label: "terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" },
+  cancelled: { label: "annulé", className: "bg-vif-corail-bg text-vif-corail-ink" },
 };
 
 function TodaySchedule({ list, count }: { list: TodayAppointment[] | null; count: number }) {
@@ -204,11 +232,11 @@ function StaffPerformance({ employees }: { employees: { employee_id: number; nam
         <p className="mt-5 text-sm text-anthracite/70">Aucun rendez-vous réalisé sur cette période.</p>
       ) : (
         <ul className="mt-5 flex flex-col gap-4">
-          {top.map((e) => (
+          {top.map((e, i) => (
             <li key={e.employee_id} className="flex items-center gap-3">
               <span
                 aria-hidden="true"
-                className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#e9dfd6] text-sm font-semibold text-brand"
+                className={`flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${AVATAR_TONES[i % AVATAR_TONES.length]}`}
               >
                 {e.name.trim().charAt(0).toUpperCase()}
               </span>

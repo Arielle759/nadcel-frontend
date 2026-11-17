@@ -34,7 +34,7 @@ function Stars({ rating }: { rating: number }) {
           key={value}
           size={15}
           aria-hidden="true"
-          className={value <= rating ? "fill-champagne text-champagne" : "fill-transparent text-sable"}
+          className={value <= rating ? "fill-vif-ambre text-vif-ambre" : "fill-transparent text-sable"}
         />
       ))}
     </span>
