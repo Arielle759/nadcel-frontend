@@ -33,45 +33,51 @@ export default function SalonGrid({
 
   return (
     <div className="grid w-full grid-cols-1 gap-x-7 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-      {salons.map((salon, index) => {
-        const cover = assetUrl(salon.cover ?? salon.logo);
-        const categories = salon.service_categories.slice(0, 3).join(", ");
-        return (
-          <Reveal key={salon.id} delay={(index % 3) * 110} className="min-w-0">
-          <Link href={`/salons/${salon.id}`} className="group flex min-w-0 flex-col">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-shadow duration-300 group-hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_20px_44px_rgba(90,50,35,0.18)]">
-              {cover ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={cover}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center">
-                  <span className="font-heading text-6xl font-semibold text-brand/30" aria-hidden="true">
-                    {salon.name.charAt(0)}
-                  </span>
-                </div>
-              )}
-              {salon.reviews_count > 0 && (
-                <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 shadow-sm">
-                  <SalonRating average={salon.reviews_avg_rating} count={salon.reviews_count} />
-                </span>
-              )}
-            </div>
-            <div className="mt-4 px-1">
-              <h3 className="text-xl font-semibold text-brand transition-colors group-hover:text-brand-soft">{salon.name}</h3>
-              <p className="mt-1 text-sm text-anthracite/75">
-                {salonArea(salon.address, salon.city)}
-                {categories && <span className="text-anthracite/75">, {categories.toLowerCase()}</span>}
-              </p>
-            </div>
-          </Link>
-          </Reveal>
-        );
-      })}
+      {salons.map((salon, index) => (
+        <Reveal key={salon.id} delay={(index % 3) * 110} className="min-w-0">
+          <SalonCard salon={salon} />
+        </Reveal>
+      ))}
     </div>
+  );
+}
+
+// Carte d'un salon (photo, note, nom, quartier et catégories) : grille de
+// recherche et carrousel de l'accueil.
+export function SalonCard({ salon }: { salon: Salon }) {
+  const cover = assetUrl(salon.cover ?? salon.logo);
+  const categories = salon.service_categories.slice(0, 3).join(", ");
+  return (
+    <Link href={`/salons/${salon.id}`} className="group flex min-w-0 flex-col">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-sable/20 shadow-[0_1px_2px_rgba(90,50,35,0.06),0_10px_28px_rgba(90,50,35,0.10)] transition-shadow duration-300 group-hover:shadow-[0_2px_6px_rgba(90,50,35,0.08),0_20px_44px_rgba(90,50,35,0.18)]">
+        {cover ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={cover}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="font-heading text-6xl font-semibold text-brand/30" aria-hidden="true">
+              {salon.name.charAt(0)}
+            </span>
+          </div>
+        )}
+        {salon.reviews_count > 0 && (
+          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 shadow-sm">
+            <SalonRating average={salon.reviews_avg_rating} count={salon.reviews_count} />
+          </span>
+        )}
+      </div>
+      <div className="mt-4 px-1">
+        <h3 className="text-xl font-semibold text-brand transition-colors group-hover:text-brand-soft">{salon.name}</h3>
+        <p className="mt-1 text-sm text-anthracite/75">
+          {salonArea(salon.address, salon.city)}
+          {categories && <span className="text-anthracite/75">, {categories.toLowerCase()}</span>}
+        </p>
+      </div>
+    </Link>
   );
 }
