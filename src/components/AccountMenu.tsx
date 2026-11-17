@@ -22,6 +22,7 @@ export default function AccountMenu({
   profileHref,
   siteLink = true,
   afterLogoutHref = "/login",
+  tone = "accent",
 }: {
   roleLabel: string;
   dashboardHref: string;
@@ -31,6 +32,8 @@ export default function AccountMenu({
   siteLink?: boolean;
   // Depuis le site public, on reste sur l'accueil après la déconnexion.
   afterLogoutHref?: string;
+  // Couleur de l'avatar : terracotta (gérant, cliente) ou sauge (administration).
+  tone?: "accent" | "sauge";
 }) {
   const user = useCurrentUser();
   const router = useRouter();
@@ -68,7 +71,9 @@ export default function AccountMenu({
   const avatar = (size: string) => (
     <span
       aria-hidden="true"
-      className={`flex ${size} shrink-0 items-center justify-center rounded-full bg-accent font-semibold text-beige shadow-[0_4px_12px_rgba(143,74,50,0.25)]`}
+      className={`flex ${size} shrink-0 items-center justify-center rounded-full font-semibold text-beige ${
+        tone === "sauge" ? "bg-sauge shadow-[0_4px_12px_rgba(79,113,85,0.25)]" : "bg-accent shadow-[0_4px_12px_rgba(143,74,50,0.25)]"
+      }`}
     >
       {initials(user?.name)}
     </span>

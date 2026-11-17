@@ -85,10 +85,10 @@ export default function AdminUsersPage() {
   const data = result?.data;
 
   return (
-    <main className="flex flex-1 flex-col px-5 pb-10 pt-2 sm:px-8">
+    <main className="flex flex-1 flex-col px-5 pb-10 pt-4 sm:px-8 md:pt-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <div>
-          <h1 className="text-3xl tracking-tight text-anthracite">Utilisateurs</h1>
+          <h1 className="flex min-h-10 items-center font-sans text-[22px] font-medium tracking-tight text-anthracite">Utilisateurs</h1>
           <p className="mt-1 text-sm text-anthracite/70">
             Un compte suspendu ne peut plus se connecter ; ses données et son historique sont conservés.
           </p>
@@ -192,8 +192,8 @@ export default function AdminUsersPage() {
                         <td className="px-3 py-3">{activity(user)}</td>
                         <td className="px-3 py-3">
                           <span
-                            className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              suspended ? "bg-alert/15 text-alert" : "bg-success/15 text-success"
+                            className={`inline-block rounded-md px-2 py-0.5 text-xs font-medium ${
+                              suspended ? "bg-[#f8b4ab] text-[#8a1f16]" : "bg-sauge-soft text-sauge-ink"
                             }`}
                           >
                             {suspended ? "Suspendu" : "Actif"}

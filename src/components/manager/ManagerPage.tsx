@@ -21,7 +21,7 @@ export default function ManagerPage({
   width?: "wide" | "narrow";
 }) {
   return (
-    <main className="flex flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10">
+    <main className="flex flex-1 flex-col px-5 py-8 sm:px-8">
       <div className={`mx-auto w-full ${width === "narrow" ? "max-w-3xl" : "max-w-6xl"}`}>
         {back && (
           <Link href={back.href} className="text-sm font-semibold text-brand transition-colors hover:text-brand-soft">
@@ -31,7 +31,7 @@ export default function ManagerPage({
         {hero ?? (
           <div className={`flex flex-wrap items-end justify-between gap-4 ${back ? "mt-3" : ""}`}>
             <div className="min-w-0">
-              <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">{title}</h1>
+              <h1 className="text-[26px] tracking-tight text-anthracite sm:text-[28px]">{title}</h1>
               {description && <p className="mt-2 max-w-2xl text-anthracite/75">{description}</p>}
             </div>
             {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

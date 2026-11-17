@@ -4,9 +4,12 @@ import { api, toErrorMessage } from "@/lib/api";
 
 // La plateforme ne voit aucun montant : chaque salon encaisse lui-même, sur place.
 export interface AdminStats {
-  salons: { online: number; pending: number; suspended: number; rejected: number };
-  users: { clients: number; new_clients: number; managers: number };
+  salons: { total?: number; online: number; pending: number; suspended: number; rejected: number };
+  // signup_trend : inscriptions de clientes du 1er à aujourd'hui comparées à la
+  // même période du mois dernier, en % (null sans comparaison possible).
+  users: { clients: number; new_clients: number; signup_trend?: number | null; managers: number };
   appointments: {
+    total?: number;
     this_month: number;
     last_month_same_period: number;
     trend: number | null; // en %, null sans période de comparaison
@@ -21,6 +24,14 @@ export interface AdminStats {
   // Derniers rendez-vous enregistrés et salons en ligne par ville (absents d'une ancienne API).
   recent_appointments?: AdminRecentAppointment[];
   cities?: { city: string; count: number; share: number }[];
+  recent_signups?: AdminSignup[];
+}
+
+export interface AdminSignup {
+  id: number;
+  name: string;
+  role: "client" | "gerant";
+  created_at: string;
 }
 
 export interface AdminRecentAppointment {
@@ -52,6 +63,8 @@ export interface AdminMonth {
   month: string; // "2026-03"
   appointments: number;
   new_clients: number;
+  new_salons?: number;
+  cancelled?: number;
   is_partial: boolean;
 }
 

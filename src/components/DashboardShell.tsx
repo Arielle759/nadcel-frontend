@@ -35,6 +35,8 @@ interface DashboardShellProps {
   // Cloche : nombre d'éléments qui attendent une action, et la liste où les traiter.
   notifications?: { count: number | null; label: string; href: string };
   look?: DashboardLook;
+  // Second groupe de rubriques sous un intertitre (ex. « Général » : profil).
+  secondaryNav?: { title: string; items: DashboardNavItem[] };
   children: React.ReactNode;
 }
 
@@ -42,7 +44,7 @@ interface DashboardShellProps {
 // active en chocolat) ; en haut à droite, la cloche et l'avatar qui porte le
 // profil, « Voir le site » et la déconnexion. Sur mobile, la navigation passe
 // en bandeau horizontal au-dessus du contenu.
-export default function DashboardShell({ title, navItems, account, notifications, look = "hub", children }: DashboardShellProps) {
+export default function DashboardShell({ title, navItems, account, notifications, look = "hub", secondaryNav, children }: DashboardShellProps) {
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
   const hub = look === "hub";
@@ -73,8 +75,54 @@ export default function DashboardShell({ title, navItems, account, notifications
   const [collapsed, setCollapsed] = useState(false);
   const compact = hub && collapsed;
 
+  const renderItem = ({ href, label, icon: Icon, matchSubpaths, badge }: DashboardNavItem) => {
+    const active = pathname === href || (matchSubpaths === true && pathname.startsWith(`${href}/`));
+    return (
+      <Link
+        key={href}
+        href={href}
+        title={compact ? label : undefined}
+        aria-current={active ? "page" : undefined}
+        className={`relative flex shrink-0 items-center gap-3 whitespace-nowrap rounded-lg text-[15px] font-medium transition-colors ${
+          hub ? `min-h-11 px-3 ${compact ? "md:justify-center md:px-0" : ""}` : "min-h-10 rounded-lg px-3 text-sm"
+        } ${
+          active
+            ? hub
+              ? "bg-accent text-white shadow-[0_2px_6px_rgba(143,74,50,0.25)]"
+              : "text-beige"
+            : `text-anthracite/85 hover:text-anthracite ${hub ? "hover:bg-[#f1ece6]" : "hover:bg-beige"}`
+        }`}
+      >
+        {active && !hub && (
+          <motion.span
+            layoutId="dashboard-nav-active"
+            className="absolute inset-0 rounded-lg bg-brand"
+            transition={{ type: "spring", stiffness: 420, damping: 34 }}
+            aria-hidden="true"
+          />
+        )}
+        <Icon size={19} strokeWidth={1.8} className="relative shrink-0" aria-hidden="true" />
+        <span className={`relative ${compact ? "md:sr-only" : ""}`}>{label}</span>
+        {badge ? (
+          <span
+            className={`relative ml-auto flex min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold leading-5 ${
+              hub
+                ? `bg-[var(--color-chart-2)] text-white ${compact ? "md:absolute md:-right-1 md:-top-1 md:min-w-5 md:text-[10px]" : ""}`
+                : active
+                  ? "bg-beige text-brand"
+                  : "bg-sauge-light text-sauge-ink"
+            }`}
+          >
+            {badge > 99 ? "99+" : badge}
+            <span className="sr-only"> à traiter</span>
+          </span>
+        ) : null}
+      </Link>
+    );
+  };
+
   return (
-    <div className="flex min-h-screen flex-1 flex-col bg-white md:flex-row">
+    <div data-look={look} className="flex min-h-screen flex-1 flex-col bg-white md:flex-row">
       <aside
         className={`z-10 flex w-full flex-col md:sticky md:top-0 md:h-screen md:shrink-0 ${
           hub
@@ -97,9 +145,6 @@ export default function DashboardShell({ title, navItems, account, notifications
         )}
 
         <div className={hub ? "px-3 pb-3 md:flex md:flex-1 md:flex-col md:pt-3" : "md:flex md:flex-1 md:flex-col"}>
-          {!hub && (
-            <p className="mb-2 hidden px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/60 md:block">{title}</p>
-          )}
           <nav
             ref={navRef}
             aria-label={title}
@@ -107,58 +152,24 @@ export default function DashboardShell({ title, navItems, account, notifications
               hub ? "gap-1.5" : "gap-1"
             }`}
           >
-            {navItems.map(({ href, label, icon: Icon, matchSubpaths, badge }) => {
-              const active = pathname === href || (matchSubpaths === true && pathname.startsWith(`${href}/`));
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  title={compact ? label : undefined}
-                  aria-current={active ? "page" : undefined}
-                  className={`relative flex shrink-0 items-center gap-3 whitespace-nowrap rounded-lg text-[15px] font-medium transition-colors ${
-                    hub ? `min-h-11 px-3 ${compact ? "md:justify-center md:px-0" : ""}` : "min-h-11 rounded-xl px-3 text-sm"
-                  } ${
-                    active
-                      ? hub
-                        ? "bg-accent text-white shadow-[0_2px_6px_rgba(143,74,50,0.25)]"
-                        : "text-beige"
-                      : `text-anthracite/85 hover:text-anthracite ${hub ? "hover:bg-[#f1ece6]" : "hover:bg-beige"}`
-                  }`}
-                >
-                  {active && !hub && (
-                    <motion.span
-                      layoutId="dashboard-nav-active"
-                      className="absolute inset-0 rounded-xl bg-brand shadow-[0_6px_16px_rgba(74,51,40,0.22)]"
-                      transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                      aria-hidden="true"
-                    />
-                  )}
-                  <Icon size={19} strokeWidth={1.8} className="relative shrink-0" aria-hidden="true" />
-                  <span className={`relative ${compact ? "md:sr-only" : ""}`}>{label}</span>
-                  {badge ? (
-                    <span
-                      className={`relative ml-auto flex min-w-6 items-center justify-center rounded-md px-1.5 text-xs font-semibold leading-5 ${
-                        hub
-                          ? `bg-[var(--color-chart-2)] text-white ${compact ? "md:absolute md:-right-1 md:-top-1 md:min-w-5 md:text-[10px]" : ""}`
-                          : active
-                            ? "bg-beige text-brand"
-                            : "bg-accent/15 text-accent"
-                      }`}
-                    >
-                      {badge > 99 ? "99+" : badge}
-                      <span className="sr-only"> à traiter</span>
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
+            {navItems.map(renderItem)}
+            {secondaryNav && (
+              <>
+                <p className="mb-1 mt-6 hidden px-3 text-sm text-anthracite/60 md:block">{secondaryNav.title}</p>
+                {secondaryNav.items.map(renderItem)}
+              </>
+            )}
           </nav>
         </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <div
-          className={`relative z-20 flex items-center gap-2 px-5 sm:px-8 ${hub ? "h-16 border-b border-[#ebe4dd] bg-white" : "justify-end pt-5"}`}
+          className={`z-20 flex items-center gap-2 ${
+            hub
+              ? "relative h-16 border-b border-[#ebe4dd] bg-white px-5 sm:px-8"
+              : "relative justify-end px-5 pt-5 md:absolute md:right-8 md:top-7 md:p-0"
+          }`}
         >
           {hub && (
             <button
@@ -173,7 +184,7 @@ export default function DashboardShell({ title, navItems, account, notifications
           )}
           {hub && <span className="mr-auto md:hidden" />}
           {notifications && <NotificationBell {...notifications} dot={hub} />}
-          <AccountMenu {...account} />
+          <AccountMenu {...account} tone={hub ? "accent" : "sauge"} />
         </div>
         {/* Changement de rubrique : léger fondu montant. Pas d'animation de sortie
             (voir PageTransition : elle lancerait les appels de la page deux fois). */}

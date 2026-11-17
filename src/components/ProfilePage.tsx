@@ -30,7 +30,7 @@ function FeedbackLine({ feedback }: { feedback: Feedback }) {
 }
 
 // « Mon profil », commun aux trois espaces (cliente, gérant, administrateur).
-export default function ProfilePage() {
+export default function ProfilePage({ title = "Mon profil" }: { title?: string } = {}) {
   const { getProfile, updateProfile, changePassword } = useProfile();
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -104,7 +104,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <ManagerPage title="Mon profil" description="Vos informations personnelles et votre mot de passe." width="narrow">
+    <ManagerPage title={title} description="Vos informations personnelles et votre mot de passe." width="narrow">
       {loading ? (
         <div className="h-96 animate-pulse rounded-2xl bg-sable/15" aria-busy="true" aria-label="Chargement" />
       ) : loadError ? (

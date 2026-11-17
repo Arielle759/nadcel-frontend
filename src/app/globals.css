@@ -42,6 +42,13 @@
   --color-chart-5: #5b6f86; /* bleu ardoise */
   --color-chart-6: #a98fb0; /* lilas */
   --color-chart-7: #d8c4b2; /* sable */
+  /* Espace administrateur : accent vert sauge (le gérant garde le terracotta),
+     pour distinguer les deux espaces d'un coup d'œil. */
+  --color-sauge: #23794a; /* vert franc : barres et repères forts, texte blanc lisible */
+  --color-sauge-mid: #4cb36e; /* vert vif : séries secondaires */
+  --color-sauge-soft: #93d9a3; /* barres secondaires */
+  --color-sauge-light: #d8f3de; /* fonds, pastilles */
+  --color-sauge-ink: #165c34; /* texte sur fond vert clair */
   --font-sans: var(--font-body);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-display);
@@ -76,11 +83,21 @@ h2,
   font-variant-numeric: lining-nums;
 }
 
-/* Titres des tableaux de bord : Figtree grasse, comme le modèle de référence. */
+/* Titres des tableaux de bord : Figtree grasse, comme les modèles de référence
+   (y compris les pages des espaces gérant et administrateur). */
 h1.font-sans,
-h2.font-sans {
+h2.font-sans,
+[data-look] main h1 {
   font-family: var(--font-body), system-ui, sans-serif;
   font-synthesis: weight;
+}
+
+[data-look="hub"] main h1 {
+  font-weight: 700;
+}
+
+[data-look="overview"] main h1 {
+  font-weight: 500;
 }
 
 h3,
