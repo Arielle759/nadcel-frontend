@@ -11,9 +11,33 @@ function notifyAuthChange(): void {
   authListeners.forEach((listener) => listener());
 }
 
+// Événement émis quand la session est effacée hors de ce module (réponse 401
+// dans lib/api.ts, qui ne peut pas importer ce fichier sans dépendance circulaire).
+export const AUTH_CLEARED_EVENT = "nadcel:auth-cleared";
+
+// Synchronisation entre onglets : la session (jeton + utilisateur) est stockée
+// dans le localStorage, commun à tous les onglets du site. Le navigateur émet
+// « storage » dans les AUTRES onglets quand une clé change : déconnexion ou
+// connexion avec un autre compte dans un onglet => tous les onglets suivent.
+function onStorage(event: StorageEvent): void {
+  if (event.key === null || event.key === TOKEN_KEY || event.key === USER_KEY) {
+    notifyAuthChange();
+  }
+}
+
 export function subscribeToAuthChanges(listener: () => void): () => void {
+  if (authListeners.size === 0 && typeof window !== "undefined") {
+    window.addEventListener("storage", onStorage);
+    window.addEventListener(AUTH_CLEARED_EVENT, notifyAuthChange);
+  }
   authListeners.add(listener);
-  return () => authListeners.delete(listener);
+  return () => {
+    authListeners.delete(listener);
+    if (authListeners.size === 0 && typeof window !== "undefined") {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(AUTH_CLEARED_EVENT, notifyAuthChange);
+    }
+  };
 }
 
 export interface AuthRole {

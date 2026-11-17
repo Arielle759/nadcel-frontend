@@ -3,7 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, Inbox, Store, MessageSquare, UsersRound } from "lucide-react";
-import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
+import { getUser, hasRole, homePathFor, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
 import PrivateSpaceMessage from "@/components/PrivateSpaceMessage";
@@ -38,7 +38,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (mounted && !isAdmin) {
-      router.replace(isAuthenticated() ? "/" : "/login");
+      // Autre compte connecté entre-temps (autre onglet) : direction son propre espace.
+      router.replace(isAuthenticated() ? homePathFor(getUser()) : "/login");
     }
   }, [mounted, isAdmin, router]);
 

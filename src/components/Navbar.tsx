@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarDays, LayoutDashboard, LogOut, Menu, UserRound, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { logout } from "@/lib/auth";
+import AccountMenu from "@/components/AccountMenu";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/useAuthState";
 import { UNIVERSES, universeHref } from "@/lib/universes";
 
@@ -33,7 +34,11 @@ export default function Navbar() {
     : isGerant
       ? "/manager/dashboard"
       : "/client/appointments";
-  const showPublicSalonLinks = !isAdmin && !isGerant;
+  const profileHref = isAdmin ? "/admin/profil" : isGerant ? "/manager/profil" : "/client/profil";
+  const roleLabel = isAdmin ? "Administrateur" : isGerant ? "Gérant" : "Cliente";
+  // Le site public est le même pour tout le monde : un gérant ou un
+  // administrateur connecté voit exactement ce que voit un visiteur, avec en
+  // plus son avatar (accès à son espace, profil, déconnexion).
   const showPartnerLink = !authed || (!isAdmin && !isGerant);
 
   function handleLogout() {
@@ -54,44 +59,20 @@ export default function Navbar() {
         {/* Hiérarchie : « Inscrire mon salon » est l'action mise en avant (doré),
             la recherche et le compte restent des liens discrets. */}
         <div className="hidden items-center gap-1 text-sm font-medium lg:flex">
-          {/* Connecté, la barre porte déjà « Mes rendez-vous », le compte et la
-              déconnexion : les services n'y tiendraient plus (ils restent dans le menu mobile). */}
-          {showPublicSalonLinks && !authed && (
-            <ul aria-label="Services" className="mr-1 flex items-center border-r border-sable/30 pr-2">
-              {UNIVERSES.map(({ label, query }, index) => (
-                <li key={label} className={index >= 5 ? "hidden" : index >= 3 ? "hidden xl:block" : undefined}>
-                  <Link href={universeHref(query)} className={serviceLink}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          {showPublicSalonLinks && (
-            <Link href="/salons" className={navLink}>
-              Trouver un salon
-            </Link>
-          )}
-          {authed && (
-            <Link href={dashboardHref} className={`${navLink} inline-flex items-center gap-2`}>
-              {isGerant || isAdmin ? <LayoutDashboard size={16} aria-hidden="true" /> : <CalendarDays size={16} aria-hidden="true" />}
-              {dashboardLabel}
-            </Link>
-          )}
-          {authed ? (
-            <>
-              <span className="ml-2 inline-flex items-center gap-2 whitespace-nowrap px-2 text-anthracite/75" title={user?.name}>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-beige" aria-hidden="true">
-                  <UserRound size={15} />
-                </span>
-                <span className="max-w-[9rem] truncate">{user?.name?.split(" ")[0] || "Mon compte"}</span>
-              </span>
-              <button type="button" onClick={handleLogout} className={`${navLink} inline-flex items-center gap-2`}>
-                <LogOut size={16} aria-hidden="true" />
-                Déconnexion
-              </button>
-            </>
-          ) : (
+          {/* Connecté, la place de « Se connecter » revient à l'avatar : on garde 3 services. */}
+          <ul aria-label="Services" className="mr-1 flex items-center border-r border-sable/30 pr-2">
+            {UNIVERSES.map(({ label, query }, index) => (
+              <li key={label} className={index >= 5 ? "hidden" : index >= 3 ? "hidden xl:block" : undefined}>
+                <Link href={universeHref(query)} className={serviceLink}>
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link href="/salons" className={navLink}>
+            Trouver un salon
+          </Link>
+          {!authed && (
             <Link href="/login" className={navLink}>
               Se connecter
             </Link>
@@ -100,6 +81,18 @@ export default function Navbar() {
             <Link href="/devenir-partenaire" className={`${partnerButton} ml-2`}>
               Inscrire mon salon
             </Link>
+          )}
+          {authed && (
+            <div className="ml-2">
+              <AccountMenu
+                roleLabel={roleLabel}
+                dashboardHref={dashboardHref}
+                dashboardLabel={dashboardLabel}
+                profileHref={profileHref}
+                siteLink={false}
+                afterLogoutHref="/"
+              />
+            </div>
           )}
         </div>
 
@@ -111,22 +104,21 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-sable/20 bg-beige px-5 py-4 shadow-lg lg:hidden">
           <div className="mx-auto flex max-w-6xl flex-col gap-1 text-sm font-medium">
-            {showPublicSalonLinks && (
-              <div className="mb-2 border-b border-sable/20 px-4 pb-4">
-                <p className="pb-2 text-xs font-semibold uppercase tracking-wide text-anthracite/75">Services</p>
-                <ul className="flex flex-wrap gap-2">
-                  {UNIVERSES.map(({ label, query }) => (
-                    <li key={label}>
-                      <Link href={universeHref(query)} onClick={() => setMenuOpen(false)} className="inline-flex min-h-10 items-center rounded-full border border-sable/40 bg-white px-4 text-brand hover:bg-sable/15">
-                        {label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {showPublicSalonLinks && <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">Trouver un salon</Link>}
+            <div className="mb-2 border-b border-sable/20 px-4 pb-4">
+              <p className="pb-2 text-xs font-semibold uppercase tracking-wide text-anthracite/75">Services</p>
+              <ul className="flex flex-wrap gap-2">
+                {UNIVERSES.map(({ label, query }) => (
+                  <li key={label}>
+                    <Link href={universeHref(query)} onClick={() => setMenuOpen(false)} className="inline-flex min-h-10 items-center rounded-full border border-sable/40 bg-white px-4 text-brand hover:bg-sable/15">
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link href="/salons" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">Trouver un salon</Link>
             {authed && <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">{dashboardLabel}</Link>}
+            {authed && <Link href={profileHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 hover:bg-sable/10">Mon profil</Link>}
             {authed ? (
               <button type="button" onClick={handleLogout} className="rounded-xl px-4 py-3 text-left hover:bg-sable/10">Se déconnecter</button>
             ) : (

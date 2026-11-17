@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, type LucideIcon } from "lucide-react";
 import AccountMenu from "@/components/AccountMenu";
 import NotificationBell from "@/components/NotificationBell";
+import { useCurrentUser } from "@/hooks/useAuthState";
 
 export interface DashboardNavItem {
   href: string;
@@ -54,6 +55,19 @@ export default function DashboardShell({ title, navItems, account, notifications
     if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
     nav.scrollTo({ left: active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2, behavior: "smooth" });
   }, [pathname]);
+
+  // Connexion avec un autre compte dans un autre onglet : la session de ce
+  // navigateur a changé de propriétaire. Les données affichées (salons,
+  // rendez-vous, statistiques) appartiennent à l'ancien compte : on recharge
+  // la page pour repartir proprement (la mise en page renvoie ensuite vers
+  // l'espace du nouveau compte si ce n'est pas le même rôle). La déconnexion,
+  // elle, est gérée par la mise en page de chaque espace (retour à la connexion).
+  const userId = useCurrentUser()?.id ?? null;
+  const firstUserId = useRef(userId);
+  useEffect(() => {
+    if (firstUserId.current === null) firstUserId.current = userId;
+    else if (userId !== null && userId !== firstUserId.current) window.location.reload();
+  }, [userId]);
 
   // Bouton ☰ du bandeau : réduit la barre latérale aux seules icônes (ordinateur).
   const [collapsed, setCollapsed] = useState(false);

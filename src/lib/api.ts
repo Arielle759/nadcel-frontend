@@ -118,6 +118,9 @@ api.interceptors.response.use(
       // Keys must stay in sync with TOKEN_KEY/USER_KEY in lib/auth.ts.
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      // Les composants abonnés à la session (barre du site, espaces privés)
+      // se mettent à jour ; valeur identique à AUTH_CLEARED_EVENT (lib/auth.ts).
+      window.dispatchEvent(new Event("nadcel:auth-cleared"));
     }
     error.message = resolveErrorMessage(error);
     return Promise.reject(error);

@@ -20,11 +20,17 @@ export default function AccountMenu({
   dashboardHref,
   dashboardLabel = "Tableau de bord",
   profileHref,
+  siteLink = true,
+  afterLogoutHref = "/login",
 }: {
   roleLabel: string;
   dashboardHref: string;
   dashboardLabel?: string;
   profileHref: string;
+  // « Voir le site » n'a de sens que depuis un espace privé (pas sur le site lui-même).
+  siteLink?: boolean;
+  // Depuis le site public, on reste sur l'accueil après la déconnexion.
+  afterLogoutHref?: string;
 }) {
   const user = useCurrentUser();
   const router = useRouter();
@@ -56,7 +62,7 @@ export default function AccountMenu({
   function handleLogout() {
     setOpen(false);
     logout();
-    router.replace("/login");
+    router.replace(afterLogoutHref);
   }
 
   const avatar = (size: string) => (
@@ -111,11 +117,13 @@ export default function AccountMenu({
               Mon profil
             </Link>
             {/* Nouvel onglet : l'espace reste ouvert ici, la session est partagée. */}
-            <a role="menuitem" href="/" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className={item}>
-              <ArrowUpRight size={17} aria-hidden="true" />
-              Voir le site
-              <span className="sr-only">(nouvel onglet)</span>
-            </a>
+            {siteLink && (
+              <a role="menuitem" href="/" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)} className={item}>
+                <ArrowUpRight size={17} aria-hidden="true" />
+                Voir le site
+                <span className="sr-only">(nouvel onglet)</span>
+              </a>
+            )}
             <button
               role="menuitem"
               type="button"

@@ -3,7 +3,7 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { LayoutDashboard, Building2, Calendar, Clock3, XCircle, UserRound, UsersRound, ChartColumn, Settings } from "lucide-react";
-import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
+import { getUser, hasRole, homePathFor, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import { useManagerSalons } from "@/hooks/useManagerSalons";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
@@ -52,7 +52,8 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (mounted && !isManager) {
-      router.replace(isAuthenticated() ? "/" : "/login");
+      // Autre compte connecté entre-temps (autre onglet) : direction son propre espace.
+      router.replace(isAuthenticated() ? homePathFor(getUser()) : "/login");
     }
   }, [mounted, isManager, router]);
 
