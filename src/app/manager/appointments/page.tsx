@@ -87,7 +87,10 @@ export default function ManagerAppointmentsPage() {
   const [cancelingId, setCancelingId] = useState<number | null>(null);
   const [tab, setTab] = useState<Tab | null>(null); // null : onglet choisi automatiquement
   const [query, setQuery] = useState("");
-  const [creating, setCreating] = useState(false);
+  // « Nouveau rendez-vous » depuis le tableau de bord ouvre directement le formulaire.
+  const [creating, setCreating] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("nouveau")
+  );
   // Heure de référence prise au chargement : un rendez-vous ne se clôture qu'après son début.
   const [loadedAt, setLoadedAt] = useState<number | null>(null);
   const { message: toastMessage, showToast } = useToast();

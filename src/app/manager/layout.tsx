@@ -104,7 +104,6 @@ export default function ManagerLayout({ children }: { children: React.ReactNode 
       navItems={NAV_ITEMS.map((item) => (item.href === "/manager/appointments" ? { ...item, badge: pending } : item))}
       account={{ roleLabel: isAdmin ? "Administrateur" : "Gérant", dashboardHref: "/manager/dashboard", profileHref: "/manager/profil" }}
       notifications={{ count: pending, label: "demande(s) de rendez-vous à confirmer", href: "/manager/appointments" }}
-      showSiteLink
     >
       {children}
     </DashboardShell>

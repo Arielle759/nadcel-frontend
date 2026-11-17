@@ -18,6 +18,34 @@ export interface AdminStats {
   };
   to_review: { pending_salons: number; low_reviews: number };
   monthly: AdminMonth[];
+  // Derniers rendez-vous enregistrés et salons en ligne par ville (absents d'une ancienne API).
+  recent_appointments?: AdminRecentAppointment[];
+  cities?: { city: string; count: number; share: number }[];
+}
+
+export interface AdminRecentAppointment {
+  id: number;
+  salon: string | null;
+  service: string | null;
+  option_label: string | null;
+  scheduled_at: string;
+  price: number;
+  status: string;
+}
+
+// « employee » : rôle prévu dans la base mais attribué à aucun compte par l'application.
+export type UserRoleName = "client" | "gerant" | "admin" | "employee";
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  created_at: string;
+  suspended_at: string | null;
+  roles: { id: number; name: UserRoleName }[];
+  appointments_count: number;
+  salons_count: number;
 }
 
 export interface AdminMonth {
@@ -126,5 +154,23 @@ export function useAdmin() {
     []
   );
 
-  return { getStats, getPendingSalons, getSalons, changeSalonState, getReviews };
+  const getUsers = useCallback(
+    (params: { page?: number; search?: string; role?: UserRoleName | ""; status?: "active" | "suspended" | "" }) =>
+      call(
+        () =>
+          api.get<Page<AdminUser>>("/admin/users", {
+            params: Object.fromEntries(Object.entries(params).filter(([, v]) => v !== "" && v !== undefined)),
+          }),
+        "Impossible de charger les utilisateurs."
+      ),
+    []
+  );
+
+  const setUserSuspended = useCallback(
+    (id: number, suspended: boolean) =>
+      call(() => api.patch<AdminUser>(`/admin/users/${id}/${suspended ? "suspend" : "reactivate"}`), "L'action n'a pas pu être enregistrée."),
+    []
+  );
+
+  return { getStats, getPendingSalons, getSalons, changeSalonState, getReviews, getUsers, setUserSuspended };
 }

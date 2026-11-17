@@ -1,16 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import CountUp from "@/components/motion/CountUp";
 import TopClients from "@/components/manager/TopClients";
-import { ExternalLink } from "lucide-react";
-import AppointmentStatusBadge from "@/components/AppointmentStatusBadge";
-import type { ManagerStats } from "@/hooks/useManager";
-import { serviceWithOption } from "@/lib/serviceOptions";
-import { ui } from "@/lib/ui";
 
 import {
-  useManagerActivity,
   type ActivityBusySlot,
   type ActivityPeriod,
   type DayPart,
@@ -35,50 +27,69 @@ export const PERIODS: { key: ActivityPeriod; label: string }[] = [
 
 const PARTS: DayPart[] = ["matin", "apres_midi", "soir"];
 
-const CARD = "rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6";
+// Cartes du tableau de bord : fond très légèrement teinté, fine bordure.
+export const CARD = "rounded-xl border border-sable/40 bg-[#faf8f5] p-5 sm:p-6";
 // Petit libellé en capitales au-dessus des chiffres.
 const LABEL = "text-[11px] font-semibold uppercase tracking-[0.08em] text-anthracite/75";
 
-const MOIS_COURT = { day: "numeric", month: "short", year: "numeric" } as const;
+export const PERIOD_SHORT: Record<ActivityPeriod, string> = {
+  month: "30 derniers jours",
+  quarter: "3 derniers mois",
+  year: "12 derniers mois",
+};
 
+// Partie « analyse » du tableau de bord gérant, sous le planning du jour.
 export default function ActivitySection({
-  stats,
-  salonId,
+  data,
+  loading,
+  error,
   period,
-  reminders,
+  onPeriodChange,
 }: {
-  stats: ManagerStats | null;
-  // Salon choisi dans le sélecteur, ou null pour tous les salons du gérant.
-  salonId: number | null;
+  data: ManagerActivity | null;
+  loading: boolean;
+  error: string | null;
   period: ActivityPeriod;
-  // Carte des rappels du lendemain, glissée sous la première ligne.
-  reminders?: React.ReactNode;
+  onPeriodChange: (period: ActivityPeriod) => void;
 }) {
-  const { data, loading, error } = useManagerActivity(period, salonId);
   const noActivity = data !== null && data.totals.completed === 0 && data.monthly.every((m) => m.total === 0);
 
   return (
-    <section className="flex flex-col gap-4" aria-busy={loading} aria-label="Activité du salon">
+    <section className="flex flex-col gap-4" aria-busy={loading} aria-labelledby="analysis-title">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 id="analysis-title" className="font-sans text-lg font-semibold text-anthracite">
+            Analyse de l&apos;activité
+          </h2>
+          <p className="text-sm text-anthracite/70">Rendez-vous réalisés et encaissements sur la période choisie.</p>
+        </div>
+        <div role="group" aria-label="Période analysée" className="flex rounded-lg border border-sable/40 bg-white p-1">
+          {PERIODS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onPeriodChange(key)}
+              aria-pressed={period === key}
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
+                period === key ? "bg-brand text-beige" : "text-anthracite/70 hover:bg-beige"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {error && (
         <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <KpiRow data={data} stats={stats} />
-
-      <div className={`grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)_minmax(0,0.85fr)] transition-opacity ${loading ? "opacity-60" : ""}`}>
-        <NextAppointmentCard stats={stats} />
-        {data ? <TopServices data={data} period={period} /> : <div className="h-56 animate-pulse rounded-2xl bg-sable/15" />}
-        <SiteCard salonId={salonId} />
-      </div>
-
-      {reminders}
-
       {!data && loading && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label="Chargement de l'activité">
           {[0, 1].map((item) => (
-            <div key={item} className="h-56 animate-pulse rounded-2xl bg-sable/15" />
+            <div key={item} className="h-56 animate-pulse rounded-xl bg-sable/15" />
           ))}
         </div>
       )}
@@ -94,18 +105,19 @@ export default function ActivitySection({
         data && (
           <div className={`flex flex-col gap-4 transition-opacity ${loading ? "opacity-60" : ""}`}>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <TopServices data={data} period={period} />
               <Forecast data={data} />
-              <Insights data={data} />
             </div>
+            <Insights data={data} />
             <TopClients clients={data.top_clients ?? []} period={period} />
             <ActivityMonthlyChart months={data.monthly} services={data.top_services} />
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <BusySlots slots={data.busy_slots} />
-              <Employees data={data} />
-            </div>
-            {/* Trois cartes de même largeur : plus de libellés coupés ni de vide. */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <BusySlots slots={data.busy_slots} />
+              </div>
               <Loyalty data={data} />
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <PaymentMethods data={data} />
               <BookingSources data={data} />
             </div>
@@ -113,160 +125,6 @@ export default function ActivitySection({
         )
       )}
     </section>
-  );
-}
-
-// Quatre indicateurs en tête : l'argent encaissé, ce qui arrive, ce qui reste
-// à clôturer et la fidélité des clients.
-function KpiRow({ data, stats }: { data: ManagerActivity | null; stats: ManagerStats | null }) {
-  const placeholder = "—";
-  const toClose = stats?.to_close ?? null;
-  return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <Kpi
-        label="Chiffre d'affaires encaissé"
-        value={data ? <CountUp value={data.totals.revenue} /> : placeholder}
-        unit={data ? "FCFA" : undefined}
-        hint="Payé sur place, noté à la clôture"
-        tone="highlight"
-      />
-      <Kpi
-        label="Rendez-vous à venir"
-        value={stats ? <CountUp value={stats.upcoming} /> : placeholder}
-        hint={stats?.pending ? `dont ${stats.pending} à confirmer` : undefined}
-        href="/manager/appointments"
-      />
-      <Kpi
-        label="À clôturer"
-        value={toClose !== null ? <CountUp value={toClose} /> : placeholder}
-        tone={toClose ? "warning" : "neutral"}
-        hint={toClose ? "Rendez-vous passés sans paiement noté" : "Tout est à jour"}
-        href={toClose ? "/manager/appointments" : undefined}
-      />
-      <Kpi
-        label="Clients fidèles"
-        value={data ? <CountUp value={data.loyalty.rate} format={(n) => `${n.toLocaleString("fr-FR")} %`} /> : placeholder}
-        hint={
-          data
-            ? `${data.loyalty.returning} sur ${data.loyalty.clients} client${data.loyalty.clients > 1 ? "s" : ""} revenu${data.loyalty.returning > 1 ? "s" : ""}`
-            : undefined
-        }
-      />
-    </div>
-  );
-}
-
-function NextAppointmentCard({ stats }: { stats: ManagerStats | null }) {
-  const next = stats?.next_appointment ?? null;
-  return (
-    <div className={`${CARD} flex flex-col`}>
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="text-base font-semibold text-anthracite">Prochain rendez-vous</p>
-        <Link href="/manager/appointments" className={`${ui.textLink} text-sm`}>
-          Voir tous <span aria-hidden="true">→</span>
-        </Link>
-      </div>
-      {!stats ? (
-        <div className="mt-4 h-20 animate-pulse rounded-xl bg-sable/15" />
-      ) : !next ? (
-        <p className="mt-4 text-sm text-anthracite/75">Aucun rendez-vous à venir pour le moment.</p>
-      ) : (
-        <div className="mt-4 flex items-start gap-3">
-          <span
-            aria-hidden="true"
-            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-beige font-heading text-lg font-semibold text-accent"
-          >
-            {(next.client_name ?? "?").trim().charAt(0).toUpperCase()}
-          </span>
-          <div className="min-w-0">
-            <p className="truncate font-semibold text-anthracite">{next.client_name ?? "Client"}</p>
-            <p className="truncate text-sm text-anthracite/75">{serviceWithOption(next.service ?? "Service", next.option_label)}</p>
-            {next.salon && <p className="truncate text-xs text-anthracite/60">{next.salon}</p>}
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-anthracite/75">
-              <span>
-                {new Date(next.scheduled_at).toLocaleDateString("fr-FR", { weekday: "short", ...MOIS_COURT })} ·{" "}
-                {new Date(next.scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-              </span>
-              <AppointmentStatusBadge status={next.status} />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Le site public s'ouvre dans un nouvel onglet : l'espace gérant reste ouvert
-// et la session, stockée dans le navigateur, est partagée entre les onglets.
-function SiteCard({ salonId }: { salonId: number | null }) {
-  const href = salonId ? `/salons/${salonId}` : "/salons";
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex min-h-44 flex-col justify-end overflow-hidden rounded-2xl bg-brand p-6 text-beige shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)] transition-transform hover:-translate-y-0.5"
-    >
-      <span aria-hidden="true" className="absolute -right-10 -top-10 size-40 rounded-full bg-accent/40" />
-      <ExternalLink size={22} aria-hidden="true" className="relative mb-auto text-beige/80" />
-      <span className="relative mt-6 font-heading text-xl font-semibold">Ouvrir le site</span>
-      <span className="relative mt-1 text-sm text-beige/75">
-        {salonId ? "Voir la fiche de ce salon telle que vos clients la voient." : "Voir vos salons tels que vos clients les voient."}
-      </span>
-      <span className="sr-only">(nouvel onglet)</span>
-    </a>
-  );
-}
-
-function Kpi({
-  label,
-  value,
-  trend = null,
-  hint,
-  tone = "neutral",
-  href,
-  unit,
-}: {
-  label: string;
-  value: React.ReactNode;
-  // Unité affichée en plus petit après le nombre (ex. FCFA) : un grand montant tient dans la carte.
-  unit?: string;
-  trend?: React.ReactNode;
-  hint?: string;
-  // highlight : la carte mise en avant, sur fond chocolat.
-  tone?: "neutral" | "warning" | "highlight";
-  href?: string;
-}) {
-  const highlight = tone === "highlight";
-  const body = (
-    <>
-      <p className={highlight ? `${LABEL} text-beige/65` : LABEL}>{label}</p>
-      <p
-        className={`mt-3 text-2xl font-semibold tabular-nums tracking-tight sm:text-3xl ${
-          highlight ? "text-beige" : tone === "warning" ? "text-champagne" : "text-brand"
-        }`}
-      >
-        {value}
-        {unit && <span className={`ml-1.5 text-base font-semibold ${highlight ? "text-beige/80" : "text-anthracite/75"}`}>{unit}</span>}
-      </p>
-      <div className={`mt-2 flex min-h-4 items-center gap-2 text-xs ${highlight ? "text-beige/70" : "text-anthracite/75"}`}>
-        {trend}
-        {hint && <span>{hint}</span>}
-      </div>
-    </>
-  );
-  const className = `rounded-2xl p-6 ${
-    highlight
-      ? "bg-brand shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)]"
-      : "bg-white shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)]"
-  } ${href ? "transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_6px_rgba(90,50,35,0.06),0_16px_36px_rgba(90,50,35,0.12)]" : ""}`;
-
-  return href ? (
-    <Link href={href} className={className}>
-      {body}
-    </Link>
-  ) : (
-    <div className={className}>{body}</div>
   );
 }
 
@@ -321,8 +179,6 @@ function BarList({ rows }: { rows: { key: string; label: string; share: number; 
     </ul>
   );
 }
-
-const PERIOD_SHORT: Record<ActivityPeriod, string> = { month: "30 derniers jours", quarter: "3 derniers mois", year: "12 derniers mois" };
 
 function TopServices({ data, period }: { data: ManagerActivity; period: ActivityPeriod }) {
   return (
@@ -440,28 +296,6 @@ function BusySlots({ slots }: { slots: ActivityBusySlot[] }) {
         </tbody>
       </table>
       <p className="mt-2 text-xs text-anthracite/75">Matin : avant 12 h. Après-midi : de 12 h à 17 h. Soir : après 17 h.</p>
-    </div>
-  );
-}
-
-function Employees({ data }: { data: ManagerActivity }) {
-  return (
-    <div className={CARD}>
-      <p className={`${LABEL} mb-3`}>Activité par employé</p>
-      {data.employees.length === 0 ? (
-        <p className="text-sm text-anthracite/75">Aucun rendez-vous attribué sur cette période.</p>
-      ) : (
-        <dl className="text-sm">
-          {data.employees.map((employee) => (
-            <div key={employee.employee_id} className="flex items-baseline justify-between gap-3 py-1.5">
-              <dt className="text-anthracite/75">
-                {employee.name}, {employee.count} rendez-vous
-              </dt>
-              <dd className="font-medium tabular-nums text-anthracite">{formatCurrency(employee.revenue)}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
     </div>
   );
 }

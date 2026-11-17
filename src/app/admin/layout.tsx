@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Inbox, Store, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Inbox, Store, MessageSquare, UsersRound } from "lucide-react";
 import { hasRole, isAuthenticated, subscribeToAuthChanges } from "@/lib/auth";
 import { useHasMounted } from "@/hooks/useHasMounted";
 import DashboardShell, { type DashboardNavItem } from "@/components/DashboardShell";
@@ -27,6 +27,7 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin/salons", label: "Demandes", icon: Inbox },
   { href: "/admin/salons/all", label: "Salons", icon: Store },
   { href: "/admin/reviews", label: "Avis", icon: MessageSquare },
+  { href: "/admin/users", label: "Utilisateurs", icon: UsersRound },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -51,6 +52,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       navItems={NAV_ITEMS.map((item) => (item.href === "/admin/salons" ? { ...item, badge: pending } : item))}
       account={{ roleLabel: "Administrateur", dashboardHref: "/admin/dashboard", profileHref: "/admin/profil" }}
       notifications={{ count: pending, label: "demande(s) de partenariat à examiner", href: "/admin/salons" }}
+      look="overview"
     >
       {children}
     </DashboardShell>

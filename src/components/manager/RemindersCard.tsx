@@ -83,7 +83,7 @@ export default function RemindersCard() {
   const visible = expanded ? ordered : pending === 0 ? [] : ordered.slice(0, 3);
 
   return (
-    <section aria-labelledby="reminders-title" className={`${ui.surface} mb-6 p-5 sm:p-6`}>
+    <section aria-labelledby="reminders-title" className="rounded-xl border border-sable/40 bg-[#faf8f5] p-5 sm:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="reminders-title" className="text-lg font-semibold text-anthracite">
           Rappels à envoyer pour demain

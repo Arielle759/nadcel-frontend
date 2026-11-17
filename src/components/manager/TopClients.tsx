@@ -36,7 +36,7 @@ export default function TopClients({ clients, period }: { clients: ActivityTopCl
   return (
     <section
       aria-labelledby="top-clients-title"
-      className="rounded-2xl bg-white p-5 shadow-[0_1px_2px_rgba(90,50,35,0.05),0_8px_24px_rgba(90,50,35,0.07)] sm:p-6"
+      className="rounded-xl border border-sable/40 bg-[#faf8f5] p-5 sm:p-6"
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 id="top-clients-title" className="font-sans text-base font-semibold text-anthracite">

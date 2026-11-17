@@ -19,6 +19,19 @@ export interface ManagerStats {
   upcoming: number;
   pending?: number; // demandes à venir encore en attente de confirmation
   next_appointment?: NextAppointment | null;
+  // Planning du jour (hors annulés) et nombre de rendez-vous la veille.
+  today?: { count: number; yesterday: number; list: TodayAppointment[] };
+  rating?: { average: number | null; count: number };
+}
+
+export interface TodayAppointment {
+  id: number;
+  scheduled_at: string;
+  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
+  client_name: string | null;
+  employee: string | null;
+  service: string | null;
+  option_label: string | null;
 }
 
 export interface NextAppointment {
