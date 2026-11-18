@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSalon } from "@/lib/salons";
 import { salonArea } from "@/lib/salonArea";
 import AppointmentForm from "@/components/AppointmentForm";
-import { ui } from "@/lib/ui";
+import FocusTopBar from "@/components/FocusTopBar";
 
 export default async function AppointmentsPage({
   params,
@@ -22,27 +21,11 @@ export default async function AppointmentsPage({
   }
 
   return (
-    <main className="flex flex-1 flex-col px-6 pb-24 pt-8 sm:px-10">
+    <main className="flex flex-1 flex-col px-6 pb-24 pt-6 sm:px-10">
       <div className="mx-auto w-full max-w-6xl">
-        <nav aria-label="Fil d'Ariane" className="text-sm text-anthracite/75">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li>
-              <Link href="/salons" className={ui.textLink}>
-                Salons
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>
-              <Link href={`/salons/${salon.id}`} className={ui.textLink}>
-                {salon.name}
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li aria-current="page">Réserver</li>
-          </ol>
-        </nav>
+        <FocusTopBar backHref={`/salons/${salon.id}`} backLabel="← Retour au salon" />
 
-        <div className="mb-10 mt-6">
+        <div className="mb-10 mt-10">
           <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Réserver chez {salon.name}</h1>
           <p className="mt-2 text-anthracite/75">{salonArea(salon.address, salon.city)}</p>
         </div>
