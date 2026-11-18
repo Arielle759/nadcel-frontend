@@ -47,9 +47,6 @@ export default function HeroSection() {
 
       <div className="relative mx-auto flex w-full max-w-6xl items-center">
         <div className="max-w-2xl">
-          <motion.p variants={itemVariants} className="mb-5 text-sm font-medium text-beige/75">
-            Salons vérifiés, partout au Sénégal
-          </motion.p>
           <motion.h1
             variants={itemVariants}
             transition={{ duration: 0.5, ease: "easeOut" }}
