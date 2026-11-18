@@ -11,7 +11,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { ui } from "@/lib/ui";
 
 // Durée d'un tour complet, proportionnelle au nombre de salons (vitesse constante).
-const SECONDS_PER_SALON = 6;
+const SECONDS_PER_SALON = 3;
 
 // Salons de l'accueil en défilement automatique et continu (la liste est
 // doublée pour boucler sans saut). Le défilement s'arrête au survol, quand
