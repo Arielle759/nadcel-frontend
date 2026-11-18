@@ -554,8 +554,8 @@ function AppointmentRow({
             <button
               type="button"
               disabled={busy}
-              onClick={onStartClose}
-              title="Absence enregistrée par erreur : clôturer le rendez-vous"
+              onClick={onArrived}
+              title="Cliente arrivée en retard ou absence enregistrée par erreur : la signaler arrivée"
               className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-anthracite/75 transition-colors hover:bg-sable/10 disabled:opacity-50"
             >
               Elle est venue
