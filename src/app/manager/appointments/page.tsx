@@ -185,7 +185,13 @@ export default function ManagerAppointmentsPage() {
       setCancelingId(null);
       const cancelledMessage = updated.client ? "Rendez-vous annulé. La cliente a été prévenue par e-mail." : "Rendez-vous annulé.";
       showToast(
-        status === "confirmed" ? "Rendez-vous confirmé." : status === "no_show" ? "Absence enregistrée." : cancelledMessage,
+        status === "confirmed"
+          ? "Rendez-vous confirmé."
+          : status === "no_show"
+            ? "Absence enregistrée."
+            : status === "in_progress"
+              ? "Arrivée enregistrée : clôturez après la prestation."
+              : cancelledMessage,
       );
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Action impossible.");
@@ -326,6 +332,7 @@ export default function ManagerAppointmentsPage() {
                   }}
                   onCancel={() => handleStatusChange(a.id, "cancelled")}
                   onNoShow={() => handleStatusChange(a.id, "no_show")}
+                  onArrived={() => handleStatusChange(a.id, "in_progress")}
                   onKeep={() => setCancelingId(null)}
                   onReminderSent={(updated) => replace({ ...a, reminder_sent_at: updated.reminder_sent_at })}
                 />
@@ -371,6 +378,7 @@ function emptyMessage(tab: Tab): string {
 function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now: number }) {
   const past = new Date(appointment.scheduled_at).getTime() <= now;
   const { label, className } = (() => {
+    if (appointment.status === "in_progress") return { label: "Cliente arrivée", className: "bg-vif-vert-bg text-vif-vert-ink" };
     if (isOpen(appointment) && past) return { label: "À clôturer", className: "bg-vif-ciel-bg text-vif-ciel-ink" };
     switch (appointment.status) {
       case "pending":
@@ -382,7 +390,9 @@ function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now
           ? { label: "Annulé tardivement", className: "bg-vif-corail-bg text-vif-corail-ink" }
           : { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" };
       case "no_show":
-        return { label: "Absente", className: "bg-red-100 text-red-800" };
+        return appointment.no_show_detected_at
+          ? { label: "Absente (auto)", className: "bg-red-100 text-red-800" }
+          : { label: "Absente", className: "bg-red-100 text-red-800" };
       default:
         return { label: "Confirmé", className: "bg-vif-vert-bg text-vif-vert-ink" };
     }
@@ -408,6 +418,7 @@ function AppointmentRow({
   onAskCancel,
   onCancel,
   onNoShow,
+  onArrived,
   onKeep,
   onReminderSent,
 }: {
@@ -423,10 +434,13 @@ function AppointmentRow({
   onAskCancel: () => void;
   onCancel: () => void;
   onNoShow: () => void;
+  onArrived: () => void;
   onKeep: () => void;
   onReminderSent: (updated: ManagerAppointment) => void;
 }) {
   const started = new Date(a.scheduled_at).getTime() <= now;
+  // Arrivée signalable à partir de 30 min avant l'heure prévue (règle du serveur).
+  const arrivalWindow = new Date(a.scheduled_at).getTime() - 30 * 60 * 1000 <= now;
   const open = isOpen(a);
   const cancelled = a.status === "cancelled" || a.status === "no_show";
 
@@ -493,7 +507,17 @@ function AppointmentRow({
                   Confirmer
                 </button>
               )}
-              {started && (
+              {a.status === "confirmed" && arrivalWindow && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={onArrived}
+                  className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-brand-soft disabled:opacity-50"
+                >
+                  Arrivée
+                </button>
+              )}
+              {started && a.status !== "confirmed" && (
                 <button
                   type="button"
                   disabled={busy}
@@ -510,18 +534,32 @@ function AppointmentRow({
                   onClick={onNoShow}
                   className="rounded-lg border border-red-800/30 px-3 py-1.5 text-xs font-semibold text-red-800 transition-colors hover:bg-red-50 disabled:opacity-50"
                 >
-                  Cliente absente
+                  Absente
                 </button>
               )}
-              <button
-                type="button"
-                disabled={busy}
-                onClick={onAskCancel}
-                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-anthracite/75 transition-colors hover:bg-alert/10 hover:text-alert disabled:opacity-50"
-              >
-                Annuler
-              </button>
+              {a.status !== "in_progress" && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={onAskCancel}
+                  className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-anthracite/75 transition-colors hover:bg-alert/10 hover:text-alert disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+              )}
             </>
+          )}
+
+          {a.status === "no_show" && !closing && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onStartClose}
+              title="Absence enregistrée par erreur : clôturer le rendez-vous"
+              className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-anthracite/75 transition-colors hover:bg-sable/10 disabled:opacity-50"
+            >
+              Elle est venue
+            </button>
           )}
 
           {canceling && (

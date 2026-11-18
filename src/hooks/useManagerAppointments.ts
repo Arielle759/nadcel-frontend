@@ -51,6 +51,8 @@ export interface ManagerAppointment {
   employee: { id: number; name: string } | null;
   status: AppointmentStatus;
   cancelled_late?: boolean;
+  /** Absence détectée automatiquement (30 min sans arrivée). */
+  no_show_detected_at?: string | null;
   price: string | number;
   payment_status: PaymentStatus;
   payment_method: PaymentMethod | null;
