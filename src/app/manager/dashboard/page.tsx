@@ -110,7 +110,13 @@ export default function ManagerDashboardPage() {
           label="Note moyenne"
           icon={Star}
           tone="ambre"
-          value={current ? (current.rating?.average ?? "—") : null}
+          value={
+            current
+              ? current.rating?.average != null
+                ? Number(current.rating.average).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+                : "—"
+              : null
+          }
           note={current?.rating ? `${current.rating.count} avis` : null}
         />
       </div>

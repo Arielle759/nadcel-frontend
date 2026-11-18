@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowDownRight, ArrowUpRight, Info, TrendingUp } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Info, TrendingDown, TrendingUp } from "lucide-react";
 import CountUp from "@/components/motion/CountUp";
 import { type AdminSignup, AdminStats, useAdmin } from "@/hooks/useAdmin";
 import { BOOKING_SOURCE_LABELS } from "@/lib/bookingSources";
@@ -342,9 +342,12 @@ function AppointmentGrowth({ stats }: { stats: AdminStats }) {
       </h2>
       <div className="mt-3 grid flex-1 grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)] items-end gap-3">
         <div className="pb-7">
-          <span className="flex size-4 items-center justify-center rounded-[3px] bg-sauge text-white">
-            <TrendingUp size={11} aria-hidden="true" />
-          </span>
+          {growth !== null && (
+            // Sens de l'icône et couleur suivent le signe de la croissance.
+            <span className={`flex size-4 items-center justify-center rounded-[3px] text-white ${growth < 0 ? "bg-[#d93a2b]" : "bg-sauge"}`}>
+              {growth < 0 ? <TrendingDown size={11} aria-hidden="true" /> : <TrendingUp size={11} aria-hidden="true" />}
+            </span>
+          )}
           <p className="mt-2 text-[28px] font-medium leading-none tabular-nums text-anthracite">
             {growth === null ? "—" : formatPct(Math.round(growth), true)}
           </p>
