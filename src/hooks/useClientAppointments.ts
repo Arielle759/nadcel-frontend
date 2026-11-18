@@ -43,6 +43,8 @@ export interface ClientAppointment {
   scheduled_at: string;
   duration: number;
   status: AppointmentStatus;
+  /** Annulée par la cliente moins de 24 h avant (calcul automatique du serveur). */
+  cancelled_late?: boolean;
   price: string;
   payment_status: PaymentStatus;
   salon: ClientAppointmentSalon;

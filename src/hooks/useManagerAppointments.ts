@@ -7,7 +7,8 @@ export type AppointmentStatus =
   | "confirmed"
   | "in_progress"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "no_show";
 
 export type PaymentStatus = "unpaid" | "paid";
 // Moyens de paiement sur place. "cash" et "card" ne sont conservés que pour l'affichage
@@ -49,6 +50,7 @@ export interface ManagerAppointment {
   duration: number; // minutes
   employee: { id: number; name: string } | null;
   status: AppointmentStatus;
+  cancelled_late?: boolean;
   price: string | number;
   payment_status: PaymentStatus;
   payment_method: PaymentMethod | null;

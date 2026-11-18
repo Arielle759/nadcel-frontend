@@ -45,10 +45,13 @@ export function NextAppointmentCard({
   appointment,
   now,
   calendarEvent,
+  cancel,
 }: {
   appointment: ClientAppointment;
   now: number;
   calendarEvent: CalendarEvent | null;
+  /** Bouton « Annuler » et sa confirmation, fournis par la page. */
+  cancel?: React.ReactNode;
 }) {
   const date = new Date(appointment.scheduled_at);
   const { salon, service } = appointment;
@@ -112,6 +115,7 @@ export function NextAppointmentCard({
               </a>
             )}
           </div>
+          {cancel}
         </div>
       </section>
     </Reveal>

@@ -175,6 +175,7 @@ const STATUS: Record<TodayAppointment["status"], { label: string; className: str
   in_progress: { label: "en cours", className: "bg-vif-ciel-bg text-vif-ciel-ink" },
   completed: { label: "terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" },
   cancelled: { label: "annulé", className: "bg-vif-corail-bg text-vif-corail-ink" },
+  no_show: { label: "absente", className: "bg-red-100 text-red-800" },
 };
 
 function TodaySchedule({ list, count }: { list: TodayAppointment[] | null; count: number }) {

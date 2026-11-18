@@ -45,7 +45,7 @@ function belongsTo(tab: Tab, a: ManagerAppointment, now: number): boolean {
     case "completed":
       return a.status === "completed";
     case "cancelled":
-      return a.status === "cancelled";
+      return a.status === "cancelled" || a.status === "no_show";
     default:
       return true;
   }
@@ -184,7 +184,9 @@ export default function ManagerAppointmentsPage() {
       replace(updated);
       setCancelingId(null);
       const cancelledMessage = updated.client ? "Rendez-vous annulé. La cliente a été prévenue par e-mail." : "Rendez-vous annulé.";
-      showToast(status === "confirmed" ? "Rendez-vous confirmé." : cancelledMessage);
+      showToast(
+        status === "confirmed" ? "Rendez-vous confirmé." : status === "no_show" ? "Absence enregistrée." : cancelledMessage,
+      );
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Action impossible.");
     } finally {
@@ -323,6 +325,7 @@ export default function ManagerAppointmentsPage() {
                     setCancelingId(a.id);
                   }}
                   onCancel={() => handleStatusChange(a.id, "cancelled")}
+                  onNoShow={() => handleStatusChange(a.id, "no_show")}
                   onKeep={() => setCancelingId(null)}
                   onReminderSent={(updated) => replace({ ...a, reminder_sent_at: updated.reminder_sent_at })}
                 />
@@ -375,7 +378,11 @@ function StatusPill({ appointment, now }: { appointment: ManagerAppointment; now
       case "completed":
         return { label: "Terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" };
       case "cancelled":
-        return { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" };
+        return appointment.cancelled_late
+          ? { label: "Annulé tardivement", className: "bg-vif-corail-bg text-vif-corail-ink" }
+          : { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" };
+      case "no_show":
+        return { label: "Absente", className: "bg-red-100 text-red-800" };
       default:
         return { label: "Confirmé", className: "bg-vif-vert-bg text-vif-vert-ink" };
     }
@@ -400,6 +407,7 @@ function AppointmentRow({
   onStopClose,
   onAskCancel,
   onCancel,
+  onNoShow,
   onKeep,
   onReminderSent,
 }: {
@@ -414,16 +422,17 @@ function AppointmentRow({
   onStopClose: () => void;
   onAskCancel: () => void;
   onCancel: () => void;
+  onNoShow: () => void;
   onKeep: () => void;
   onReminderSent: (updated: ManagerAppointment) => void;
 }) {
   const started = new Date(a.scheduled_at).getTime() <= now;
   const open = isOpen(a);
-  const cancelled = a.status === "cancelled";
+  const cancelled = a.status === "cancelled" || a.status === "no_show";
 
   return (
     <li className={`flex flex-col gap-3 px-4 py-3 sm:px-5 ${cancelled ? "opacity-60" : ""}`}>
-      <div className="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 gap-y-2 md:grid-cols-[4.5rem_minmax(0,1fr)_10rem_8rem_auto]">
+      <div className="grid grid-cols-[4.5rem_1fr] items-center gap-x-4 gap-y-2 md:grid-cols-[4.5rem_minmax(0,1fr)_10rem_8rem_17rem]">
         <div className="leading-tight">
           <p className={`text-base font-semibold text-brand ${cancelled ? "line-through" : ""}`}>{timeLabel(a.scheduled_at)}</p>
           {a.duration > 0 && <p className="text-xs text-anthracite/75">{formatDuration(a.duration)}</p>}
@@ -492,6 +501,16 @@ function AppointmentRow({
                   className="rounded-lg bg-brand px-3 py-1.5 text-xs font-semibold text-beige transition-colors hover:bg-brand-soft disabled:opacity-50"
                 >
                   Clôturer
+                </button>
+              )}
+              {started && a.status === "confirmed" && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={onNoShow}
+                  className="rounded-lg border border-red-800/30 px-3 py-1.5 text-xs font-semibold text-red-800 transition-colors hover:bg-red-50 disabled:opacity-50"
+                >
+                  Cliente absente
                 </button>
               )}
               <button

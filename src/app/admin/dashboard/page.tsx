@@ -395,6 +395,7 @@ const STATUS: Record<string, { label: string; className: string }> = {
   in_progress: { label: "En cours", className: "bg-vif-ciel-bg text-vif-ciel-ink" },
   completed: { label: "Terminé", className: "bg-vif-lilas-bg text-vif-lilas-ink" },
   cancelled: { label: "Annulé", className: "bg-vif-corail-bg text-vif-corail-ink" },
+  no_show: { label: "Absente", className: "bg-red-100 text-red-800" },
 };
 
 const ROLE_LABELS: Record<AdminSignup["role"], string> = { client: "Cliente", gerant: "Gérant" };

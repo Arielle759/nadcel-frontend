@@ -6,7 +6,8 @@ export type AppointmentStatus =
   | "confirmed"
   | "in_progress"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  | "no_show";
 
 export interface AppointmentSalon {
   id: number;

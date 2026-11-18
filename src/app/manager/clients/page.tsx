@@ -19,6 +19,8 @@ interface ManagerClient {
   last_visit: string | null;
   next_visit: string | null;
   spent: number;
+  late_cancellations: number;
+  no_shows: number;
 }
 
 interface ClientsPage {
@@ -146,6 +148,17 @@ export default function ManagerClientsPage() {
                       <td className="whitespace-nowrap px-3 py-3 tabular-nums">
                         {c.visits}
                         <span className="text-xs text-anthracite/60"> / {c.appointments} rdv</span>
+                        {(c.no_shows > 0 || c.late_cancellations > 0) && (
+                          <span className="block text-xs font-medium text-red-800">
+                            {[
+                              c.no_shows > 0 && `${c.no_shows} absence${c.no_shows > 1 ? "s" : ""}`,
+                              c.late_cancellations > 0 &&
+                                `${c.late_cancellations} annulation${c.late_cancellations > 1 ? "s" : ""} tardive${c.late_cancellations > 1 ? "s" : ""}`,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
+                        )}
                       </td>
                       <td className="whitespace-nowrap px-3 py-3">{dateFr(c.last_visit)}</td>
                       <td className="whitespace-nowrap px-3 py-3">{dateFr(c.next_visit)}</td>

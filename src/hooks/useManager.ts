@@ -27,7 +27,7 @@ export interface ManagerStats {
 export interface TodayAppointment {
   id: number;
   scheduled_at: string;
-  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
+  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled" | "no_show";
   client_name: string | null;
   employee: string | null;
   service: string | null;

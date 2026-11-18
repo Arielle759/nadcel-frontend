@@ -11,14 +11,21 @@ import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
 import { NextAppointmentCard } from "@/components/client/ClientHighlights";
 
-const CANCELLATION_HOURS = 24;
+const LATE_CANCELLATION_HOURS = 24;
 
-// Même règle que le backend (Appointment::clientCanCancel) : une demande en attente
-// s'annule à tout moment, un rendez-vous confirmé jusqu'à 24 h avant.
+// Même règle que le backend (Appointment::clientCanCancel) : annulation en ligne
+// possible jusqu'à l'heure du rendez-vous.
 function clientCanCancel(appointment: ClientAppointment, now: number): boolean {
-  if (appointment.status === "pending") return true;
-  if (appointment.status !== "confirmed") return false;
-  return new Date(appointment.scheduled_at).getTime() - now > CANCELLATION_HOURS * 60 * 60 * 1000;
+  if (appointment.status !== "pending" && appointment.status !== "confirmed") return false;
+  return new Date(appointment.scheduled_at).getTime() > now;
+}
+
+// Annulation tardive : rendez-vous confirmé, moins de 24 h avant (Appointment::isLateCancellation).
+function isLateCancellation(appointment: ClientAppointment, now: number): boolean {
+  return (
+    appointment.status === "confirmed" &&
+    new Date(appointment.scheduled_at).getTime() - now <= LATE_CANCELLATION_HOURS * 60 * 60 * 1000
+  );
 }
 
 // Un salon suspendu, retiré ou supprimé, ou un service désactivé, ne peut plus
@@ -162,7 +169,9 @@ export default function ClientAppointmentsPage() {
     setActionError(null);
     try {
       const updated = await cancelAppointment(id);
-      setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status: updated.status } : a)));
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: updated.status, cancelled_late: updated.cancelled_late } : a)),
+      );
       setConfirmCancelId(null);
     } catch (err) {
       setActionError({ id, message: err instanceof Error ? err.message : "Impossible d'annuler la réservation." });
@@ -192,13 +201,39 @@ export default function ClientAppointmentsPage() {
     }
   }
 
+  // Confirmation d'annulation (cartes de la liste et carte du prochain rendez-vous).
+  const renderCancelConfirm = (appointment: ClientAppointment, late: boolean) => (
+    <div className="mt-4 rounded-2xl bg-red-50 p-4">
+      <p className="text-sm font-medium text-red-900">Annuler ce rendez-vous ? Le salon sera prévenu.</p>
+      {late && (
+        <p className="mt-1 text-sm text-red-900/80">
+          Il commence dans moins de {LATE_CANCELLATION_HOURS} h : l&apos;annulation sera signalée au salon comme
+          tardive. Le créneau sera aussitôt libéré pour une autre cliente.
+        </p>
+      )}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          disabled={cancellingId === appointment.id}
+          onClick={() => handleCancel(appointment.id)}
+          className="inline-flex min-h-11 items-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-900 disabled:opacity-60"
+        >
+          {cancellingId === appointment.id ? "Annulation..." : "Oui, annuler"}
+        </button>
+        <button type="button" onClick={() => setConfirmCancelId(null)} className={ui.buttonSecondary}>
+          Garder le rendez-vous
+        </button>
+      </div>
+    </div>
+  );
+
   // Une carte de rendez-vous (à venir ou passé), avec ses actions.
   const renderAppointment = (appointment: ClientAppointment, now: number) => {
     const date = new Date(appointment.scheduled_at);
     const canCancel = clientCanCancel(appointment, now);
     // Seulement une fois confirmé : un rendez-vous en attente peut encore être refusé.
     const canAddToCalendar = appointment.status === "confirmed" && isUpcoming(appointment, now);
-    const tooLateToCancel = appointment.status === "confirmed" && isUpcoming(appointment, now) && !canCancel;
+    const late = canCancel && isLateCancellation(appointment, now);
     const canReview =
       appointment.status === "completed" && !appointment.review && !reviewedIds.has(appointment.id);
     const isReviewing = reviewingId === appointment.id;
@@ -229,7 +264,7 @@ export default function ClientAppointmentsPage() {
                   {appointment.service.name}, {formatDuration(appointment.duration ?? appointment.service.duration)}
                 </p>
               </div>
-              <AppointmentStatusBadge status={appointment.status} />
+              <AppointmentStatusBadge status={appointment.status} late={appointment.cancelled_late} />
             </div>
 
             <p className="mt-3 text-sm text-anthracite/80">
@@ -241,11 +276,6 @@ export default function ClientAppointmentsPage() {
 
             {appointment.status === "pending" && (
               <p className="mt-2 text-sm text-anthracite/70">En attente de confirmation par le salon.</p>
-            )}
-            {tooLateToCancel && (
-              <p className="mt-2 text-sm text-anthracite/70">
-                Moins de {CANCELLATION_HOURS} h avant le rendez-vous : pour annuler, contactez directement le salon.
-              </p>
             )}
             {appointment.review && (
               <p className="mt-2 text-sm text-anthracite/70">
@@ -291,24 +321,7 @@ export default function ClientAppointmentsPage() {
                 </div>
               )}
 
-            {isConfirmingCancel && (
-              <div className="mt-4 rounded-2xl bg-red-50 p-4">
-                <p className="text-sm font-medium text-red-900">Annuler ce rendez-vous ? Le salon sera prévenu.</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={cancellingId === appointment.id}
-                    onClick={() => handleCancel(appointment.id)}
-                    className="inline-flex min-h-11 items-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-900 disabled:opacity-60"
-                  >
-                    {cancellingId === appointment.id ? "Annulation..." : "Oui, annuler"}
-                  </button>
-                  <button type="button" onClick={() => setConfirmCancelId(null)} className={ui.buttonSecondary}>
-                    Garder le rendez-vous
-                  </button>
-                </div>
-              </div>
-            )}
+            {isConfirmingCancel && renderCancelConfirm(appointment, late)}
 
             {isReviewing && (
               <div className="mt-4 rounded-2xl bg-beige p-4">
@@ -373,6 +386,31 @@ export default function ClientAppointmentsPage() {
               appointment={upcoming[0]}
               now={now}
               calendarEvent={upcoming[0].status === "confirmed" ? calendarEventFor(upcoming[0]) : null}
+              cancel={
+                confirmCancelId === upcoming[0].id ? (
+                  <div>
+                    {renderCancelConfirm(upcoming[0], isLateCancellation(upcoming[0], now))}
+                    {actionError?.id === upcoming[0].id && (
+                      <p role="alert" className="mt-2 text-sm text-red-800">
+                        {actionError.message}
+                      </p>
+                    )}
+                  </div>
+                ) : clientCanCancel(upcoming[0], now) ? (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConfirmCancelId(upcoming[0].id);
+                        setActionError(null);
+                      }}
+                      className={`${ui.buttonSecondary} text-red-800`}
+                    >
+                      Annuler le rendez-vous
+                    </button>
+                  </div>
+                ) : null
+              }
             />
           </div>
         )}
