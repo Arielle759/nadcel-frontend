@@ -9,6 +9,12 @@ export interface ClientAppointmentSalon {
   city?: string;
   phone?: string | null;
   cover?: string | null;
+  // État du salon aujourd'hui (pour ne proposer de reprendre rendez-vous
+  // que dans un salon encore en ligne).
+  is_active?: boolean;
+  is_verified?: boolean;
+  deactivated_at?: string | null;
+  deleted_at?: string | null;
 }
 
 export interface ClientAppointmentService {
@@ -18,6 +24,8 @@ export interface ClientAppointmentService {
   option_label?: string | null;
   image?: string | null;
   category?: string;
+  is_active?: boolean;
+  deleted_at?: string | null;
 }
 
 export interface ClientAppointmentEmployee {

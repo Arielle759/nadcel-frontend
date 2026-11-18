@@ -1,7 +1,6 @@
 "use client";
 
 import AddToCalendar from "@/components/AddToCalendar";
-import CountUp from "@/components/motion/CountUp";
 import Reveal from "@/components/motion/Reveal";
 import type { ClientAppointment } from "@/hooks/useClientAppointments";
 import type { CalendarEvent } from "@/lib/calendar";
@@ -117,68 +116,5 @@ export function NextAppointmentCard({
         </div>
       </section>
     </Reveal>
-  );
-}
-
-// « Mon parcours beauté » : ce que le client a déjà vécu sur Nadcel.
-export function BeautyJourney({ appointments }: { appointments: ClientAppointment[] }) {
-  const completed = appointments.filter((a) => a.status === "completed");
-  const visits = new Map<number, { name: string; count: number }>();
-  for (const a of completed) {
-    const current = visits.get(a.salon.id);
-    visits.set(a.salon.id, { name: a.salon.name, count: (current?.count ?? 0) + 1 });
-  }
-  const favorite = [...visits.values()].sort((a, b) => b.count - a.count)[0];
-
-  if (completed.length === 0) {
-    return (
-      <Reveal className="rounded-2xl bg-sable/35 px-6 py-5">
-        <p className="font-semibold text-brand">Votre parcours beauté commence ici</p>
-        <p className="mt-1 text-sm text-anthracite/70">
-          Après chaque rendez-vous, vous retrouverez ici vos visites et votre salon préféré.
-        </p>
-      </Reveal>
-    );
-  }
-
-  const tiles = [
-    { label: "Rendez-vous honorés", value: <CountUp value={completed.length} />, hint: "depuis votre inscription" },
-    {
-      label: "Salons découverts",
-      value: <CountUp value={visits.size} />,
-      hint: visits.size > 1 ? "salons différents visités" : "pour l'instant",
-    },
-    {
-      label: "Votre salon préféré",
-      value: <span className="text-xl leading-tight">{favorite.name}</span>,
-      hint: `${favorite.count} visite${favorite.count > 1 ? "s" : ""}`,
-    },
-  ];
-
-  return (
-    <section aria-labelledby="journey-title">
-      <h2 id="journey-title" className="text-xl font-semibold tracking-tight text-brand">
-        Mon parcours beauté
-      </h2>
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {tiles.map((tile, index) => (
-          <Reveal
-            key={tile.label}
-            delay={index * 100}
-            className={`rounded-2xl p-6 ${
-              index === 0
-                ? "bg-brand text-beige shadow-[0_6px_16px_rgba(59,42,36,0.18),0_18px_40px_rgba(74,51,40,0.22)]"
-                : ui.surface
-            }`}
-          >
-            <p className={`${LABEL} ${index === 0 ? "text-beige/65" : "text-anthracite/75"}`}>{tile.label}</p>
-            <p className={`mt-3 text-3xl font-semibold tabular-nums tracking-tight ${index === 0 ? "text-beige" : "text-brand"}`}>
-              {tile.value}
-            </p>
-            <p className={`mt-2 text-xs ${index === 0 ? "text-beige/70" : "text-anthracite/75"}`}>{tile.hint}</p>
-          </Reveal>
-        ))}
-      </div>
-    </section>
   );
 }

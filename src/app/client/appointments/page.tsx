@@ -9,14 +9,10 @@ import type { CalendarEvent } from "@/lib/calendar";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
-import DashboardBanner from "@/components/DashboardBanner";
-import { BeautyJourney, NextAppointmentCard } from "@/components/client/ClientHighlights";
-import { useCurrentUser } from "@/hooks/useAuthState";
+import { NextAppointmentCard } from "@/components/client/ClientHighlights";
 import { serviceWithOption } from "@/lib/serviceOptions";
 
 const CANCELLATION_HOURS = 24;
-
-type Tab = "upcoming" | "past";
 
 // Même règle que le backend (Appointment::clientCanCancel) : une demande en attente
 // s'annule à tout moment, un rendez-vous confirmé jusqu'à 24 h avant.
@@ -26,22 +22,19 @@ function clientCanCancel(appointment: ClientAppointment, now: number): boolean {
   return new Date(appointment.scheduled_at).getTime() - now > CANCELLATION_HOURS * 60 * 60 * 1000;
 }
 
-// « Bonsoir » à partir de 18 h. Calculé après chargement (pas côté serveur).
-function greeting(now: number | null): string {
-  return now !== null && new Date(now).getHours() >= 18 ? "Bonsoir" : "Bonjour";
-}
-
-// Résumé du bandeau : le prochain rendez-vous, ou une invitation à réserver.
-function bannerSummary(upcoming: ClientAppointment[] | null): string {
-  if (upcoming === null) return "Vos rendez-vous à venir et votre historique.";
-  const next = upcoming[0];
-  if (!next) return "Aucun rendez-vous à venir pour le moment.";
-  const date = new Date(next.scheduled_at);
-  const day = date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-  const time =
-    date.getMinutes() === 0 ? `${date.getHours()} h` : `${date.getHours()} h ${String(date.getMinutes()).padStart(2, "0")}`;
-  const where = next.salon?.name ? ` chez ${next.salon.name}` : "";
-  return `Prochain rendez-vous : ${day} à ${time}${where}.`;
+// Un salon suspendu, retiré ou supprimé, ou un service désactivé, ne peut plus
+// être réservé : pas de bouton « Réserver à nouveau » (il mènerait à une page
+// introuvable).
+function stillBookable(a: ClientAppointment): boolean {
+  const { salon, service } = a;
+  return (
+    salon.is_active !== false &&
+    salon.is_verified !== false &&
+    !salon.deactivated_at &&
+    !salon.deleted_at &&
+    service.is_active !== false &&
+    !service.deleted_at
+  );
 }
 
 function isUpcoming(appointment: ClientAppointment, now: number): boolean {
@@ -108,9 +101,7 @@ export default function ClientAppointmentsPage() {
   const [now, setNow] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("upcoming");
-  const user = useCurrentUser();
-  const firstName = user?.name?.trim().split(/\s+/)[0];
+  const [showAllPast, setShowAllPast] = useState(false);
 
   const [confirmCancelId, setConfirmCancelId] = useState<number | null>(null);
   const [cancellingId, setCancellingId] = useState<number | null>(null);
@@ -152,7 +143,20 @@ export default function ClientAppointmentsPage() {
     };
   }, [appointments, now]);
 
-  const visible = tab === "upcoming" ? upcoming : past;
+  // « Réserver à nouveau » : les dernières prestations terminées, une par
+  // couple salon + service, pour reprendre rendez-vous en un clic.
+  const rebook = useMemo(() => {
+    const seen = new Set<string>();
+    const items: ClientAppointment[] = [];
+    for (const a of past) {
+      const key = `${a.salon.id}-${a.service.id}`;
+      if (a.status !== "completed" || seen.has(key) || !stillBookable(a)) continue;
+      seen.add(key);
+      items.push(a);
+      if (items.length === 3) break;
+    }
+    return items;
+  }, [past]);
 
   async function handleCancel(id: number) {
     setCancellingId(id);
@@ -189,243 +193,268 @@ export default function ClientAppointmentsPage() {
     }
   }
 
+  // Une carte de rendez-vous (à venir ou passé), avec ses actions.
+  const renderAppointment = (appointment: ClientAppointment, now: number) => {
+    const date = new Date(appointment.scheduled_at);
+    const canCancel = clientCanCancel(appointment, now);
+    // Seulement une fois confirmé : un rendez-vous en attente peut encore être refusé.
+    const canAddToCalendar = appointment.status === "confirmed" && isUpcoming(appointment, now);
+    const tooLateToCancel = appointment.status === "confirmed" && isUpcoming(appointment, now) && !canCancel;
+    const canReview =
+      appointment.status === "completed" && !appointment.review && !reviewedIds.has(appointment.id);
+    const isReviewing = reviewingId === appointment.id;
+    const isConfirmingCancel = confirmCancelId === appointment.id;
+    const itemError = actionError?.id === appointment.id ? actionError.message : null;
+
+    return (
+      <article key={appointment.id} className={`${ui.surface} p-5 sm:p-6`}>
+        <div className="flex gap-5">
+          <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-beige py-3 text-center">
+            <span className="text-xs text-anthracite/70">
+              {date.toLocaleDateString("fr-FR", { weekday: "short" })}
+            </span>
+            <span className="text-2xl font-semibold leading-tight tabular-nums text-brand">{date.getDate()}</span>
+            <span className="text-xs text-anthracite/70">{date.toLocaleDateString("fr-FR", { month: "short" })}</span>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+              <div className="min-w-0">
+                <Link
+                  href={`/salons/${appointment.salon.id}`}
+                  className="text-lg font-semibold text-brand transition-colors hover:text-brand-soft"
+                >
+                  {appointment.salon.name}
+                </Link>
+                <p className="mt-0.5 text-sm text-anthracite/80">
+                  {serviceWithOption(appointment.service.name, appointment.option_label)}, {formatDuration(appointment.duration ?? appointment.service.duration)}
+                </p>
+              </div>
+              <AppointmentStatusBadge status={appointment.status} />
+            </div>
+
+            <p className="mt-3 text-sm text-anthracite/80">
+              <span className="font-semibold text-anthracite">{formatTime(date)}</span>
+              {appointment.employee?.name && <>, avec {appointment.employee.name}</>}
+              {", "}
+              {formatCurrency(Number(appointment.price))}
+            </p>
+
+            {appointment.status === "pending" && (
+              <p className="mt-2 text-sm text-anthracite/70">En attente de confirmation par le salon.</p>
+            )}
+            {tooLateToCancel && (
+              <p className="mt-2 text-sm text-anthracite/70">
+                Moins de {CANCELLATION_HOURS} h avant le rendez-vous : pour annuler, contactez directement le salon.
+              </p>
+            )}
+            {appointment.review && (
+              <p className="mt-2 text-sm text-anthracite/70">
+                Votre avis : <span className="text-champagne">{"★".repeat(appointment.review.rating)}</span>
+              </p>
+            )}
+            {reviewedIds.has(appointment.id) && (
+              <p className="mt-2 text-sm font-medium text-brand">Merci, votre avis a été publié.</p>
+            )}
+
+            {(canCancel || canReview || canAddToCalendar || appointment.status === "completed" || appointment.status === "cancelled") &&
+              !isReviewing &&
+              !isConfirmingCancel && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {canAddToCalendar && (
+                    <AddToCalendar event={calendarEventFor(appointment)} filename={`nadcel-rendez-vous-${appointment.id}.ics`} />
+                  )}
+                  {canReview && (
+                    <button type="button" onClick={() => openReviewForm(appointment.id)} className={ui.buttonPrimary}>
+                      Laisser un avis
+                    </button>
+                  )}
+                  {(appointment.status === "completed" || appointment.status === "cancelled") && stillBookable(appointment) && (
+                    <Link
+                      href={`/salons/${appointment.salon.id}/appointments?service=${appointment.service.id}`}
+                      className={ui.buttonSecondary}
+                    >
+                      Réserver à nouveau
+                    </Link>
+                  )}
+                  {canCancel && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConfirmCancelId(appointment.id);
+                        setActionError(null);
+                      }}
+                      className={`${ui.buttonSecondary} text-red-800`}
+                    >
+                      Annuler
+                    </button>
+                  )}
+                </div>
+              )}
+
+            {isConfirmingCancel && (
+              <div className="mt-4 rounded-2xl bg-red-50 p-4">
+                <p className="text-sm font-medium text-red-900">Annuler ce rendez-vous ? Le salon sera prévenu.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={cancellingId === appointment.id}
+                    onClick={() => handleCancel(appointment.id)}
+                    className="inline-flex min-h-11 items-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-900 disabled:opacity-60"
+                  >
+                    {cancellingId === appointment.id ? "Annulation..." : "Oui, annuler"}
+                  </button>
+                  <button type="button" onClick={() => setConfirmCancelId(null)} className={ui.buttonSecondary}>
+                    Garder le rendez-vous
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {isReviewing && (
+              <div className="mt-4 rounded-2xl bg-beige p-4">
+                <p className="text-sm font-semibold text-brand">Comment s&apos;est passé votre rendez-vous ?</p>
+                <div className="mt-2">
+                  <StarRating value={reviewNote} onChange={setReviewNote} />
+                </div>
+                <label htmlFor={`comment-${appointment.id}`} className="sr-only">
+                  Votre commentaire
+                </label>
+                <textarea
+                  id={`comment-${appointment.id}`}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Accueil, ponctualité, résultat... (facultatif)"
+                  rows={3}
+                  className="mt-3 w-full rounded-2xl bg-white px-4 py-3 text-sm text-anthracite outline-none shadow-[0_1px_2px_rgba(90,50,35,0.06)] focus:shadow-[0_0_0_2px_var(--color-brand)]"
+                />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={submittingReview}
+                    onClick={() => handleSubmitReview(appointment.id)}
+                    className={ui.buttonPrimary}
+                  >
+                    {submittingReview ? "Envoi..." : "Publier mon avis"}
+                  </button>
+                  <button type="button" onClick={() => setReviewingId(null)} className={ui.buttonSecondary}>
+                    Plus tard
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {itemError && (
+              <p role="alert" className="mt-3 text-sm text-red-700">
+                {itemError}
+              </p>
+            )}
+          </div>
+        </div>
+      </article>
+    );
+  };
+
   return (
     <main className="flex flex-1 flex-col px-5 py-8 sm:px-10 sm:py-10">
       <div className="mx-auto w-full max-w-4xl">
-        <DashboardBanner
-          eyebrow="Mes rendez-vous"
-          title={firstName ? `${greeting(now)} ${firstName},` : "Mes rendez-vous"}
-          summary={bannerSummary(loading ? null : upcoming)}
-          image="/images/services/manucure.jpg"
-          actions={
-            <Link href="/salons" className={ui.buttonOnDark}>
-              Nouvelle réservation
-            </Link>
-          }
-        />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-brand sm:text-4xl">Mes rendez-vous</h1>
+            <p className="mt-2 text-anthracite/75">Retrouvez vos réservations, annulez-les dans les délais ou laissez un avis.</p>
+          </div>
+          <Link href="/salons" className={ui.buttonPrimary}>
+            Nouvelle réservation
+          </Link>
+        </div>
 
-        {!loading && now !== null && (
-          <div className="mt-8 flex flex-col gap-8">
-            {upcoming[0] && (
-              <NextAppointmentCard
-                appointment={upcoming[0]}
-                now={now}
-                calendarEvent={upcoming[0].status === "confirmed" ? calendarEventFor(upcoming[0]) : null}
-              />
-            )}
-            <BeautyJourney appointments={appointments} />
+        {!loading && now !== null && upcoming[0] && (
+          <div className="mt-8">
+            <NextAppointmentCard
+              appointment={upcoming[0]}
+              now={now}
+              calendarEvent={upcoming[0].status === "confirmed" ? calendarEventFor(upcoming[0]) : null}
+            />
           </div>
         )}
 
-        <h2 className="mt-12 text-xl font-semibold tracking-tight text-brand">Tous mes rendez-vous</h2>
-        <div role="tablist" aria-label="Période" className={`${ui.surface} mt-4 inline-flex gap-1 rounded-full p-1`}>
-          {(
-            [
-              ["upcoming", "À venir", upcoming.length],
-              ["past", "Passées", past.length],
-            ] as const
-          ).map(([key, label, count]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={tab === key}
-              onClick={() => setTab(key)}
-              className={`min-h-10 rounded-full px-5 text-sm font-semibold transition-colors ${
-                tab === key ? "bg-brand text-beige" : "text-anthracite/75 hover:text-brand"
-              }`}
-            >
-              {label} {!loading && <span className={tab === key ? "text-beige/70" : "text-anthracite/75"}>({count})</span>}
-            </button>
-          ))}
-        </div>
+        {loading && (
+          <div className="mt-8 flex flex-col gap-4" aria-busy="true" aria-label="Chargement de vos rendez-vous">
+            {[0, 1, 2].map((item) => (
+              <div key={item} className="h-36 animate-pulse rounded-2xl bg-sable/15" />
+            ))}
+          </div>
+        )}
 
-        <div className="mt-8 flex flex-col gap-4" aria-busy={loading}>
-          {loading &&
-            [0, 1, 2].map((item) => <div key={item} className="h-36 animate-pulse rounded-2xl bg-sable/15" />)}
+        {error && <p className="mt-8 text-sm text-red-700">{error}</p>}
 
-          {error && <p className="text-sm text-red-700">{error}</p>}
-
-          {!loading && !error && visible.length === 0 && (
-            <div className={`${ui.surface} flex flex-col items-center gap-4 px-6 py-14 text-center`}>
-              <p className="font-heading text-2xl font-semibold text-brand">
-                {tab === "upcoming" ? "Aucun rendez-vous à venir" : "Aucune réservation passée"}
-              </p>
-              <p className="max-w-md text-sm leading-6 text-anthracite/75">
-                {tab === "upcoming"
-                  ? "Trouvez un salon près de chez vous et réservez votre prochain moment beauté en moins d'une minute."
-                  : "Vos rendez-vous terminés ou annulés apparaîtront ici."}
-              </p>
-              {tab === "upcoming" && (
+        {!loading && !error && now !== null && (
+          <>
+            {upcoming.length === 0 && (
+              <div className={`${ui.surface} mt-8 flex flex-col items-center gap-4 px-6 py-12 text-center`}>
+                <p className="font-heading text-2xl font-semibold text-brand">Aucun rendez-vous à venir</p>
+                <p className="max-w-md text-sm leading-6 text-anthracite/75">
+                  Trouvez un salon près de chez vous et réservez votre prochain moment beauté en moins d&apos;une minute.
+                </p>
                 <Link href="/salons" className={ui.buttonPrimary}>
                   Trouver un salon
                 </Link>
-              )}
-            </div>
-          )}
+              </div>
+            )}
 
-          {now !== null &&
-            visible.map((appointment) => {
-              const date = new Date(appointment.scheduled_at);
-              const canCancel = clientCanCancel(appointment, now);
-              // Seulement une fois confirmé : un rendez-vous en attente peut encore être refusé.
-              const canAddToCalendar = appointment.status === "confirmed" && isUpcoming(appointment, now);
-              const tooLateToCancel = appointment.status === "confirmed" && isUpcoming(appointment, now) && !canCancel;
-              const canReview =
-                appointment.status === "completed" && !appointment.review && !reviewedIds.has(appointment.id);
-              const isReviewing = reviewingId === appointment.id;
-              const isConfirmingCancel = confirmCancelId === appointment.id;
-              const itemError = actionError?.id === appointment.id ? actionError.message : null;
-
-              return (
-                <article key={appointment.id} className={`${ui.surface} p-5 sm:p-6`}>
-                  <div className="flex gap-5">
-                    <div className="flex w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-beige py-3 text-center">
-                      <span className="text-xs text-anthracite/70">
-                        {date.toLocaleDateString("fr-FR", { weekday: "short" })}
-                      </span>
-                      <span className="text-2xl font-semibold leading-tight tabular-nums text-brand">{date.getDate()}</span>
-                      <span className="text-xs text-anthracite/70">{date.toLocaleDateString("fr-FR", { month: "short" })}</span>
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-                        <div className="min-w-0">
-                          <Link
-                            href={`/salons/${appointment.salon.id}`}
-                            className="text-lg font-semibold text-brand transition-colors hover:text-brand-soft"
-                          >
-                            {appointment.salon.name}
-                          </Link>
-                          <p className="mt-0.5 text-sm text-anthracite/80">
-                            {serviceWithOption(appointment.service.name, appointment.option_label)}, {formatDuration(appointment.duration ?? appointment.service.duration)}
-                          </p>
-                        </div>
-                        <AppointmentStatusBadge status={appointment.status} />
-                      </div>
-
-                      <p className="mt-3 text-sm text-anthracite/80">
-                        <span className="font-semibold text-anthracite">{formatTime(date)}</span>
-                        {appointment.employee?.name && <>, avec {appointment.employee.name}</>}
-                        {", "}
-                        {formatCurrency(Number(appointment.price))}
+            {rebook.length > 0 && (
+              <section aria-labelledby="rebook-title" className="mt-12">
+                <h2 id="rebook-title" className="text-xl font-semibold tracking-tight text-brand">
+                  Réserver à nouveau
+                </h2>
+                <ul className="mt-4 grid gap-4 sm:grid-cols-3">
+                  {rebook.map((a) => (
+                    <li key={a.id} className={`${ui.surface} flex flex-col p-5`}>
+                      <p className="font-semibold text-brand">{serviceWithOption(a.service.name, a.option_label)}</p>
+                      <p className="mt-0.5 text-sm text-anthracite/75">{a.salon.name}</p>
+                      <p className="mt-2 text-sm tabular-nums text-anthracite/75">
+                        {formatDuration(a.duration)}, dernière fois {formatCurrency(Number(a.price))}
                       </p>
+                      <Link
+                        href={`/salons/${a.salon.id}/appointments?service=${a.service.id}`}
+                        className={`${ui.buttonSecondary} mt-4 self-start`}
+                      >
+                        Réserver
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-                      {appointment.status === "pending" && (
-                        <p className="mt-2 text-sm text-anthracite/70">En attente de confirmation par le salon.</p>
-                      )}
-                      {tooLateToCancel && (
-                        <p className="mt-2 text-sm text-anthracite/70">
-                          Moins de {CANCELLATION_HOURS} h avant le rendez-vous : pour annuler, contactez directement le salon.
-                        </p>
-                      )}
-                      {appointment.review && (
-                        <p className="mt-2 text-sm text-anthracite/70">
-                          Votre avis : <span className="text-champagne">{"★".repeat(appointment.review.rating)}</span>
-                        </p>
-                      )}
-                      {reviewedIds.has(appointment.id) && (
-                        <p className="mt-2 text-sm font-medium text-brand">Merci, votre avis a été publié.</p>
-                      )}
+            {upcoming.length > 1 && (
+              <section aria-labelledby="upcoming-title" className="mt-12">
+                <h2 id="upcoming-title" className="text-xl font-semibold tracking-tight text-brand">
+                  Ensuite
+                </h2>
+                <div className="mt-4 flex flex-col gap-4">{upcoming.slice(1).map((a) => renderAppointment(a, now))}</div>
+              </section>
+            )}
 
-                      {(canCancel || canReview || canAddToCalendar || appointment.status === "completed" || appointment.status === "cancelled") &&
-                        !isReviewing &&
-                        !isConfirmingCancel && (
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {canAddToCalendar && (
-                              <AddToCalendar event={calendarEventFor(appointment)} filename={`nadcel-rendez-vous-${appointment.id}.ics`} />
-                            )}
-                            {canReview && (
-                              <button type="button" onClick={() => openReviewForm(appointment.id)} className={ui.buttonPrimary}>
-                                Laisser un avis
-                              </button>
-                            )}
-                            {(appointment.status === "completed" || appointment.status === "cancelled") && (
-                              <Link
-                                href={`/salons/${appointment.salon.id}/appointments?service=${appointment.service.id}`}
-                                className={ui.buttonSecondary}
-                              >
-                                Réserver à nouveau
-                              </Link>
-                            )}
-                            {canCancel && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setConfirmCancelId(appointment.id);
-                                  setActionError(null);
-                                }}
-                                className={`${ui.buttonSecondary} text-red-800`}
-                              >
-                                Annuler
-                              </button>
-                            )}
-                          </div>
-                        )}
-
-                      {isConfirmingCancel && (
-                        <div className="mt-4 rounded-2xl bg-red-50 p-4">
-                          <p className="text-sm font-medium text-red-900">Annuler ce rendez-vous ? Le salon sera prévenu.</p>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              disabled={cancellingId === appointment.id}
-                              onClick={() => handleCancel(appointment.id)}
-                              className="inline-flex min-h-11 items-center rounded-full bg-red-800 px-5 text-sm font-semibold text-white transition-colors hover:bg-red-900 disabled:opacity-60"
-                            >
-                              {cancellingId === appointment.id ? "Annulation..." : "Oui, annuler"}
-                            </button>
-                            <button type="button" onClick={() => setConfirmCancelId(null)} className={ui.buttonSecondary}>
-                              Garder le rendez-vous
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {isReviewing && (
-                        <div className="mt-4 rounded-2xl bg-beige p-4">
-                          <p className="text-sm font-semibold text-brand">Comment s&apos;est passé votre rendez-vous ?</p>
-                          <div className="mt-2">
-                            <StarRating value={reviewNote} onChange={setReviewNote} />
-                          </div>
-                          <label htmlFor={`comment-${appointment.id}`} className="sr-only">
-                            Votre commentaire
-                          </label>
-                          <textarea
-                            id={`comment-${appointment.id}`}
-                            value={reviewComment}
-                            onChange={(e) => setReviewComment(e.target.value)}
-                            placeholder="Accueil, ponctualité, résultat... (facultatif)"
-                            rows={3}
-                            className="mt-3 w-full rounded-2xl bg-white px-4 py-3 text-sm text-anthracite outline-none shadow-[0_1px_2px_rgba(90,50,35,0.06)] focus:shadow-[0_0_0_2px_var(--color-brand)]"
-                          />
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <button
-                              type="button"
-                              disabled={submittingReview}
-                              onClick={() => handleSubmitReview(appointment.id)}
-                              className={ui.buttonPrimary}
-                            >
-                              {submittingReview ? "Envoi..." : "Publier mon avis"}
-                            </button>
-                            <button type="button" onClick={() => setReviewingId(null)} className={ui.buttonSecondary}>
-                              Plus tard
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {itemError && (
-                        <p role="alert" className="mt-3 text-sm text-red-700">
-                          {itemError}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-        </div>
+            {past.length > 0 && (
+              <section aria-labelledby="history-title" className="mt-12">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 id="history-title" className="text-xl font-semibold tracking-tight text-brand">
+                    Historique
+                  </h2>
+                  {past.length > 3 && (
+                    <button type="button" onClick={() => setShowAllPast((v) => !v)} className={`${ui.textLink} text-sm`}>
+                      {showAllPast ? "Voir moins" : `Voir tout (${past.length})`}
+                    </button>
+                  )}
+                </div>
+                <div className="mt-4 flex flex-col gap-4">
+                  {(showAllPast ? past : past.slice(0, 3)).map((a) => renderAppointment(a, now))}
+                </div>
+              </section>
+            )}
+          </>
+        )}
       </div>
     </main>
   );
