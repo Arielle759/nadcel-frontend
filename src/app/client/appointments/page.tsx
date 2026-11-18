@@ -10,7 +10,6 @@ import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/lib/duration";
 import { ui } from "@/lib/ui";
 import { NextAppointmentCard } from "@/components/client/ClientHighlights";
-import { serviceWithOption } from "@/lib/serviceOptions";
 
 const CANCELLATION_HOURS = 24;
 
@@ -50,7 +49,7 @@ function calendarEventFor(appointment: ClientAppointment): CalendarEvent {
   const { salon } = appointment;
   const location = [salon.name, salon.address, salon.city].filter(Boolean).join(", ");
   const details = [
-    `${serviceWithOption(appointment.service.name, appointment.option_label)}${appointment.employee?.name ? ` avec ${appointment.employee.name}` : ""}.`,
+    `${appointment.service.name}${appointment.employee?.name ? ` avec ${appointment.employee.name}` : ""}.`,
     `Prix : ${formatCurrency(Number(appointment.price))}, à régler au salon.`,
     salon.phone ? `Salon : ${salon.phone}` : null,
     "Réservé sur Nadcel.",
@@ -59,7 +58,7 @@ function calendarEventFor(appointment: ClientAppointment): CalendarEvent {
     .join("\n");
   return {
     uid: `rdv-${appointment.id}@nadcel.sn`,
-    title: `${serviceWithOption(appointment.service.name, appointment.option_label)} chez ${salon.name}`,
+    title: `${appointment.service.name} chez ${salon.name}`,
     start,
     end: new Date(start.getTime() + minutes * 60_000),
     location,
@@ -227,7 +226,7 @@ export default function ClientAppointmentsPage() {
                   {appointment.salon.name}
                 </Link>
                 <p className="mt-0.5 text-sm text-anthracite/80">
-                  {serviceWithOption(appointment.service.name, appointment.option_label)}, {formatDuration(appointment.duration ?? appointment.service.duration)}
+                  {appointment.service.name}, {formatDuration(appointment.duration ?? appointment.service.duration)}
                 </p>
               </div>
               <AppointmentStatusBadge status={appointment.status} />
@@ -410,7 +409,7 @@ export default function ClientAppointmentsPage() {
                 <ul className="mt-4 grid gap-4 sm:grid-cols-3">
                   {rebook.map((a) => (
                     <li key={a.id} className={`${ui.surface} flex flex-col p-5`}>
-                      <p className="font-semibold text-brand">{serviceWithOption(a.service.name, a.option_label)}</p>
+                      <p className="font-semibold text-brand">{a.service.name}</p>
                       <p className="mt-0.5 text-sm text-anthracite/75">{a.salon.name}</p>
                       <p className="mt-2 text-sm tabular-nums text-anthracite/75">
                         {formatDuration(a.duration)}, dernière fois {formatCurrency(Number(a.price))}

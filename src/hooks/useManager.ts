@@ -31,7 +31,6 @@ export interface TodayAppointment {
   client_name: string | null;
   employee: string | null;
   service: string | null;
-  option_label: string | null;
 }
 
 export interface NextAppointment {
@@ -40,7 +39,6 @@ export interface NextAppointment {
   status: "pending" | "confirmed";
   client_name: string | null;
   service: string | null;
-  option_label: string | null;
   salon: string | null;
 }
 

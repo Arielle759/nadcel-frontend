@@ -3,7 +3,6 @@ const DRAFT_KEY = "booking_draft";
 export interface BookingDraft {
   salonId: number;
   serviceId: number;
-  optionId?: number | null;
   date: string; // YYYY-MM-DD
   heure: string; // HH:mm
 }

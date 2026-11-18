@@ -7,14 +7,12 @@ interface UseAvailabilityResult {
   getMonthAvailability: (
     salonId: number | string,
     serviceId: number | string,
-    month: string,
-    optionId?: number | null
+    month: string
   ) => Promise<MonthAvailability>;
   getDayAvailability: (
     salonId: number | string,
     date: string,
-    serviceId: number | string,
-    optionId?: number | null
+    serviceId: number | string
   ) => Promise<string[]>;
 }
 
@@ -23,12 +21,11 @@ export function useAvailability(): UseAvailabilityResult {
     async (
       salonId: number | string,
       serviceId: number | string,
-      month: string,
-      optionId?: number | null
+      month: string
     ): Promise<MonthAvailability> => {
       try {
         const { data } = await api.get<MonthAvailability>(`/salons/${salonId}/availability`, {
-          params: { service_id: serviceId, month, ...(optionId ? { option_id: optionId } : {}) },
+          params: { service_id: serviceId, month },
         });
         return data;
       } catch (err) {
@@ -42,12 +39,11 @@ export function useAvailability(): UseAvailabilityResult {
     async (
       salonId: number | string,
       date: string,
-      serviceId: number | string,
-      optionId?: number | null
+      serviceId: number | string
     ): Promise<string[]> => {
       try {
         const { data } = await api.get<string[]>(`/salons/${salonId}/availability/${date}`, {
-          params: { service_id: serviceId, ...(optionId ? { option_id: optionId } : {}) },
+          params: { service_id: serviceId },
         });
         return data;
       } catch (err) {

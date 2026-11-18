@@ -18,7 +18,6 @@ import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import { formatCurrency } from "@/lib/currency";
 import { formatDuration } from "@/components/manager/activityFormat";
-import { serviceWithOption } from "@/lib/serviceOptions";
 
 type Tab = "to_close" | "upcoming" | "completed" | "cancelled" | "all";
 
@@ -440,7 +439,7 @@ function AppointmentRow({
             )}
           </p>
           <p className="truncate text-sm text-anthracite/75">
-            {serviceWithOption(a.service?.name ?? "Service", a.option_label)}
+            {a.service?.name ?? "Service"}
             {!a.client && a.client_phone && (
               <>
                 {", "}

@@ -12,7 +12,6 @@ import HubPage, { HUB_BUTTON, SalonPicker, useChosenSalon } from "@/components/m
 import RemindersCard from "@/components/manager/RemindersCard";
 import CountUp from "@/components/motion/CountUp";
 import { formatCurrency } from "@/lib/currency";
-import { serviceWithOption } from "@/lib/serviceOptions";
 import { ui } from "@/lib/ui";
 
 function dayTrend(today: number, yesterday: number): string | null {
@@ -207,7 +206,7 @@ function TodaySchedule({ list, count }: { list: TodayAppointment[] | null; count
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-anthracite">{a.client_name ?? "Client"}</p>
-                  <p className="truncate text-xs text-anthracite/65">{serviceWithOption(a.service ?? "Service", a.option_label)}</p>
+                  <p className="truncate text-xs text-anthracite/65">{a.service ?? "Service"}</p>
                 </div>
                 <span className={`shrink-0 rounded-md px-2.5 py-0.5 text-xs font-medium ${status.className}`}>{status.label}</span>
               </li>

@@ -21,7 +21,6 @@ export interface ClientAppointmentService {
   id: number;
   name: string;
   duration: number;
-  option_label?: string | null;
   image?: string | null;
   category?: string;
   is_active?: boolean;
@@ -43,7 +42,6 @@ export interface ClientAppointment {
   id: number;
   scheduled_at: string;
   duration: number;
-  option_label?: string | null;
   status: AppointmentStatus;
   price: string;
   payment_status: PaymentStatus;

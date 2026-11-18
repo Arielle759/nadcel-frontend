@@ -7,7 +7,6 @@ import CountUp from "@/components/motion/CountUp";
 import { type AdminSignup, AdminStats, useAdmin } from "@/hooks/useAdmin";
 import { BOOKING_SOURCE_LABELS } from "@/lib/bookingSources";
 import { formatCurrency } from "@/lib/currency";
-import { serviceWithOption } from "@/lib/serviceOptions";
 import type { BookingSource } from "@/hooks/useManagerAppointments";
 import SenegalMap from "@/components/admin/SenegalMap";
 
@@ -480,7 +479,7 @@ function RecentActivity({ stats }: { stats: AdminStats }) {
                   <tr key={a.id}>
                     <td className="py-1.5 pr-3 tabular-nums">#{a.id}</td>
                     <td className="max-w-[8rem] truncate py-1.5 pr-3">{a.salon ?? "Salon"}</td>
-                    <td className="max-w-[8rem] truncate py-1.5 pr-3">{serviceWithOption(a.service ?? "Service", a.option_label)}</td>
+                    <td className="max-w-[8rem] truncate py-1.5 pr-3">{a.service ?? "Service"}</td>
                     <td className="py-1.5 pr-3 tabular-nums">
                       {new Date(a.scheduled_at).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}
                     </td>

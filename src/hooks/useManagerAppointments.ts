@@ -28,7 +28,6 @@ export type OfflineBookingSource = Exclude<BookingSource, "online">;
 export interface OfflineAppointmentData {
   salon_id: number;
   service_id: number;
-  service_option_id?: number | null;
   scheduled_at: string; // YYYY-MM-DDTHH:mm:00
   client_name: string;
   client_phone: string;
@@ -48,7 +47,6 @@ export interface ManagerAppointment {
   service: Service;
   scheduled_at: string;
   duration: number; // minutes
-  option_label?: string | null;
   employee: { id: number; name: string } | null;
   status: AppointmentStatus;
   price: string | number;

@@ -38,7 +38,6 @@ export interface AdminRecentAppointment {
   id: number;
   salon: string | null;
   service: string | null;
-  option_label: string | null;
   scheduled_at: string;
   price: number;
   status: string;
