@@ -24,7 +24,7 @@ const FAQ_ITEMS = [
   {
     question: "Comment annuler ou modifier une réservation ?",
     answer:
-      "Vous pouvez annuler une réservation en attente ou confirmée depuis votre espace « Mes rendez-vous », tant qu'il reste plus de 24h avant le rendez-vous. Pour changer de service, de date ou d'horaire, annulez la réservation existante puis reprenez rendez-vous, ou contactez directement le salon.",
+      "Vous pouvez annuler une réservation en attente ou confirmée depuis votre espace « Mes rendez-vous », jusqu'à l'heure du rendez-vous. Si elle est confirmée et qu'il reste moins de 24 h, l'annulation est signalée au salon comme tardive. Pour changer de service, de date ou d'horaire, annulez la réservation existante puis reprenez rendez-vous, ou contactez directement le salon.",
   },
   {
     question: "Comment devenir salon partenaire sur NADCEL ?",

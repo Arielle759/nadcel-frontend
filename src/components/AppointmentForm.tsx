@@ -27,7 +27,8 @@ interface AppointmentFormProps {
 const STRIP_DAYS = 14;
 // Réservation en ligne possible jusqu'à 3 mois à l'avance (même limite côté API).
 const MAX_ADVANCE_DAYS = 90;
-const CANCELLATION_HOURS = 24;
+// Même seuil que le backend (Appointment::LATE_CANCELLATION_HOURS).
+const LATE_CANCELLATION_HOURS = 24;
 
 function toDateInputValue(date: Date): string {
   const year = date.getFullYear();
@@ -343,8 +344,8 @@ export default function AppointmentForm({ salonId, salonName, services, initialS
         </p>
       )}
       <p className="mt-4 text-xs leading-5 text-anthracite/70">
-        Paiement au salon en espèces, par Wave ou Orange Money. Annulation gratuite depuis votre espace jusqu&apos;à{" "}
-        {CANCELLATION_HOURS} h avant le rendez-vous.
+        Paiement au salon en espèces, par Wave ou Orange Money. Annulation possible depuis votre espace jusqu&apos;à
+        l&apos;heure du rendez-vous ; à moins de {LATE_CANCELLATION_HOURS} h, elle est signalée au salon comme tardive.
       </p>
     </div>
   );
