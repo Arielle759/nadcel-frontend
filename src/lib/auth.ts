@@ -86,6 +86,18 @@ export async function register(payload: RegisterData): Promise<AuthResponse> {
 
 export function logout(): void {
   if (typeof window !== "undefined") {
+    // Le serveur invalide le jeton (il ne pourra plus servir, même copié).
+    // Appel direct, hors du client « api » : sa gestion des 401 effacerait une
+    // session ouverte entre-temps. Une erreur réseau n'empêche pas la
+    // déconnexion locale ; keepalive laisse partir la requête si la page change.
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+        method: "POST",
+        headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+        keepalive: true,
+      }).catch(() => {});
+    }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   }
