@@ -61,11 +61,18 @@ interface PaginatedResponse<T> {
   current_page: number;
 }
 
+export interface ServiceStatusResult {
+  service: Service;
+  // Rendez-vous à venir déjà pris pour le service désactivé.
+  upcoming_appointments?: number;
+}
+
 interface UseServicesResult {
-  getServices: (salonId: number | string) => Promise<Service[]>;
+  // includeInactive : réservé au gérant du salon, pour réactiver ses services.
+  getServices: (salonId: number | string, options?: { includeInactive?: boolean }) => Promise<Service[]>;
   createService: (data: CreateServiceData) => Promise<Service>;
   updateService: (id: number | string, data: UpdateServiceData) => Promise<Service>;
-  deleteService: (id: number | string) => Promise<void>;
+  setServiceActive: (id: number | string, active: boolean) => Promise<ServiceStatusResult>;
   loading: boolean;
   error: string | null;
 }
@@ -74,22 +81,29 @@ export function useServices(): UseServicesResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getServices = useCallback(async (salonId: number | string): Promise<Service[]> => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data } = await api.get<PaginatedResponse<Service>>("/services", {
-        params: { salon_id: salonId, per_page: 100 },
-      });
-      return data.data;
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de charger les services.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getServices = useCallback(
+    async (salonId: number | string, options?: { includeInactive?: boolean }): Promise<Service[]> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.get<PaginatedResponse<Service>>("/services", {
+          params: {
+            salon_id: salonId,
+            per_page: 100,
+            ...(options?.includeInactive ? { include_inactive: 1 } : {}),
+          },
+        });
+        return data.data;
+      } catch (err) {
+        const message = toErrorMessage(err, "Impossible de charger les services.");
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   const createService = useCallback(async (data: CreateServiceData): Promise<Service> => {
     setLoading(true);
@@ -164,19 +178,28 @@ export function useServices(): UseServicesResult {
     []
   );
 
-  const deleteService = useCallback(async (id: number | string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    try {
-      await api.delete(`/services/${id}`);
-    } catch (err) {
-      const message = toErrorMessage(err, "Impossible de supprimer le service.");
-      setError(message);
-      throw new Error(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const setServiceActive = useCallback(
+    async (id: number | string, active: boolean): Promise<ServiceStatusResult> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data } = await api.patch<ServiceStatusResult>(
+          `/services/${id}/${active ? "activate" : "deactivate"}`
+        );
+        return data;
+      } catch (err) {
+        const message = toErrorMessage(
+          err,
+          active ? "Impossible de réactiver ce service." : "Impossible de désactiver ce service."
+        );
+        setError(message);
+        throw new Error(message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
-  return { getServices, createService, updateService, deleteService, loading, error };
+  return { getServices, createService, updateService, setServiceActive, loading, error };
 }

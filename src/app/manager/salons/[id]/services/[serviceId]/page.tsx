@@ -16,7 +16,7 @@ export default function EditServicePage() {
 
   useEffect(() => {
     let isMounted = true;
-    getServices(id)
+    getServices(id, { includeInactive: true })
       .then((services) => {
         if (!isMounted) return;
         const found = services.find((s) => String(s.id) === serviceId);
